@@ -430,6 +430,29 @@ test "diffRunMeta detects pty_experiment_host_machine mismatch" {
     try std.testing.expectEqualStrings("changed", rows[12].delta);
 }
 
+test "diffRunMeta detects host_identity_release mismatch" {
+    const left = RunMeta{ .host_identity_release = "6.1.0" };
+    const right = RunMeta{ .host_identity_release = "6.6.0" };
+    const rows = diffRunMeta(left, right);
+    try std.testing.expectEqualStrings("host_identity_release", rows[3].field);
+    try std.testing.expectEqualStrings("changed", rows[3].delta);
+}
+
+test "parseRunMeta reads root host identity fields" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    const a = arena.allocator();
+    const text =
+        \\{"host_identity_machine":"aarch64","host_identity_release":"6.6.0","host_identity_sysname":"Linux","transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":1}}
+    ;
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
+    defer parsed.deinit();
+    const m = try parseRunMeta(a, parsed.value);
+    try std.testing.expectEqualStrings("aarch64", m.host_identity_machine.?);
+    try std.testing.expectEqualStrings("6.6.0", m.host_identity_release.?);
+    try std.testing.expectEqualStrings("Linux", m.host_identity_sysname.?);
+}
+
 test "parseRunMeta reads PTY experiment telemetry numbers" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
