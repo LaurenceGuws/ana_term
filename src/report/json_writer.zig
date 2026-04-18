@@ -93,6 +93,29 @@ pub fn writeRun(
         } else {
             try buf.appendSlice(allocator, "null");
         }
+        const pty_host_null = std.mem.eql(u8, guarded_state, "scaffold_only");
+        try buf.appendSlice(allocator, ",\n    \"pty_experiment_host_machine\": ");
+        if (pty_host_null) {
+            try buf.appendSlice(allocator, "null");
+        } else {
+            var w = buf.writer(allocator);
+            try std.json.Stringify.encodeJsonString(
+                ctx.pty_experiment_host_machine[0..ctx.pty_experiment_host_machine_len],
+                .{},
+                &w,
+            );
+        }
+        try buf.appendSlice(allocator, ",\n    \"pty_experiment_host_release\": ");
+        if (pty_host_null) {
+            try buf.appendSlice(allocator, "null");
+        } else {
+            var w2 = buf.writer(allocator);
+            try std.json.Stringify.encodeJsonString(
+                ctx.pty_experiment_host_release[0..ctx.pty_experiment_host_release_len],
+                .{},
+                &w2,
+            );
+        }
         try buf.appendSlice(allocator, ",\n    \"pty_experiment_open_ok\": ");
         if (ctx.pty_experiment_open_ok) |b| {
             try buf.print(allocator, "{}", .{b});
