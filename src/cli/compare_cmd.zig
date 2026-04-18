@@ -57,14 +57,26 @@ pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
         },
     }
 
-    var map_a = run_json.parseResultsMap(allocator, parsed_a.value) catch {
-        printErr("could not parse results from first run.json\n") catch {};
+    var map_a = run_json.parseResultsMapCompare(allocator, parsed_a.value) catch |err| {
+        switch (err) {
+            error.DuplicateSpecId => printErr("first run.json: duplicate spec_id in results\n") catch {},
+            error.MissingSpecOrStatus => printErr("first run.json: result row missing spec_id or status\n") catch {},
+            error.InvalidResultRow => printErr("first run.json: result entry must be an object\n") catch {},
+            error.MissingResults, error.BadResults, error.NotObject => printErr("first run.json: invalid results array\n") catch {},
+            error.OutOfMemory => return errors.Category.runtime_failure.exitCode(),
+        }
         return errors.Category.invalid_spec.exitCode();
     };
     defer run_json.deinitMap(allocator, &map_a);
 
-    var map_b = run_json.parseResultsMap(allocator, parsed_b.value) catch {
-        printErr("could not parse results from second run.json\n") catch {};
+    var map_b = run_json.parseResultsMapCompare(allocator, parsed_b.value) catch |err| {
+        switch (err) {
+            error.DuplicateSpecId => printErr("second run.json: duplicate spec_id in results\n") catch {},
+            error.MissingSpecOrStatus => printErr("second run.json: result row missing spec_id or status\n") catch {},
+            error.InvalidResultRow => printErr("second run.json: result entry must be an object\n") catch {},
+            error.MissingResults, error.BadResults, error.NotObject => printErr("second run.json: invalid results array\n") catch {},
+            error.OutOfMemory => return errors.Category.runtime_failure.exitCode(),
+        }
         return errors.Category.invalid_spec.exitCode();
     };
     defer run_json.deinitMap(allocator, &map_b);

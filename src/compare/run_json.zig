@@ -5,6 +5,7 @@ pub const Row = struct {
     notes: []const u8,
 };
 
+/// Parses `results` into a map; skips malformed rows (legacy / lenient).
 pub fn parseResultsMap(allocator: std.mem.Allocator, root: std.json.Value) !std.StringArrayHashMap(Row) {
     var map = std.StringArrayHashMap(Row).init(allocator);
     errdefer deinitMap(allocator, &map);
@@ -35,6 +36,61 @@ pub fn parseResultsMap(allocator: std.mem.Allocator, root: std.json.Value) !std.
             .string => |s| s,
             else => continue,
         };
+        const notes = blk: {
+            const n = row.get("notes") orelse break :blk "";
+            break :blk switch (n) {
+                .string => |s| s,
+                else => "",
+            };
+        };
+
+        const owned_id = try allocator.dupe(u8, spec_id);
+        errdefer allocator.free(owned_id);
+        const owned_status = try allocator.dupe(u8, status);
+        errdefer allocator.free(owned_status);
+        const owned_notes = try allocator.dupe(u8, notes);
+        errdefer allocator.free(owned_notes);
+
+        try map.put(owned_id, .{ .status = owned_status, .notes = owned_notes });
+    }
+
+    return map;
+}
+
+/// Strict parse for `compare`: every result row must have string `spec_id` and `status`; duplicate `spec_id` values are rejected.
+pub fn parseResultsMapCompare(allocator: std.mem.Allocator, root: std.json.Value) !std.StringArrayHashMap(Row) {
+    var map = std.StringArrayHashMap(Row).init(allocator);
+    errdefer deinitMap(allocator, &map);
+
+    const obj = switch (root) {
+        .object => |o| o,
+        else => return error.NotObject,
+    };
+
+    const results_val = obj.get("results") orelse return error.MissingResults;
+    const arr = switch (results_val) {
+        .array => |a| a,
+        else => return error.BadResults,
+    };
+
+    for (arr.items) |item| {
+        const row = switch (item) {
+            .object => |r| r,
+            else => return error.InvalidResultRow,
+        };
+        const sid_val = row.get("spec_id") orelse return error.MissingSpecOrStatus;
+        const st_val = row.get("status") orelse return error.MissingSpecOrStatus;
+        const spec_id = switch (sid_val) {
+            .string => |s| s,
+            else => return error.MissingSpecOrStatus,
+        };
+        const status = switch (st_val) {
+            .string => |s| s,
+            else => return error.MissingSpecOrStatus,
+        };
+
+        if (map.get(spec_id) != null) return error.DuplicateSpecId;
+
         const notes = blk: {
             const n = row.get("notes") orelse break :blk "";
             break :blk switch (n) {
