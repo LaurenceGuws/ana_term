@@ -1,5 +1,14 @@
 const std = @import("std");
+const parse = @import("cli/parse.zig");
+const dispatch = @import("cli/dispatch.zig");
 
-pub fn main() void {
-    std.debug.print("ana_term: phase-1 scaffold (use subcommands after ANA-108+)\n", .{});
+pub fn main() u8 {
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    defer _ = gpa.deinit();
+    const allocator = gpa.allocator();
+
+    const argv = parse.argvRest(allocator) catch return 3;
+    defer parse.freeArgv(allocator, argv);
+
+    return dispatch.run(allocator, argv);
 }
