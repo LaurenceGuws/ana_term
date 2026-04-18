@@ -22,6 +22,12 @@ pub fn writeEnvJson(allocator: std.mem.Allocator, run_dir: []const u8, ctx: RunC
         try buf.appendSlice(allocator, ",\n  \"comparison_id\": null");
     }
 
+    if (ctx.run_group) |g| {
+        try buf.print(allocator, ",\n  \"run_group\": \"{s}\"", .{g});
+    } else {
+        try buf.appendSlice(allocator, ",\n  \"run_group\": null");
+    }
+
     if (ctx.suite_name) |s| {
         try buf.print(allocator, ",\n  \"suite\": \"{s}\"", .{s});
     } else {

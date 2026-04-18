@@ -32,6 +32,12 @@ pub fn writeRunSummary(
     } else {
         try buf.appendSlice(allocator, "- suite: (direct run)\n");
     }
+    if (ctx.comparison_id) |c| {
+        try buf.print(allocator, "- comparison_id: {s}\n", .{c});
+    }
+    if (ctx.run_group) |g| {
+        try buf.print(allocator, "- run_group: {s}\n", .{g});
+    }
     try buf.appendSlice(allocator, "\n## Results\n\n");
 
     if (records.len == 0) {

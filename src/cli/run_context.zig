@@ -7,6 +7,8 @@ pub const RunContext = struct {
     platform: []const u8,
     suite_name: ?[]const u8,
     comparison_id: ?[]const u8,
+    /// Optional batch label for grouping multiple comparisons (e.g. CI matrix key).
+    run_group: ?[]const u8,
 
     pub fn initDefault() RunContext {
         return .{
@@ -16,6 +18,7 @@ pub const RunContext = struct {
             .platform = defaultPlatformTag(),
             .suite_name = null,
             .comparison_id = null,
+            .run_group = null,
         };
     }
 };

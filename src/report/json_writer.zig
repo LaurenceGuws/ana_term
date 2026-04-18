@@ -34,6 +34,18 @@ pub fn writeRun(
         try buf.appendSlice(allocator, ",\n  \"suite\": null");
     }
 
+    if (ctx.comparison_id) |s| {
+        try buf.print(allocator, ",\n  \"comparison_id\": \"{s}\"", .{s});
+    } else {
+        try buf.appendSlice(allocator, ",\n  \"comparison_id\": null");
+    }
+
+    if (ctx.run_group) |s| {
+        try buf.print(allocator, ",\n  \"run_group\": \"{s}\"", .{s});
+    } else {
+        try buf.appendSlice(allocator, ",\n  \"run_group\": null");
+    }
+
     try buf.appendSlice(allocator, ",\n  \"started_at\": \"\",\n  \"ended_at\": \"\",\n  \"results\": [\n");
 
     for (records, 0..) |r, i| {

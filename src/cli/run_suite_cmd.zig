@@ -62,6 +62,24 @@ pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
             i += 2;
             continue;
         }
+        if (std.mem.eql(u8, argv[i], "--comparison-id")) {
+            if (i + 1 >= argv.len) {
+                printErr("--comparison-id requires a value\n") catch {};
+                return errors.Category.unknown_command.exitCode();
+            }
+            ctx.comparison_id = argv[i + 1];
+            i += 2;
+            continue;
+        }
+        if (std.mem.eql(u8, argv[i], "--run-group")) {
+            if (i + 1 >= argv.len) {
+                printErr("--run-group requires a value\n") catch {};
+                return errors.Category.unknown_command.exitCode();
+            }
+            ctx.run_group = argv[i + 1];
+            i += 2;
+            continue;
+        }
         if (argv[i].len > 0 and argv[i][0] == '-') {
             printErr("unknown flag\n") catch {};
             return errors.Category.unknown_command.exitCode();
