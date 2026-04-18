@@ -3,6 +3,7 @@ const run_execute = @import("../runner/run_execute.zig");
 const RunContext = @import("../cli/run_context.zig").RunContext;
 const transport_stub = @import("../runner/transport_stub.zig");
 const run_json_validate = @import("run_json_validate.zig");
+const run_fingerprint = @import("run_fingerprint.zig");
 
 fn appendJsonEncodedString(allocator: std.mem.Allocator, buf: *std.ArrayList(u8), bytes: []const u8) !void {
     var enc: std.io.Writer.Allocating = .init(allocator);
@@ -15,6 +16,7 @@ fn appendJsonEncodedString(allocator: std.mem.Allocator, buf: *std.ArrayList(u8)
 pub fn writePlaceholder(allocator: std.mem.Allocator, run_dir: []const u8, run_id: []const u8) !void {
     var ctx = RunContext.initDefault();
     ctx.captureHostIdentity();
+    try run_fingerprint.populate(&ctx, allocator, run_id, &.{});
     try writeRun(allocator, run_dir, run_id, &.{}, ctx);
 }
 
@@ -65,6 +67,10 @@ pub fn writeRun(
     try appendJsonEncodedString(allocator, &buf, ctx.host_identity_release[0..ctx.host_identity_release_len]);
     try buf.appendSlice(allocator, ",\n  \"host_identity_sysname\": ");
     try appendJsonEncodedString(allocator, &buf, ctx.host_identity_sysname[0..ctx.host_identity_sysname_len]);
+
+    try buf.appendSlice(allocator, ",\n  \"run_fingerprint_digest\": ");
+    try appendJsonEncodedString(allocator, &buf, ctx.run_fingerprint_digest_hex[0..ctx.run_fingerprint_digest_len]);
+    try buf.appendSlice(allocator, ",\n  \"run_fingerprint_version\": \"1\"");
 
     const guarded_opt_in = ctx.transport_mode == .pty_guarded;
     const guarded_state: []const u8 = blk: {
