@@ -1,5 +1,6 @@
 const modes = @import("../capture/modes.zig");
 const ExecutionMode = @import("../runner/execution_mode.zig").ExecutionMode;
+const TransportMode = @import("../runner/transport_mode.zig").TransportMode;
 
 pub const RunContext = struct {
     capture_mode: []const u8,
@@ -15,6 +16,9 @@ pub const RunContext = struct {
     /// Stricter validation when supported (PH1-M4+).
     strict: bool,
     execution_mode: ExecutionMode,
+    transport_mode: TransportMode,
+    /// Recorded in `run.json` → `transport.timeout_ms`.
+    timeout_ms: u32,
 
     pub fn initDefault() RunContext {
         return .{
@@ -28,6 +32,8 @@ pub const RunContext = struct {
             .dry_run = false,
             .strict = false,
             .execution_mode = .placeholder,
+            .transport_mode = .none,
+            .timeout_ms = 30_000,
         };
     }
 };
