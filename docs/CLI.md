@@ -41,6 +41,11 @@ These flags identify **which terminal** is under test and how it would be invoke
 - On full runs (artifacts written), the harness records **`host_identity_machine`**, **`host_identity_release`**, and **`host_identity_sysname`** from runtime **`uname`** (see **`docs/HOST_IDENTITY_PLAN.md`** and **`docs/REPORT_FORMAT.md`**).
 - **`--dry-run`** does not write `run.json`; these keys are not applicable.
 
+**PH1-M11 run fingerprint (`run.json` root)**
+
+- Full runs include **`run_fingerprint_digest`** (64-char lowercase hex) and **`run_fingerprint_version`** (**`1`**) derived from a documented canonical payload (see **`docs/RUN_FINGERPRINT_PLAN.md`**).
+- **`--dry-run`** does not write `run.json`; fingerprint keys are not applicable.
+
 ## Transport configuration (`run`, `run-suite`, PH1-M5+)
 
 These flags describe the **transport seam** (how the harness would attach to a terminal for I/O). They complement **`--terminal`**, which names the *logical* terminal identity for comparison metadata.

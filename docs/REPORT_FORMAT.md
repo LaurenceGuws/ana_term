@@ -41,6 +41,15 @@ Top-level JSON object with at least:
 
 **Serialization order**: after `execution_mode`, before `transport`: `host_identity_machine`, `host_identity_release`, `host_identity_sysname` (lexicographic). See **`docs/HOST_IDENTITY_PLAN.md`**.
 
+**PH1-M11+ (run fingerprint)** — present on every harness `run.json` that writes artifacts:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `run_fingerprint_digest` | string | **64**-character lowercase hex SHA-256 of the canonical payload (`docs/RUN_FINGERPRINT_PLAN.md`). |
+| `run_fingerprint_version` | string | Fingerprint schema revision; phase-1 value **`1`**. |
+
+**Serialization order**: after `host_identity_sysname`, before `transport`: `run_fingerprint_digest`, `run_fingerprint_version` (lexicographic).
+
 Each **result** object includes:
 
 | Field | Type | Description |
