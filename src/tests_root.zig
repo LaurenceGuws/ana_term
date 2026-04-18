@@ -12,6 +12,7 @@ test {
     _ = @import("report/artifact_bundle_fingerprint.zig");
     _ = @import("report/report_envelope_fingerprint.zig");
     _ = @import("report/compare_envelope_fingerprint.zig");
+    _ = @import("report/run_envelope_fingerprint.zig");
     _ = @import("report/run_json_validate.zig");
     _ = @import("compare/run_json.zig");
     _ = @import("compare/compare_json.zig");
