@@ -73,3 +73,21 @@ test "validateRunReport rejects missing schema_version" {
     defer parsed.deinit();
     try std.testing.expect(validateRunReport(parsed.value) != null);
 }
+
+test "validateRunReport rejects result row missing observations" {
+    const text =
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t"},"results":[{"spec_id":"p","status":"manual","notes":"","capture_mode":"manual"}]}
+    ;
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
+    defer parsed.deinit();
+    try std.testing.expect(validateRunReport(parsed.value) != null);
+}
+
+test "validateRunReport rejects non-object terminal" {
+    const text =
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":"oops","results":[]}
+    ;
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
+    defer parsed.deinit();
+    try std.testing.expect(validateRunReport(parsed.value) != null);
+}
