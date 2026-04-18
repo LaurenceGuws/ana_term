@@ -15,6 +15,7 @@ pub fn handshakeString(mode: TransportMode) ?[]const u8 {
     return switch (mode) {
         .none => null,
         .pty_stub => "stub-handshake-v1",
+        .pty_guarded => null,
     };
 }
 
@@ -23,5 +24,6 @@ pub fn handshakeLatencyNs(mode: TransportMode, run_id: []const u8) u64 {
     return switch (mode) {
         .none => 0,
         .pty_stub => fnvRunId(run_id),
+        .pty_guarded => 0,
     };
 }
