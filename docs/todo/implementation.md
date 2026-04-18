@@ -34,47 +34,57 @@ Outcome:
 
 - Accepted at `ANA-GATE-50`.
 
-### `PH1-M4` (`in_progress`)
+### `PH1-M4` (`completed`)
 
 Purpose:
 
 - Introduce protocol-aware execution seams while preserving deterministic text-first artifacts.
 
+Outcome:
+
+- Accepted at `ANA-GATE-60`.
+
+### `PH1-M5` (`in_progress`)
+
+Purpose:
+
+- Begin terminal transport ownership seams via deterministic stub transport contracts.
+
 Owner docs:
 
 - `docs/Vision.md`
 - `docs/todo/JIRA_BOARD.md`
-- `docs/todo/PH1_M4_TICKETS.md`
+- `docs/todo/PH1_M5_TICKETS.md`
 - `docs/todo/ENGINEER_ENTRYPOINT.md`
 
 Scope:
 
-- execution mode model + protocol-stub seam
-- run/run-suite pipeline threading
-- report/compare metadata + validation hardening for execution modes
-- PH1-M4 smoke and checkpoint evidence
+- transport mode model + stub transport seam
+- run/run-suite transport metadata threading
+- report/compare metadata + validation hardening for transport fields
+- PH1-M5 smoke and checkpoint evidence
 
 Acceptance criteria:
 
-- tickets `ANA-401` through `ANA-410` complete in order.
+- tickets `ANA-501` through `ANA-510` complete in order.
 - one commit per ticket with `[ANA-###]` subject prefix.
-- `ANA-GATE-60` reached and reported.
+- `ANA-GATE-70` reached and reported.
 
 Non-goals:
 
-- full PTY/ConPTY automation
+- production PTY/ConPTY integration
 - screenshot/OCR systems
 - rich TUI frontend
 
 Queue lines (exact):
 
-- [x] Execute `ANA-401` through `ANA-410` in order from `docs/todo/PH1_M4_TICKETS.md`.
+- [x] Execute `ANA-501` through `ANA-510` in order from `docs/todo/PH1_M5_TICKETS.md`.
 - [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
-- [x] Stop only at `ANA-GATE-60` (post `ANA-410`) unless truly blocked.
-- [x] Submit checkpoint packet in `docs/todo/PH1_M4_CHECKPOINT.md`.
+- [x] Stop only at `ANA-GATE-70` (post `ANA-510`) unless truly blocked.
+- [x] Submit checkpoint packet in `docs/todo/PH1_M5_CHECKPOINT.md`.
 
-### `PH1-M5` (`pending`)
+### `PH1-M6` (`pending`)
 
 Purpose:
 
-- start real terminal transport ownership after PH1-M4 acceptance.
+- evaluate transition from stub transport to guarded real transport prototype.
