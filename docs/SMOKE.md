@@ -1,6 +1,6 @@
-# Smoke workflow (PH1-M2 through PH1-M13)
+# Smoke workflow (PH1-M2 through PH1-M14)
 
-Minimal operator path: run the **baseline-linux** suite twice with **different terminal identities**, then produce one **compare** report (markdown + JSON). **PH1-M3** adds strict `report` / `compare` checks and metadata-rich compare output. **PH1-M4** adds **execution modes** (`placeholder` vs `protocol_stub`), **`--dry-run`**, and deterministic stub **observations**—use **Section 6** when touching the runner seam. **PH1-M5** adds **transport** metadata (`none` vs **`pty_stub`**) and **`--timeout-ms`**—use **Section 7**. **PH1-M6** adds guarded transport scaffolding—use **Section 8**. **PH1-M7** adds a minimal Linux PTY open/close experiment—use **Section 9** (Linux host only). **PH1-M8** adds deterministic telemetry for that experiment—use **Section 10**. **PH1-M9** adds host **`uname`** snapshots on the guarded experiment path—use **Section 11**. **PH1-M10** adds root **`host_identity_*`** fields on every artifact run—use **Section 12**. **PH1-M11** adds deterministic **`run_fingerprint_*`** fields—use **Section 13**. **PH1-M12** adds deterministic **`specset_fingerprint_*`** fields—use **Section 14**. **PH1-M13** adds deterministic **`resultset_fingerprint_*`** fields—use **Section 15**.
+Minimal operator path: run the **baseline-linux** suite twice with **different terminal identities**, then produce one **compare** report (markdown + JSON). **PH1-M3** adds strict `report` / `compare` checks and metadata-rich compare output. **PH1-M4** adds **execution modes** (`placeholder` vs `protocol_stub`), **`--dry-run`**, and deterministic stub **observations**—use **Section 6** when touching the runner seam. **PH1-M5** adds **transport** metadata (`none` vs **`pty_stub`**) and **`--timeout-ms`**—use **Section 7**. **PH1-M6** adds guarded transport scaffolding—use **Section 8**. **PH1-M7** adds a minimal Linux PTY open/close experiment—use **Section 9** (Linux host only). **PH1-M8** adds deterministic telemetry for that experiment—use **Section 10**. **PH1-M9** adds host **`uname`** snapshots on the guarded experiment path—use **Section 11**. **PH1-M10** adds root **`host_identity_*`** fields on every artifact run—use **Section 12**. **PH1-M11** adds deterministic **`run_fingerprint_*`** fields—use **Section 13**. **PH1-M12** adds deterministic **`specset_fingerprint_*`** fields—use **Section 14**. **PH1-M13** adds deterministic **`resultset_fingerprint_*`** fields—use **Section 15**. **PH1-M14** adds deterministic root **`transport_fingerprint_*`** fields—use **Section 16**.
 
 ## Prerequisites
 
@@ -191,11 +191,23 @@ After a full run that writes **`run.json`**, **`report`** must exit **0**. In **
 
 - **`resultset_fingerprint_digest`**: **64** lowercase hex characters.
 - **`resultset_fingerprint_version`**: **`1`**.
-- Serialization order: after **`specset_fingerprint_version`**, before **`transport`** (see **`docs/REPORT_FORMAT.md`**).
+- Serialization order: after **`specset_fingerprint_version`**, before root **`transport_fingerprint_*`** and the nested **`transport`** object (see **`docs/REPORT_FORMAT.md`**).
 
 **Compare**: two runs with the same **ordered `results` rows** (same **`spec_id`**, **`status`**, **`capture_mode`**, and **`notes`** per row) should yield the same **`resultset_fingerprint_digest`**; changing status, notes, capture mode, or row order should change the digest. **`metadata_deltas`** should include **`resultset_fingerprint_digest`** when left and right digests differ.
 
 See **`docs/RESULTSET_FINGERPRINT_PLAN.md`**.
+
+## 16. PH1-M14 transport fingerprint (artifact runs)
+
+After a full run that writes **`run.json`**, **`report`** must exit **0**. In **`run.json`** root metadata verify:
+
+- **`transport_fingerprint_digest`**: **64** lowercase hex characters.
+- **`transport_fingerprint_version`**: **`1`**.
+- Serialization order: after **`resultset_fingerprint_version`**, before the nested **`transport`** object (see **`docs/REPORT_FORMAT.md`**).
+
+**Compare**: identical **effective transport configuration** (mode, timeout, guarded flags, handshake/latency inputs, and guarded PTY snapshot fields when applicable) and the same **`run_id`** should yield the same **`transport_fingerprint_digest`**; changing mode, timeout, stub latency inputs, or guarded experiment fields should change the digest. **`metadata_deltas`** should include **`transport_fingerprint_digest`** when left and right digests differ.
+
+See **`docs/TRANSPORT_FINGERPRINT_PLAN.md`**.
 
 ## References
 
@@ -213,3 +225,4 @@ See **`docs/RESULTSET_FINGERPRINT_PLAN.md`**.
 - Run fingerprint (PH1-M11): `docs/RUN_FINGERPRINT_PLAN.md`
 - Spec-set fingerprint (PH1-M12): `docs/SPECSET_FINGERPRINT_PLAN.md`
 - Results-set fingerprint (PH1-M13): `docs/RESULTSET_FINGERPRINT_PLAN.md`
+- Transport fingerprint (PH1-M14): `docs/TRANSPORT_FINGERPRINT_PLAN.md`
