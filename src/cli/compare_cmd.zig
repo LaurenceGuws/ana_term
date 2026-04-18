@@ -2,6 +2,7 @@ const std = @import("std");
 const errors = @import("../core/errors.zig");
 const run_json = @import("../compare/run_json.zig");
 const compare_markdown = @import("../compare/compare_markdown.zig");
+const compare_json = @import("../compare/compare_json.zig");
 
 const max_read = 4 * 1024 * 1024;
 
@@ -73,8 +74,9 @@ pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
 
     std.fs.cwd().makePath("artifacts/compare") catch return errors.Category.runtime_failure.exitCode();
     compare_markdown.writeFile(allocator, "artifacts/compare/compare.md", rows, path_a, path_b) catch return errors.Category.runtime_failure.exitCode();
+    compare_json.writeFile(allocator, "artifacts/compare/compare.json", rows, path_a, path_b) catch return errors.Category.runtime_failure.exitCode();
 
-    printStdout("compare: wrote artifacts/compare/compare.md\n", .{}) catch return errors.Category.runtime_failure.exitCode();
+    printStdout("compare: wrote artifacts/compare/compare.md and artifacts/compare/compare.json\n", .{}) catch return errors.Category.runtime_failure.exitCode();
     return 0;
 }
 
