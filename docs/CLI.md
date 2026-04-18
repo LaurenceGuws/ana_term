@@ -62,6 +62,12 @@ Recorded under `transport` in `run.json` (see `docs/REPORT_FORMAT.md`):
 
 On **non-Linux** hosts, `pty_guarded` (non-dry-run) fails with exit **2** before writing artifacts. Opt-in rules are unchanged.
 
+**PH1-M8 telemetry (`transport` in `run.json`)**
+
+- **`pty_experiment_attempt`**: `null` for `scaffold_only`; **`1`** after a full Linux experiment run.
+- **`pty_experiment_elapsed_ns`**: `null` for `scaffold_only`; non-negative nanoseconds (wall time) for the guarded PTY block on `experiment_linux_pty`, clamped for JSON integers.
+- Invariants and risks: **`docs/PTY_EXPERIMENT_HARDENING_PLAN.md`** and **`docs/REPORT_FORMAT.md`**.
+
 ## `list`
 
 **Purpose**: Enumerate discovered `.toml` probe specs.

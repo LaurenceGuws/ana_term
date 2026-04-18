@@ -46,6 +46,8 @@ Phase-1 placeholder runs may use minimal values but must preserve these keys for
 
 The harness emits a **`transport`** object alongside core run fields. Keys are stable for `report` / `compare`.
 
+**Serialization order (PH1-M8+)**: when `mode` is `pty_guarded`, the harness writes transport keys in lexicographic order: `guarded_opt_in`, `guarded_state`, `handshake`, `handshake_latency_ns`, `mode`, `pty_capability_notes`, `pty_experiment_attempt`, `pty_experiment_elapsed_ns`, `pty_experiment_error`, `pty_experiment_open_ok`, `timeout_ms`.
+
 | Field | Type | Description |
 |-------|------|-------------|
 | `mode` | string | `none`, `pty_stub`, or `pty_guarded`. |
@@ -59,9 +61,13 @@ The harness emits a **`transport`** object alongside core run fields. Keys are s
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `pty_experiment_open_ok` | boolean or `null` | `null` when `guarded_state` is `scaffold_only`; otherwise whether the minimal PTY pair opened. |
+| `pty_capability_notes` | string or `null` | Human-readable note on what was attempted (e.g. Linux `/dev/ptmx` path); `null` when `guarded_state` is `scaffold_only`. |
+| `pty_experiment_attempt` | integer or `null` | **PH1-M8+**: `null` when `scaffold_only`; otherwise **`1`** (single experiment attempt). |
+| `pty_experiment_elapsed_ns` | integer or `null` | **PH1-M8+**: `null` when `scaffold_only`; else wall-time nanoseconds for the experiment block, clamped to signed JSON range (`≤ 2^63−1`). |
 | `pty_experiment_error` | string or `null` | Short static reason when open failed; `null` on success or when not applicable. |
-| `pty_capability_notes` | string or `null` | Human-readable note on what was attempted (e.g. Linux `/dev/ptmx` path); `null` when not applicable. |
+| `pty_experiment_open_ok` | boolean or `null` | `null` when `guarded_state` is `scaffold_only`; otherwise whether the minimal PTY pair opened. |
+
+See **`docs/PTY_EXPERIMENT_HARDENING_PLAN.md`** for PH1-M8 acceptance notes.
 
 ## `summary.md` (required)
 
