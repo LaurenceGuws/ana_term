@@ -150,3 +150,12 @@ test "validateRunReport rejects invalid transport.mode" {
     defer parsed.deinit();
     try std.testing.expect(validateRunReport(parsed.value) != null);
 }
+
+test "validateRunReport rejects non-integer transport.timeout_ms" {
+    const text =
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t"},"execution_mode":"placeholder","transport":{"handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":3.5},"results":[]}
+    ;
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
+    defer parsed.deinit();
+    try std.testing.expect(validateRunReport(parsed.value) != null);
+}

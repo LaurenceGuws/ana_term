@@ -352,6 +352,21 @@ test "diffRunMeta detects transport_mode mismatch" {
     try std.testing.expectEqualStrings("changed", rows[9].delta);
 }
 
+test "parseRunMeta formats transport numeric fields" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    const a = arena.allocator();
+    const text =
+        \\{"transport":{"handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":5000}}
+    ;
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
+    defer parsed.deinit();
+    const m = try parseRunMeta(a, parsed.value);
+    try std.testing.expectEqualStrings("none", m.transport_mode.?);
+    try std.testing.expectEqualStrings("5000", m.transport_timeout_ms.?);
+    try std.testing.expectEqualStrings("0", m.transport_handshake_latency_ns.?);
+}
+
 test "parseResultsMapCompare rejects duplicate spec_id" {
     const a = std.testing.allocator;
     const text =
