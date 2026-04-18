@@ -4,6 +4,7 @@ const loader = @import("../dsl/loader.zig");
 const validator = @import("../dsl/validator.zig");
 const run_plan_mod = @import("../runner/run_plan.zig");
 const run_execute = @import("../runner/run_execute.zig");
+const protocol_stub = @import("../runner/protocol_stub.zig");
 const TerminalInvocation = @import("../runner/terminal_invocation.zig").TerminalInvocation;
 const artifact_paths = @import("../report/artifact_paths.zig");
 const json_writer = @import("../report/json_writer.zig");
@@ -37,8 +38,16 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
         };
 
         const plan = run_plan_mod.buildPlan(allocator, path, sid, ctx.capture_mode) catch return errors.Category.runtime_failure.exitCode();
-        const rec = run_execute.executePlaceholder(allocator, plan) catch return errors.Category.runtime_failure.exitCode();
+        const rec = switch (ctx.execution_mode) {
+            .placeholder => run_execute.executePlaceholder(allocator, plan) catch return errors.Category.runtime_failure.exitCode(),
+            .protocol_stub => protocol_stub.executeProtocolStub(allocator, plan) catch return errors.Category.runtime_failure.exitCode(),
+        };
         records.append(allocator, rec) catch return errors.Category.runtime_failure.exitCode();
+    }
+
+    if (ctx.dry_run) {
+        printStdout("dry-run: ok, planned {d} spec(s)\n", .{records.items.len}) catch return errors.Category.runtime_failure.exitCode();
+        return 0;
     }
 
     const run_dir = artifact_paths.nextRunDirectory(allocator, "artifacts") catch return errors.Category.runtime_failure.exitCode();
