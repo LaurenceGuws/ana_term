@@ -26,6 +26,34 @@ pub fn validateRunReport(root: std.json.Value) ?[]const u8 {
     };
     if (getString(term_obj, "name") == null) return "terminal.name must be a string";
 
+    const tr_o = obj.get("transport") orelse return "missing transport object";
+    const tr = switch (tr_o) {
+        .object => |t| t,
+        else => return "transport must be a JSON object",
+    };
+    const tr_mode = getString(tr, "mode") orelse return "missing or invalid transport.mode (string required)";
+    if (!std.mem.eql(u8, tr_mode, "none") and !std.mem.eql(u8, tr_mode, "pty_stub")) {
+        return "transport.mode must be none or pty_stub";
+    }
+    const timeout_ms = getInteger(tr, "timeout_ms") orelse return "transport.timeout_ms must be an integer";
+    if (timeout_ms <= 0) return "transport.timeout_ms must be positive";
+
+    const hs = tr.get("handshake") orelse return "transport.handshake required";
+    if (std.mem.eql(u8, tr_mode, "none")) {
+        switch (hs) {
+            .null => {},
+            else => return "transport.handshake must be null when mode is none",
+        }
+    } else {
+        if (getString(tr, "handshake") == null) return "transport.handshake must be a string when mode is pty_stub";
+    }
+
+    const hlat = getInteger(tr, "handshake_latency_ns") orelse return "transport.handshake_latency_ns must be an integer";
+    if (hlat < 0) return "transport.handshake_latency_ns must be non-negative";
+    if (std.mem.eql(u8, tr_mode, "none") and hlat != 0) {
+        return "transport.handshake_latency_ns must be 0 when mode is none";
+    }
+
     const res_o = obj.get("results") orelse return "missing results array";
     const arr = switch (res_o) {
         .array => |a| a,
@@ -61,9 +89,17 @@ fn getString(obj: std.json.ObjectMap, key: []const u8) ?[]const u8 {
     };
 }
 
+fn getInteger(obj: std.json.ObjectMap, key: []const u8) ?i64 {
+    const v = obj.get(key) orelse return null;
+    return switch (v) {
+        .integer => |i| i,
+        else => null,
+    };
+}
+
 test "validateRunReport accepts minimal harness-shaped run.json" {
     const text =
-        \\{"schema_version":"0.2","run_id":"run-001","started_at":"","ended_at":"","platform":"linux","term":"xterm","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","results":[{"spec_id":"p","status":"manual","notes":"","capture_mode":"manual","observations":{}}]}
+        \\{"schema_version":"0.2","run_id":"run-001","started_at":"","ended_at":"","platform":"linux","term":"xterm","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","transport":{"handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":30000},"results":[{"spec_id":"p","status":"manual","notes":"","capture_mode":"manual","observations":{}}]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
@@ -81,7 +117,7 @@ test "validateRunReport rejects missing schema_version" {
 
 test "validateRunReport rejects result row missing observations" {
     const text =
-        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t"},"execution_mode":"placeholder","results":[{"spec_id":"p","status":"manual","notes":"","capture_mode":"manual"}]}
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t"},"execution_mode":"placeholder","transport":{"handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":30000},"results":[{"spec_id":"p","status":"manual","notes":"","capture_mode":"manual"}]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
@@ -90,7 +126,7 @@ test "validateRunReport rejects result row missing observations" {
 
 test "validateRunReport rejects non-object terminal" {
     const text =
-        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":"oops","execution_mode":"placeholder","results":[]}
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":"oops","execution_mode":"placeholder","transport":{"handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":30000},"results":[]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
@@ -99,7 +135,16 @@ test "validateRunReport rejects non-object terminal" {
 
 test "validateRunReport rejects invalid execution_mode" {
     const text =
-        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t"},"execution_mode":"bogus","results":[]}
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t"},"execution_mode":"bogus","transport":{"handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":30000},"results":[]}
+    ;
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
+    defer parsed.deinit();
+    try std.testing.expect(validateRunReport(parsed.value) != null);
+}
+
+test "validateRunReport rejects invalid transport.mode" {
+    const text =
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t"},"execution_mode":"placeholder","transport":{"handshake":null,"handshake_latency_ns":0,"mode":"bogus","timeout_ms":30000},"results":[]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
