@@ -50,9 +50,9 @@ This file is the canonical ticket board for active execution.
 
 ## Current State
 
-- `in_progress`: `ANA-105`
-- `todo`: `ANA-106`..`ANA-120`
+- `in_progress`: `ANA-106`
+- `todo`: `ANA-107`..`ANA-120`
 - `blocked`: none
 - `review_gate`: none
 - `done`: none
-- `implementation_complete` (Engineer; Architect promotes to `done` at gate): `ANA-101`, `ANA-102`, `ANA-103`, `ANA-104`
+- `implementation_complete` (Engineer; Architect promotes to `done` at gate): `ANA-101`, `ANA-102`, `ANA-103`, `ANA-104`, `ANA-105`
