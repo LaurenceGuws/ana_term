@@ -1,5 +1,21 @@
 const std = @import("std");
 const errors = @import("../core/errors.zig");
+const categories = @import("../probes/categories.zig");
+
+fn printListStub(extra_args: usize) !void {
+    var buf: [4096]u8 = undefined;
+    var w = std.fs.File.stdout().writer(&buf);
+    try w.interface.print("list: probe kinds: ", .{});
+    for (categories.all, 0..) |c, i| {
+        if (i > 0) try w.interface.print(", ", .{});
+        try w.interface.print("{s}", .{c});
+    }
+    try w.interface.print(
+        " — discovery wires in ANA-111+ (extra args: {d})\n",
+        .{extra_args},
+    );
+    try w.interface.flush();
+}
 
 fn printStdout(comptime fmt: []const u8, args: anytype) !void {
     var buf: [4096]u8 = undefined;
@@ -23,10 +39,7 @@ pub fn run(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
     }
     const cmd = argv[0];
     if (std.mem.eql(u8, cmd, "list")) {
-        printStdout(
-            "list: placeholder — discovery wires in ANA-111+ (extra args: {d})\n",
-            .{argv.len - 1},
-        ) catch return errors.Category.runtime_failure.exitCode();
+        printListStub(argv.len - 1) catch return errors.Category.runtime_failure.exitCode();
         return 0;
     }
     if (std.mem.eql(u8, cmd, "run")) {
