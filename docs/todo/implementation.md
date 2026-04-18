@@ -541,7 +541,7 @@ Outcome:
 
 - Accepted at `ANA-GATE-180`.
 
-### `PH1-M17` (`in_progress`)
+### `PH1-M17` (`review_gate`)
 
 Purpose:
 
@@ -576,7 +576,11 @@ Non-goals:
 
 Queue lines (exact):
 
-- [ ] Execute `ANA-1701` through `ANA-1710` in order from `docs/todo/PH1_M17_TICKETS.md`.
-- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
-- [ ] Stop only at `ANA-GATE-190` (post `ANA-1710`) unless truly blocked.
-- [ ] Submit checkpoint packet in `docs/todo/PH1_M17_CHECKPOINT.md`.
+- [x] Execute `ANA-1701` through `ANA-1710` in order from `docs/todo/PH1_M17_TICKETS.md`.
+- [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [x] Stop only at `ANA-GATE-190` (post `ANA-1710`) unless truly blocked.
+- [x] Submit checkpoint packet in `docs/todo/PH1_M17_CHECKPOINT.md`.
+
+Outcome:
+
+- Super-gate `ANA-GATE-190` reached; Architect acceptance pending.

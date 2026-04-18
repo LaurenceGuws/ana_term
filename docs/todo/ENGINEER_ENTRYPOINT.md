@@ -4,8 +4,8 @@ Read this file first in Dual Agent Mode.
 
 ## Active Batch
 
-- Execute only `PH1-M17` / sprint `PH1-M17-S1`.
-- Super-gate: `ANA-GATE-190` (report after `ANA-1710` or hard blocker).
+- **Paused at `ANA-GATE-190`.** Sprint `PH1-M17-S1` engineer queue (`ANA-1701`..`ANA-1710`) is complete; resume only after Architect gate acceptance or new Architect direction.
+- Super-gate: `ANA-GATE-190` (checkpoint: `docs/todo/PH1_M17_CHECKPOINT.md`).
 - Ticket source: `docs/todo/PH1_M17_TICKETS.md`.
 - Board source: `docs/todo/JIRA_BOARD.md`.
 
