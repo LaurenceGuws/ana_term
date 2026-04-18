@@ -12,6 +12,22 @@ The `ana_term` binary (installed as `ana_term` via `zig build`) exposes a text-f
   - `2`: invalid spec or validation failure.
   - `3`: I/O or runtime failure (read/write errors, unexpected OS errors).
 
+## Terminal target model (`run`, `run-suite`)
+
+These flags identify **which terminal** is under test and how it would be invoked. PH1-M2 records them in artifacts even when the harness does not yet spawn a real PTY session.
+
+| Flag | Meaning |
+|------|---------|
+| `--terminal <name>` | Short **logical id** for the terminal under test (e.g. `wezterm`, `alacritty`). Used in `run.json` / `env.json` and compare reports. |
+| `--terminal-cmd <string>` | Optional **full shell command** (or argv prefix) that would launch that terminal for automation later. May contain spaces; pass as a single flag argument. |
+| `--platform <name>` | OS tag for the run (e.g. `linux`). Defaults to a sensible native tag when omitted. |
+
+**Rules**
+
+- `--terminal` is the primary key for comparison: two runs with different `--terminal` values are expected to differ in metadata even if specs match.
+- `--terminal-cmd` is optional metadata for reproducibility; it does not override `--terminal` identity.
+- Unknown or missing `--terminal` is recorded as `unknown` in artifacts unless a default is documented per command.
+
 ## `list`
 
 **Purpose**: Enumerate discovered `.toml` probe specs.
@@ -36,8 +52,9 @@ The `ana_term` binary (installed as `ana_term` via `zig build`) exposes a text-f
 | Input | Description |
 |-------|-------------|
 | Path | Directory (e.g. `probes/smoke`) or single `.toml` file. |
-| `--terminal <name>` | Optional; recorded in `run.json` (phase-1 may ignore execution). |
-| `--platform <name>` | Optional; recorded in `run.json`. |
+| `--terminal <name>` | Optional; logical terminal id (see **Terminal target model**). |
+| `--terminal-cmd <string>` | Optional; launch command string for future automation. |
+| `--platform <name>` | Optional; OS tag recorded in artifacts. |
 | `--capture <mode>` | Optional; one of `manual`, `text_observation`, `timed`. |
 
 | Output | Description |
