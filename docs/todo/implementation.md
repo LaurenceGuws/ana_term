@@ -192,6 +192,7 @@ Owner docs:
 - `docs/Vision.md`
 - `docs/todo/JIRA_BOARD.md`
 - `docs/todo/PH1_M9_TICKETS.md`
+- `docs/todo/PH1_M9_CORRECTIVE_TICKETS.md`
 - `docs/todo/ENGINEER_ENTRYPOINT.md`
 
 Scope:
@@ -220,3 +221,10 @@ Queue lines (exact):
 - [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
 - [x] Stop only at `ANA-GATE-110` (post `ANA-910`) unless truly blocked.
 - [x] Submit checkpoint packet in `docs/todo/PH1_M9_CHECKPOINT.md`.
+
+Corrective queue lines (post review rejection):
+
+- [x] Execute `ANA-911` through `ANA-913` in order from `docs/todo/PH1_M9_CORRECTIVE_TICKETS.md`.
+- [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [x] Stop only at `ANA-GATE-110` (post `ANA-913`) unless truly blocked.
+- [x] Update `docs/todo/PH1_M9_CHECKPOINT.md` with corrective evidence and re-request Architect review.
