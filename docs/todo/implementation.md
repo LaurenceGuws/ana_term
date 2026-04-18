@@ -181,8 +181,42 @@ Queue lines (exact):
 - [x] Stop only at `ANA-GATE-100` (post `ANA-810`) unless truly blocked.
 - [x] Submit checkpoint packet in `docs/todo/PH1_M8_CHECKPOINT.md`.
 
-### `PH1-M9` (`pending`)
+### `PH1-M9` (`review_gate`)
 
 Purpose:
 
-- (Architect to define after `ANA-GATE-100`.)
+- Harden guarded PTY experiment reproducibility with deterministic environment capture and clearer failure evidence.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M9_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- document PH1-M9 reproducibility plan and boundaries
+- add deterministic PTY experiment environment snapshot fields in artifacts
+- add report/compare invariants for reproducibility fields
+- expand regression coverage for failure-path evidence formatting
+- PH1-M9 smoke and checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-901` through `ANA-910` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-110` reached and reported.
+
+Non-goals:
+
+- Windows ConPTY implementation
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [x] Execute `ANA-901` through `ANA-910` in order from `docs/todo/PH1_M9_TICKETS.md`.
+- [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [x] Stop only at `ANA-GATE-110` (post `ANA-910`) unless truly blocked.
+- [x] Submit checkpoint packet in `docs/todo/PH1_M9_CHECKPOINT.md`.
