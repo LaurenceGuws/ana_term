@@ -4,6 +4,7 @@ const dispatch = @import("cli/dispatch.zig");
 
 comptime {
     _ = @import("dsl/loader.zig");
+    _ = @import("dsl/validator.zig");
 }
 
 pub fn main() u8 {
