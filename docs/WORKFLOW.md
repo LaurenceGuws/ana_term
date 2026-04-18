@@ -28,7 +28,7 @@ Roles:
 ## Jira System (Dual Mode)
 
 - Board authority: `docs/todo/JIRA_BOARD.md`.
-- Ticket authority: active sprint ticket pack (current: `docs/todo/PH1_M1_TICKETS.md`).
+- **Ticket authority (dynamic sprint):** the path to the active ticket pack is **not** fixed in this file. Read `docs/todo/implementation.md` (active milestone) and `docs/todo/ENGINEER_ENTRYPOINT.md` for the current filename (for example `docs/todo/PH1_M3_TICKETS.md` during `PH1-M3`). `docs/AGENT_HANDOFF.md` also names the ticket pack in its read order. Do not assume a retired sprint file (such as an older `PH1_M1` pack) unless it is still listed there.
 - One ticket should map to one commit.
 - Engineer executes in strict ticket order.
 - Architect owns transitions to `review_gate` and `done`.

@@ -20,48 +20,28 @@ This file is the canonical ticket board for active execution.
 
 ## Current Sprint
 
-- Sprint ID: `PH1-M2-S1`
-- Objective: first real comparison lane (`ANA-201`..`ANA-220`)
-- Commit budget before checkpoint: `20`
-- Super-gate: `ANA-GATE-40`
+- Sprint ID: `PH1-M3-S1`
+- Objective: correctness hardening + evidence quality (`ANA-301`..`ANA-310`)
+- Commit budget before checkpoint: `10`
+- Super-gate: `ANA-GATE-50`
 
-## Corrective batch (governance — post rejection `101b3d1`)
+## Ticket Order (`PH1-M3-S1`)
 
-| Ticket | Purpose |
-|--------|---------|
-| `ANA-221` | Add `docs/todo/PH1_M2_TICKETS.md` to git (ticket authority referenced by `implementation.md`). |
-| `ANA-222` | Refocus `docs/AGENT_HANDOFF.md` and `docs/todo/ENGINEER_ENTRYPOINT.md` to PH1-M2 / `ANA-GATE-40`. |
-| `ANA-223` | Board + checkpoint corrective evidence; gate re-opened for Architect. |
-
-## Ticket Order (`PH1-M2-S1`)
-
-1. `ANA-201`
-2. `ANA-202`
-3. `ANA-203`
-4. `ANA-204`
-5. `ANA-205`
-6. `ANA-206`
-7. `ANA-207`
-8. `ANA-208`
-9. `ANA-209`
-10. `ANA-210`
-11. `ANA-211`
-12. `ANA-212`
-13. `ANA-213`
-14. `ANA-214`
-15. `ANA-215`
-16. `ANA-216`
-17. `ANA-217`
-18. `ANA-218`
-19. `ANA-219`
-20. `ANA-220`
+1. `ANA-301`
+2. `ANA-302`
+3. `ANA-303`
+4. `ANA-304`
+5. `ANA-305`
+6. `ANA-306`
+7. `ANA-307`
+8. `ANA-308`
+9. `ANA-309`
+10. `ANA-310`
 
 ## Current State
 
-- `in_progress`: none
-- `todo`: none
+- `in_progress`: `ANA-302`
+- `todo`: `ANA-303`..`ANA-310`
 - `blocked`: none
-- `review_gate`: `ANA-GATE-40` (re-opened after corrective `ANA-221`..`ANA-223`; pending Architect)
-- `done`: `ANA-101`..`ANA-123` (accepted)
-
-Engineer note: sprint execution `ANA-201`..`ANA-220` is complete; governance fixes landed in `ANA-221`..`ANA-223`. Checkpoint: `docs/todo/PH1_M2_CHECKPOINT.md`.
+- `review_gate`: none
+- `done`: `ANA-101`..`ANA-123`, `ANA-201`..`ANA-223` (accepted)
