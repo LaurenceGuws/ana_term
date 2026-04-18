@@ -3,6 +3,7 @@ test {
     _ = @import("report/artifact_paths.zig");
     _ = @import("report/json_writer.zig");
     _ = @import("report/run_fingerprint.zig");
+    _ = @import("report/specset_fingerprint.zig");
     _ = @import("report/run_json_validate.zig");
     _ = @import("compare/run_json.zig");
     _ = @import("runner/transport_guard_preflight.zig");

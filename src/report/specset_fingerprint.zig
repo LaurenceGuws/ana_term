@@ -33,3 +33,59 @@ pub fn populate(ctx: *RunContext, allocator: std.mem.Allocator, records: []const
     writeHexLower(&ctx.specset_fingerprint_digest_hex, &digest);
     ctx.specset_fingerprint_digest_len = 64;
 }
+
+test "populate is deterministic for same suite and spec order" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    const a = arena.allocator();
+
+    var r = [_]run_execute.RunRecord{.{ .spec_id = "p1", .status = "manual", .notes = "", .capture_mode = "manual", .observations_json = "{}" }};
+
+    var ctx = RunContext.initDefault();
+    ctx.suite_name = "suite-a";
+    try populate(&ctx, a, &r);
+
+    var ctx2 = RunContext.initDefault();
+    ctx2.suite_name = "suite-a";
+    try populate(&ctx2, a, &r);
+
+    try std.testing.expectEqualSlices(u8, ctx.specset_fingerprint_digest_hex[0..64], ctx2.specset_fingerprint_digest_hex[0..64]);
+}
+
+test "populate changes when spec_id order changes" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    const a = arena.allocator();
+
+    var ab = [_]run_execute.RunRecord{
+        .{ .spec_id = "a", .status = "manual", .notes = "", .capture_mode = "manual", .observations_json = "{}" },
+        .{ .spec_id = "b", .status = "manual", .notes = "", .capture_mode = "manual", .observations_json = "{}" },
+    };
+    var ba = [_]run_execute.RunRecord{
+        .{ .spec_id = "b", .status = "manual", .notes = "", .capture_mode = "manual", .observations_json = "{}" },
+        .{ .spec_id = "a", .status = "manual", .notes = "", .capture_mode = "manual", .observations_json = "{}" },
+    };
+
+    var ctx_ab = RunContext.initDefault();
+    try populate(&ctx_ab, a, &ab);
+
+    var ctx_ba = RunContext.initDefault();
+    try populate(&ctx_ba, a, &ba);
+
+    try std.testing.expect(!std.mem.eql(u8, ctx_ab.specset_fingerprint_digest_hex[0..64], ctx_ba.specset_fingerprint_digest_hex[0..64]));
+}
+
+test "populate changes when suite label changes" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    const a = arena.allocator();
+
+    var ctx_named = RunContext.initDefault();
+    ctx_named.suite_name = "named";
+    try populate(&ctx_named, a, &.{});
+
+    var ctx_null = RunContext.initDefault();
+    try populate(&ctx_null, a, &.{});
+
+    try std.testing.expect(!std.mem.eql(u8, ctx_named.specset_fingerprint_digest_hex[0..64], ctx_null.specset_fingerprint_digest_hex[0..64]));
+}
