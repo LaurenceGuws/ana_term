@@ -78,6 +78,9 @@ pub const RunContext = struct {
     /// PH1-M18: 64-char lowercase SHA-256 hex; length 0 until `artifact_bundle_fingerprint.populate`.
     artifact_bundle_fingerprint_digest_hex: [64]u8,
     artifact_bundle_fingerprint_digest_len: u8,
+    /// PH1-M19: 64-char lowercase SHA-256 hex; length 0 until `report_envelope_fingerprint.populate`.
+    report_envelope_fingerprint_digest_hex: [64]u8,
+    report_envelope_fingerprint_digest_len: u8,
 
     pub fn initDefault() RunContext {
         return .{
@@ -125,6 +128,8 @@ pub const RunContext = struct {
             .metadata_envelope_fingerprint_digest_len = 0,
             .artifact_bundle_fingerprint_digest_hex = std.mem.zeroes([64]u8),
             .artifact_bundle_fingerprint_digest_len = 0,
+            .report_envelope_fingerprint_digest_hex = std.mem.zeroes([64]u8),
+            .report_envelope_fingerprint_digest_len = 0,
         };
     }
 
