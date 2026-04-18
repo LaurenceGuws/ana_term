@@ -60,6 +60,9 @@ pub const RunContext = struct {
     /// PH1-M12: 64-char lowercase SHA-256 hex; length 0 until `specset_fingerprint.populate`.
     specset_fingerprint_digest_hex: [64]u8,
     specset_fingerprint_digest_len: u8,
+    /// PH1-M13: 64-char lowercase SHA-256 hex; length 0 until `resultset_fingerprint.populate`.
+    resultset_fingerprint_digest_hex: [64]u8,
+    resultset_fingerprint_digest_len: u8,
 
     pub fn initDefault() RunContext {
         return .{
@@ -95,6 +98,8 @@ pub const RunContext = struct {
             .run_fingerprint_digest_len = 0,
             .specset_fingerprint_digest_hex = std.mem.zeroes([64]u8),
             .specset_fingerprint_digest_len = 0,
+            .resultset_fingerprint_digest_hex = std.mem.zeroes([64]u8),
+            .resultset_fingerprint_digest_len = 0,
         };
     }
 
