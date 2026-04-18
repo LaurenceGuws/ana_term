@@ -66,7 +66,16 @@ Top-level JSON object with at least:
 | `resultset_fingerprint_digest` | string | **64**-character lowercase hex SHA-256 of the canonical payload (`docs/RESULTSET_FINGERPRINT_PLAN.md`). |
 | `resultset_fingerprint_version` | string | Fingerprint schema revision; phase-1 value **`1`**. |
 
-**Serialization order**: after `specset_fingerprint_version`, before `transport`: `resultset_fingerprint_digest`, `resultset_fingerprint_version` (lexicographic).
+**Serialization order**: after `specset_fingerprint_version`, before the nested `transport` object: `resultset_fingerprint_digest`, `resultset_fingerprint_version` (lexicographic).
+
+**PH1-M14+ (transport fingerprint)** — present on every harness `run.json` that writes artifacts:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `transport_fingerprint_digest` | string | **64**-character lowercase hex SHA-256 of the canonical payload (`docs/TRANSPORT_FINGERPRINT_PLAN.md`). |
+| `transport_fingerprint_version` | string | Fingerprint schema revision; phase-1 value **`1`**. |
+
+**Serialization order**: after `resultset_fingerprint_version`, before the nested `transport` object: `transport_fingerprint_digest`, `transport_fingerprint_version` (lexicographic).
 
 Each **result** object includes:
 
