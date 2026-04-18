@@ -20,30 +20,28 @@ This file is the canonical ticket board for active execution.
 
 ## Current Sprint
 
-- Sprint ID: `PH1-M5-S1`
-- Objective: transport seam ownership (`ANA-501`..`ANA-510`)
+- Sprint ID: `PH1-M6-S1`
+- Objective: guarded transport scaffolding (`ANA-601`..`ANA-610`)
 - Commit budget before checkpoint: `10`
-- Super-gate: `ANA-GATE-70`
+- Super-gate: `ANA-GATE-80`
 
-## Ticket Order (`PH1-M5-S1`)
+## Ticket Order (`PH1-M6-S1`)
 
-1. `ANA-501`
-2. `ANA-502`
-3. `ANA-503`
-4. `ANA-504`
-5. `ANA-505`
-6. `ANA-506`
-7. `ANA-507`
-8. `ANA-508`
-9. `ANA-509`
-10. `ANA-510`
+1. `ANA-601`
+2. `ANA-602`
+3. `ANA-603`
+4. `ANA-604`
+5. `ANA-605`
+6. `ANA-606`
+7. `ANA-607`
+8. `ANA-608`
+9. `ANA-609`
+10. `ANA-610`
 
 ## Current State
 
-- `in_progress`: none
-- `todo`: none
+- `in_progress`: `ANA-602`
+- `todo`: `ANA-603`..`ANA-610`
 - `blocked`: none
 - `review_gate`: none
-- `done`: `ANA-101`..`ANA-123`, `ANA-201`..`ANA-223`, `ANA-301`..`ANA-310`, `ANA-401`..`ANA-410` (accepted)
-
-Engineer note: sprint `PH1-M5-S1` tickets `ANA-501`..`ANA-510` are committed; checkpoint in `docs/todo/PH1_M5_CHECKPOINT.md`. Super-gate: `ANA-GATE-70` (Architect review).
+- `done`: `ANA-101`..`ANA-123`, `ANA-201`..`ANA-223`, `ANA-301`..`ANA-310`, `ANA-401`..`ANA-410`, `ANA-501`..`ANA-510` (accepted)
