@@ -20,28 +20,28 @@ This file is the canonical ticket board for active execution.
 
 ## Current Sprint
 
-- Sprint ID: `PH1-M13-S1`
-- Objective: results-set fingerprint integrity hardening (`ANA-1301`..`ANA-1310`)
+- Sprint ID: `PH1-M14-S1`
+- Objective: transport-fingerprint integrity hardening (`ANA-1401`..`ANA-1410`)
 - Commit budget before checkpoint: `10`
-- Super-gate: `ANA-GATE-150`
+- Super-gate: `ANA-GATE-160`
 
-## Ticket Order (`PH1-M13-S1`)
+## Ticket Order (`PH1-M14-S1`)
 
-1. `ANA-1301`
-2. `ANA-1302`
-3. `ANA-1303`
-4. `ANA-1304`
-5. `ANA-1305`
-6. `ANA-1306`
-7. `ANA-1307`
-8. `ANA-1308`
-9. `ANA-1309`
-10. `ANA-1310`
+1. `ANA-1401`
+2. `ANA-1402`
+3. `ANA-1403`
+4. `ANA-1404`
+5. `ANA-1405`
+6. `ANA-1406`
+7. `ANA-1407`
+8. `ANA-1408`
+9. `ANA-1409`
+10. `ANA-1410`
 
 ## Current State
 
-- `in_progress`: none
-- `todo`: none
+- `in_progress`: `ANA-1402`
+- `todo`: `ANA-1403`..`ANA-1410`
 - `blocked`: none
-- `review_gate`: `ANA-GATE-150` (PH1-M13-S1 engineering complete; Architect acceptance moves sprint tickets to `done`)
-- `done`: `ANA-101`..`ANA-123`, `ANA-201`..`ANA-223`, `ANA-301`..`ANA-310`, `ANA-401`..`ANA-410`, `ANA-501`..`ANA-510`, `ANA-601`..`ANA-610`, `ANA-701`..`ANA-710`, `ANA-801`..`ANA-810`, `ANA-901`..`ANA-913`, `ANA-1001`..`ANA-1010`, `ANA-1101`..`ANA-1110`, `ANA-1201`..`ANA-1210` (accepted)
+- `review_gate`: none
+- `done`: `ANA-101`..`ANA-123`, `ANA-201`..`ANA-223`, `ANA-301`..`ANA-310`, `ANA-401`..`ANA-410`, `ANA-501`..`ANA-510`, `ANA-601`..`ANA-610`, `ANA-701`..`ANA-710`, `ANA-801`..`ANA-810`, `ANA-901`..`ANA-913`, `ANA-1001`..`ANA-1010`, `ANA-1101`..`ANA-1110`, `ANA-1201`..`ANA-1210`, `ANA-1301`..`ANA-1310` (accepted)
