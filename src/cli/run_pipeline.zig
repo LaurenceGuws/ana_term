@@ -55,6 +55,7 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
     }
 
     if (ctx.transport_mode == .pty_guarded and !ctx.dry_run) {
+        ctx.capturePtyHostSnapshot();
         ctx.pty_capability_notes = "linux /dev/ptmx grantpt unlockpt ptsname_r slave open";
         ctx.pty_experiment_attempt = 1;
         const t_start = std.time.Instant.now() catch null;

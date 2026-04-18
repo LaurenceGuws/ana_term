@@ -1,6 +1,12 @@
+const std = @import("std");
 const modes = @import("../capture/modes.zig");
 const ExecutionMode = @import("../runner/execution_mode.zig").ExecutionMode;
 const TransportMode = @import("../runner/transport_mode.zig").TransportMode;
+
+/// Truncated copy of `uname.machine` during guarded PTY experiment (PH1-M9).
+pub const pty_host_machine_cap: usize = 64;
+/// Truncated copy of `uname.release` during guarded PTY experiment (PH1-M9).
+pub const pty_host_release_cap: usize = 256;
 
 pub const RunContext = struct {
     capture_mode: []const u8,
@@ -29,6 +35,11 @@ pub const RunContext = struct {
     pty_experiment_attempt: ?u32,
     /// PH1-M8: wall-time nanoseconds for experiment block, clamped to `maxInt(i64)` for JSON.
     pty_experiment_elapsed_ns: ?u64,
+    /// PH1-M9: filled at start of non-dry-run guarded PTY experiment on Linux; else length 0.
+    pty_experiment_host_machine: [pty_host_machine_cap]u8,
+    pty_experiment_host_machine_len: u8,
+    pty_experiment_host_release: [pty_host_release_cap]u8,
+    pty_experiment_host_release_len: u16,
 
     pub fn initDefault() RunContext {
         return .{
@@ -50,7 +61,25 @@ pub const RunContext = struct {
             .pty_capability_notes = null,
             .pty_experiment_attempt = null,
             .pty_experiment_elapsed_ns = null,
+            .pty_experiment_host_machine = std.mem.zeroes([pty_host_machine_cap]u8),
+            .pty_experiment_host_machine_len = 0,
+            .pty_experiment_host_release = std.mem.zeroes([pty_host_release_cap]u8),
+            .pty_experiment_host_release_len = 0,
         };
+    }
+
+    /// Snapshot `uname` for reproducibility; call once per guarded experiment run.
+    pub fn capturePtyHostSnapshot(ctx: *RunContext) void {
+        const u = std.posix.uname();
+        const m = std.mem.sliceTo(&u.machine, 0);
+        const n_m = @min(m.len, pty_host_machine_cap);
+        @memcpy(ctx.pty_experiment_host_machine[0..n_m], m[0..n_m]);
+        ctx.pty_experiment_host_machine_len = @intCast(n_m);
+
+        const r = std.mem.sliceTo(&u.release, 0);
+        const n_r = @min(r.len, pty_host_release_cap);
+        @memcpy(ctx.pty_experiment_host_release[0..n_r], r[0..n_r]);
+        ctx.pty_experiment_host_release_len = @intCast(n_r);
     }
 };
 
