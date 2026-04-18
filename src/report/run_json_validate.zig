@@ -263,6 +263,15 @@ test "validateRunReport rejects pty_guarded without opt-in flag in json" {
     try std.testing.expect(validateRunReport(parsed.value) != null);
 }
 
+test "validateRunReport accepts pty_guarded experiment failure telemetry" {
+    const text =
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","transport":{"guarded_opt_in":true,"guarded_state":"experiment_linux_pty","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":"linux /dev/ptmx","pty_experiment_attempt":1,"pty_experiment_elapsed_ns":0,"pty_experiment_error":"grantpt","pty_experiment_open_ok":false,"timeout_ms":30000},"results":[]}
+    ;
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
+    defer parsed.deinit();
+    try std.testing.expect(validateRunReport(parsed.value) == null);
+}
+
 test "validateRunReport rejects pty_guarded experiment with wrong attempt count" {
     const text =
         \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","transport":{"guarded_opt_in":true,"guarded_state":"experiment_linux_pty","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":"linux /dev/ptmx","pty_experiment_attempt":2,"pty_experiment_elapsed_ns":1,"pty_experiment_error":null,"pty_experiment_open_ok":true,"timeout_ms":30000},"results":[]}

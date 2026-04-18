@@ -407,6 +407,20 @@ test "diffRunMeta detects guarded_state mismatch" {
     try std.testing.expectEqualStrings("changed", rows[3].delta);
 }
 
+test "parseRunMeta reads PTY experiment telemetry numbers" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    const a = arena.allocator();
+    const text =
+        \\{"transport":{"guarded_opt_in":true,"guarded_state":"experiment_linux_pty","handshake":"x","handshake_latency_ns":1,"mode":"pty_guarded","pty_capability_notes":"n","pty_experiment_attempt":1,"pty_experiment_elapsed_ns":99,"pty_experiment_error":null,"pty_experiment_open_ok":true,"timeout_ms":1}}
+    ;
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
+    defer parsed.deinit();
+    const m = try parseRunMeta(a, parsed.value);
+    try std.testing.expectEqualStrings("1", m.pty_experiment_attempt.?);
+    try std.testing.expectEqualStrings("99", m.pty_experiment_elapsed_ns.?);
+}
+
 test "parseRunMeta formats transport numeric fields" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
