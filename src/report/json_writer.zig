@@ -49,7 +49,12 @@ pub fn writeRun(
 
     try buf.print(allocator, ",\n  \"execution_mode\": \"{s}\"", .{ctx.execution_mode.tag()});
 
+    const guarded_opt_in = ctx.transport_mode == .pty_guarded;
+    const guarded_state: []const u8 = if (guarded_opt_in) "scaffold_only" else "na";
+
     try buf.appendSlice(allocator, ",\n  \"transport\": {\n");
+    try buf.print(allocator, "    \"guarded_opt_in\": {},\n", .{guarded_opt_in});
+    try buf.print(allocator, "    \"guarded_state\": \"{s}\",\n", .{guarded_state});
     try buf.appendSlice(allocator, "    \"handshake\": ");
     if (transport_stub.handshakeString(ctx.transport_mode)) |hs| {
         try buf.print(allocator, "\"{s}\"", .{hs});

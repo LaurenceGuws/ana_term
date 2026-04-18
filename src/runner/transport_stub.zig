@@ -15,15 +15,15 @@ pub fn handshakeString(mode: TransportMode) ?[]const u8 {
     return switch (mode) {
         .none => null,
         .pty_stub => "stub-handshake-v1",
-        .pty_guarded => null,
+        .pty_guarded => "guarded-handshake-v1",
     };
 }
 
-/// Synthetic handshake latency in nanoseconds (`0` for `none`; FNV of `run_id` for `pty_stub`).
+/// Synthetic handshake latency in nanoseconds (`0` for `none`; FNV of `run_id` for stub modes).
 pub fn handshakeLatencyNs(mode: TransportMode, run_id: []const u8) u64 {
     return switch (mode) {
         .none => 0,
         .pty_stub => fnvRunId(run_id),
-        .pty_guarded => 0,
+        .pty_guarded => fnvRunId(run_id) ^ 0x9e3779b97f4a7c15,
     };
 }
