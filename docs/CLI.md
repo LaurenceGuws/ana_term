@@ -88,7 +88,12 @@ These flags identify **which terminal** is under test and how it would be invoke
 **PH1-M20 compare-envelope fingerprint (`run.json` root)**
 
 - Full runs include **`compare_envelope_fingerprint_digest`** (64-char lowercase hex) and **`compare_envelope_fingerprint_version`** (**`1`**) derived from a documented canonical payload (see **`docs/COMPARE_ENVELOPE_FINGERPRINT_PLAN.md`**).
-- **`--dry-run`** does not write `run.json`; report-envelope fingerprint keys are not applicable.
+- **`--dry-run`** does not write `run.json`; compare-envelope fingerprint keys are not applicable.
+
+**PH1-M21 run-envelope fingerprint (`run.json` root)**
+
+- Full runs include **`run_envelope_fingerprint_digest`** (64-char lowercase hex) and **`run_envelope_fingerprint_version`** (**`1`**) derived from a documented canonical payload (see **`docs/RUN_ENVELOPE_FINGERPRINT_PLAN.md`**).
+- **`--dry-run`** does not write `run.json`; run-envelope fingerprint keys are not applicable.
 
 ## Transport configuration (`run`, `run-suite`, PH1-M5+)
 
