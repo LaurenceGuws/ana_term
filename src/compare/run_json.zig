@@ -13,6 +13,8 @@ pub const RunMeta = struct {
     host_identity_sysname: ?[]const u8 = null,
     run_fingerprint_digest: ?[]const u8 = null,
     run_fingerprint_version: ?[]const u8 = null,
+    specset_fingerprint_digest: ?[]const u8 = null,
+    specset_fingerprint_version: ?[]const u8 = null,
     guarded_opt_in: ?[]const u8 = null,
     guarded_state: ?[]const u8 = null,
     pty_capability_notes: ?[]const u8 = null,
@@ -53,6 +55,8 @@ pub fn parseRunMeta(allocator: std.mem.Allocator, root: std.json.Value) !RunMeta
     m.host_identity_sysname = readOptString(obj, "host_identity_sysname");
     m.run_fingerprint_digest = readOptString(obj, "run_fingerprint_digest");
     m.run_fingerprint_version = readOptString(obj, "run_fingerprint_version");
+    m.specset_fingerprint_digest = readOptString(obj, "specset_fingerprint_digest");
+    m.specset_fingerprint_version = readOptString(obj, "specset_fingerprint_version");
     if (obj.get("terminal")) |t| switch (t) {
         .object => |term_o| {
             m.terminal_name = readOptString(term_o, "name");
@@ -145,7 +149,7 @@ fn metaDelta(l: ?[]const u8, r: ?[]const u8) []const u8 {
 }
 
 /// Fixed field order for deterministic compare output.
-pub fn diffRunMeta(left: RunMeta, right: RunMeta) [25]MetaDiffRow {
+pub fn diffRunMeta(left: RunMeta, right: RunMeta) [27]MetaDiffRow {
     return .{
         .{ .field = "comparison_id", .left = left.comparison_id, .right = right.comparison_id, .delta = metaDelta(left.comparison_id, right.comparison_id) },
         .{ .field = "execution_mode", .left = left.execution_mode, .right = right.execution_mode, .delta = metaDelta(left.execution_mode, right.execution_mode) },
@@ -164,6 +168,8 @@ pub fn diffRunMeta(left: RunMeta, right: RunMeta) [25]MetaDiffRow {
         .{ .field = "pty_experiment_open_ok", .left = left.pty_experiment_open_ok, .right = right.pty_experiment_open_ok, .delta = metaDelta(left.pty_experiment_open_ok, right.pty_experiment_open_ok) },
         .{ .field = "run_fingerprint_digest", .left = left.run_fingerprint_digest, .right = right.run_fingerprint_digest, .delta = metaDelta(left.run_fingerprint_digest, right.run_fingerprint_digest) },
         .{ .field = "run_fingerprint_version", .left = left.run_fingerprint_version, .right = right.run_fingerprint_version, .delta = metaDelta(left.run_fingerprint_version, right.run_fingerprint_version) },
+        .{ .field = "specset_fingerprint_digest", .left = left.specset_fingerprint_digest, .right = right.specset_fingerprint_digest, .delta = metaDelta(left.specset_fingerprint_digest, right.specset_fingerprint_digest) },
+        .{ .field = "specset_fingerprint_version", .left = left.specset_fingerprint_version, .right = right.specset_fingerprint_version, .delta = metaDelta(left.specset_fingerprint_version, right.specset_fingerprint_version) },
         .{ .field = "run_group", .left = left.run_group, .right = right.run_group, .delta = metaDelta(left.run_group, right.run_group) },
         .{ .field = "suite", .left = left.suite, .right = right.suite, .delta = metaDelta(left.suite, right.suite) },
         .{ .field = "term", .left = left.term, .right = right.term, .delta = metaDelta(left.term, right.term) },
@@ -408,8 +414,8 @@ test "diffRunMeta detects transport_mode mismatch" {
     const left = RunMeta{ .transport_mode = "none" };
     const right = RunMeta{ .transport_mode = "pty_stub" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("transport_mode", rows[23].field);
-    try std.testing.expectEqualStrings("changed", rows[23].delta);
+    try std.testing.expectEqualStrings("transport_mode", rows[25].field);
+    try std.testing.expectEqualStrings("changed", rows[25].delta);
 }
 
 test "diffRunMeta detects pty_experiment_open_ok mismatch" {
@@ -457,7 +463,7 @@ test "parseRunMeta reads root host identity fields" {
     defer arena.deinit();
     const a = arena.allocator();
     const text =
-        \\{"host_identity_machine":"aarch64","host_identity_release":"6.6.0","host_identity_sysname":"Linux","run_fingerprint_digest":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","run_fingerprint_version":"1","transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":1}}
+        \\{"host_identity_machine":"aarch64","host_identity_release":"6.6.0","host_identity_sysname":"Linux","run_fingerprint_digest":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","run_fingerprint_version":"1","specset_fingerprint_digest":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc","specset_fingerprint_version":"1","transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":1}}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
@@ -467,6 +473,8 @@ test "parseRunMeta reads root host identity fields" {
     try std.testing.expectEqualStrings("Linux", m.host_identity_sysname.?);
     try std.testing.expectEqualStrings("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", m.run_fingerprint_digest.?);
     try std.testing.expectEqualStrings("1", m.run_fingerprint_version.?);
+    try std.testing.expectEqualStrings("cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", m.specset_fingerprint_digest.?);
+    try std.testing.expectEqualStrings("1", m.specset_fingerprint_version.?);
 }
 
 test "parseRunMeta reads PTY experiment telemetry numbers" {
