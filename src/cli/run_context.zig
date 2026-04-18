@@ -92,3 +92,13 @@ pub fn defaultPlatformTag() []const u8 {
         else => "unknown",
     };
 }
+
+test "capturePtyHostSnapshot fills machine and release on Linux" {
+    const builtin = @import("builtin");
+    if (builtin.target.os.tag != .linux) return error.SkipZigTest;
+
+    var ctx = RunContext.initDefault();
+    ctx.capturePtyHostSnapshot();
+    try std.testing.expect(ctx.pty_experiment_host_machine_len > 0);
+    try std.testing.expect(ctx.pty_experiment_host_release_len > 0);
+}
