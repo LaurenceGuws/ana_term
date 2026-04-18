@@ -237,7 +237,7 @@ Outcome:
 
 - Accepted at `ANA-GATE-110` after corrective closeout (`ANA-911`..`ANA-913`).
 
-### `PH1-M10` (`review_gate`)
+### `PH1-M10` (`completed`)
 
 Purpose:
 
@@ -276,3 +276,47 @@ Queue lines (exact):
 - [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
 - [x] Stop only at `ANA-GATE-120` (post `ANA-1010`) unless truly blocked.
 - [x] Submit checkpoint packet in `docs/todo/PH1_M10_CHECKPOINT.md`.
+
+Outcome:
+
+- Accepted at `ANA-GATE-120`.
+
+### `PH1-M11` (`review_gate`)
+
+Purpose:
+
+- Harden cross-run auditability by adding deterministic run-fingerprint identity and surfacing it in report/compare outputs.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M11_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- define PH1-M11 run-fingerprint plan and boundaries
+- emit deterministic root run fingerprint fields in `run.json`
+- add schema invariants and compare metadata rows for fingerprint fields
+- expand regression tests and smoke coverage
+- PH1-M11 checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-1101` through `ANA-1110` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-130` reached and reported.
+
+Non-goals:
+
+- Windows ConPTY implementation
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [x] Execute `ANA-1101` through `ANA-1110` in order from `docs/todo/PH1_M11_TICKETS.md`.
+- [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [x] Stop only at `ANA-GATE-130` (post `ANA-1110`) unless truly blocked.
+- [x] Submit checkpoint packet in `docs/todo/PH1_M11_CHECKPOINT.md`.
