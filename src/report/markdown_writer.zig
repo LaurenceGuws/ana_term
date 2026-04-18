@@ -25,7 +25,11 @@ pub fn writeRunSummary(
     try buf.print(allocator, "# Run {s}\n\n## Environment\n\n", .{run_id});
     try buf.print(allocator, "- platform: {s}\n- TERM: {s}\n- terminal (logical): {s}\n- execution_mode: {s}\n- transport: mode={s} timeout_ms={d}\n", .{ ctx.platform, term, ctx.terminal_name, ctx.execution_mode.tag(), ctx.transport_mode.tag(), ctx.timeout_ms });
     if (ctx.transport_mode == .pty_guarded) {
-        try buf.appendSlice(allocator, "- guarded transport: scaffold_only (deterministic stub handshake; no real PTY)\n");
+        if (ctx.dry_run) {
+            try buf.appendSlice(allocator, "- guarded transport: scaffold_only (dry-run; deterministic stub handshake)\n");
+        } else {
+            try buf.print(allocator, "- guarded transport: experiment_linux_pty open_ok={any}\n", .{ctx.pty_experiment_open_ok});
+        }
     }
     if (ctx.terminal_cmd.len > 0) {
         try buf.print(allocator, "- terminal-cmd: `{s}`\n", .{ctx.terminal_cmd});

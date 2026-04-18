@@ -50,7 +50,11 @@ pub fn writeRun(
     try buf.print(allocator, ",\n  \"execution_mode\": \"{s}\"", .{ctx.execution_mode.tag()});
 
     const guarded_opt_in = ctx.transport_mode == .pty_guarded;
-    const guarded_state: []const u8 = if (guarded_opt_in) "scaffold_only" else "na";
+    const guarded_state: []const u8 = blk: {
+        if (ctx.transport_mode != .pty_guarded) break :blk "na";
+        if (ctx.dry_run) break :blk "scaffold_only";
+        break :blk "experiment_linux_pty";
+    };
 
     try buf.appendSlice(allocator, ",\n  \"transport\": {\n");
     try buf.print(allocator, "    \"guarded_opt_in\": {},\n", .{guarded_opt_in});
@@ -62,7 +66,30 @@ pub fn writeRun(
         try buf.appendSlice(allocator, "null");
     }
     const lat_ns = transport_stub.handshakeLatencyNs(ctx.transport_mode, run_id);
-    try buf.print(allocator, ",\n    \"handshake_latency_ns\": {d},\n    \"mode\": \"{s}\",\n    \"timeout_ms\": {d}\n  }}", .{ lat_ns, ctx.transport_mode.tag(), ctx.timeout_ms });
+    try buf.print(allocator, ",\n    \"handshake_latency_ns\": {d},\n    \"mode\": \"{s}\"", .{ lat_ns, ctx.transport_mode.tag() });
+
+    if (ctx.transport_mode == .pty_guarded) {
+        try buf.appendSlice(allocator, ",\n    \"pty_capability_notes\": ");
+        if (ctx.pty_capability_notes) |n| {
+            try buf.print(allocator, "\"{s}\"", .{n});
+        } else {
+            try buf.appendSlice(allocator, "null");
+        }
+        try buf.appendSlice(allocator, ",\n    \"pty_experiment_error\": ");
+        if (ctx.pty_experiment_error) |e| {
+            try buf.print(allocator, "\"{s}\"", .{e});
+        } else {
+            try buf.appendSlice(allocator, "null");
+        }
+        try buf.appendSlice(allocator, ",\n    \"pty_experiment_open_ok\": ");
+        if (ctx.pty_experiment_open_ok) |b| {
+            try buf.print(allocator, "{}", .{b});
+        } else {
+            try buf.appendSlice(allocator, "null");
+        }
+    }
+
+    try buf.print(allocator, ",\n    \"timeout_ms\": {d}\n  }}", .{ctx.timeout_ms});
 
     try buf.appendSlice(allocator, ",\n  \"started_at\": \"\",\n  \"ended_at\": \"\",\n  \"results\": [\n");
 
