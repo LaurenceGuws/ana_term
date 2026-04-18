@@ -1,5 +1,6 @@
 const std = @import("std");
 const errors = @import("../core/errors.zig");
+const run_json_validate = @import("../report/run_json_validate.zig");
 
 const max_read = 4 * 1024 * 1024;
 
@@ -43,6 +44,13 @@ pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
             printErr("invalid run.json (expected top-level JSON object)\n") catch {};
             return errors.Category.invalid_spec.exitCode();
         },
+    }
+
+    if (run_json_validate.validateRunReport(parsed.value)) |msg| {
+        printErr("invalid run.json (schema)\n") catch {};
+        printErr(msg) catch {};
+        printErr("\n") catch {};
+        return errors.Category.invalid_spec.exitCode();
     }
 
     printStdout("ok: validated {s}\n", .{json_path}) catch return errors.Category.runtime_failure.exitCode();
