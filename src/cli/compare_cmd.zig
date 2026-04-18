@@ -84,8 +84,18 @@ pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
     const rows = run_json.diffResults(allocator, &map_a, &map_b) catch return errors.Category.runtime_failure.exitCode();
     defer run_json.deinitDiffRows(allocator, rows);
 
-    const meta_a = run_json.parseRunMeta(parsed_a.value);
-    const meta_b = run_json.parseRunMeta(parsed_b.value);
+    var meta_arena = std.heap.ArenaAllocator.init(allocator);
+    defer meta_arena.deinit();
+    const meta_alloc = meta_arena.allocator();
+
+    const meta_a = run_json.parseRunMeta(meta_alloc, parsed_a.value) catch {
+        printErr("could not parse metadata from first run.json\n") catch {};
+        return errors.Category.invalid_spec.exitCode();
+    };
+    const meta_b = run_json.parseRunMeta(meta_alloc, parsed_b.value) catch {
+        printErr("could not parse metadata from second run.json\n") catch {};
+        return errors.Category.invalid_spec.exitCode();
+    };
     const meta_diff = run_json.diffRunMeta(meta_a, meta_b);
 
     std.fs.cwd().makePath("artifacts/compare") catch return errors.Category.runtime_failure.exitCode();

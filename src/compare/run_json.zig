@@ -8,6 +8,10 @@ pub const RunMeta = struct {
     comparison_id: ?[]const u8 = null,
     run_group: ?[]const u8 = null,
     execution_mode: ?[]const u8 = null,
+    transport_handshake: ?[]const u8 = null,
+    transport_handshake_latency_ns: ?[]const u8 = null,
+    transport_mode: ?[]const u8 = null,
+    transport_timeout_ms: ?[]const u8 = null,
 };
 
 pub const MetaDiffRow = struct {
@@ -17,8 +21,8 @@ pub const MetaDiffRow = struct {
     delta: []const u8,
 };
 
-/// Reads identity fields from a parsed `run.json` root (slices point into the parsed document).
-pub fn parseRunMeta(root: std.json.Value) RunMeta {
+/// Reads metadata fields. String slices may point into `root`; numeric transport fields are formatted into `allocator`.
+pub fn parseRunMeta(allocator: std.mem.Allocator, root: std.json.Value) !RunMeta {
     const obj = switch (root) {
         .object => |o| o,
         else => return .{},
@@ -36,7 +40,37 @@ pub fn parseRunMeta(root: std.json.Value) RunMeta {
         },
         else => {},
     } else {}
+
+    if (obj.get("transport")) |tv| switch (tv) {
+        .object => |tr| {
+            m.transport_mode = readOptString(tr, "mode");
+            m.transport_handshake = readHandshakeField(tr);
+            m.transport_timeout_ms = try readOptNumberString(allocator, tr, "timeout_ms");
+            m.transport_handshake_latency_ns = try readOptNumberString(allocator, tr, "handshake_latency_ns");
+        },
+        else => {},
+    } else {}
+
     return m;
+}
+
+fn readHandshakeField(tr: std.json.ObjectMap) ?[]const u8 {
+    const v = tr.get("handshake") orelse return null;
+    return switch (v) {
+        .string => |s| s,
+        .null => null,
+        else => null,
+    };
+}
+
+fn readOptNumberString(allocator: std.mem.Allocator, obj: std.json.ObjectMap, key: []const u8) !?[]const u8 {
+    const v = obj.get(key) orelse return null;
+    const n = switch (v) {
+        .integer => |i| i,
+        else => return error.InvalidCompareMeta,
+    };
+    const s = try std.fmt.allocPrint(allocator, "{d}", .{n});
+    return s;
 }
 
 fn readOptString(obj: std.json.ObjectMap, key: []const u8) ?[]const u8 {
@@ -65,7 +99,7 @@ fn metaDelta(l: ?[]const u8, r: ?[]const u8) []const u8 {
 }
 
 /// Fixed field order for deterministic compare output.
-pub fn diffRunMeta(left: RunMeta, right: RunMeta) [7]MetaDiffRow {
+pub fn diffRunMeta(left: RunMeta, right: RunMeta) [11]MetaDiffRow {
     return .{
         .{ .field = "comparison_id", .left = left.comparison_id, .right = right.comparison_id, .delta = metaDelta(left.comparison_id, right.comparison_id) },
         .{ .field = "execution_mode", .left = left.execution_mode, .right = right.execution_mode, .delta = metaDelta(left.execution_mode, right.execution_mode) },
@@ -74,6 +108,10 @@ pub fn diffRunMeta(left: RunMeta, right: RunMeta) [7]MetaDiffRow {
         .{ .field = "suite", .left = left.suite, .right = right.suite, .delta = metaDelta(left.suite, right.suite) },
         .{ .field = "term", .left = left.term, .right = right.term, .delta = metaDelta(left.term, right.term) },
         .{ .field = "terminal", .left = left.terminal_name, .right = right.terminal_name, .delta = metaDelta(left.terminal_name, right.terminal_name) },
+        .{ .field = "transport_handshake", .left = left.transport_handshake, .right = right.transport_handshake, .delta = metaDelta(left.transport_handshake, right.transport_handshake) },
+        .{ .field = "transport_handshake_latency_ns", .left = left.transport_handshake_latency_ns, .right = right.transport_handshake_latency_ns, .delta = metaDelta(left.transport_handshake_latency_ns, right.transport_handshake_latency_ns) },
+        .{ .field = "transport_mode", .left = left.transport_mode, .right = right.transport_mode, .delta = metaDelta(left.transport_mode, right.transport_mode) },
+        .{ .field = "transport_timeout_ms", .left = left.transport_timeout_ms, .right = right.transport_timeout_ms, .delta = metaDelta(left.transport_timeout_ms, right.transport_timeout_ms) },
     };
 }
 
@@ -304,6 +342,14 @@ test "diffRunMeta detects execution_mode mismatch" {
     const rows = diffRunMeta(left, right);
     try std.testing.expectEqualStrings("execution_mode", rows[1].field);
     try std.testing.expectEqualStrings("changed", rows[1].delta);
+}
+
+test "diffRunMeta detects transport_mode mismatch" {
+    const left = RunMeta{ .transport_mode = "none" };
+    const right = RunMeta{ .transport_mode = "pty_stub" };
+    const rows = diffRunMeta(left, right);
+    try std.testing.expectEqualStrings("transport_mode", rows[9].field);
+    try std.testing.expectEqualStrings("changed", rows[9].delta);
 }
 
 test "parseResultsMapCompare rejects duplicate spec_id" {
