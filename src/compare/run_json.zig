@@ -8,6 +8,8 @@ pub const RunMeta = struct {
     comparison_id: ?[]const u8 = null,
     run_group: ?[]const u8 = null,
     execution_mode: ?[]const u8 = null,
+    guarded_opt_in: ?[]const u8 = null,
+    guarded_state: ?[]const u8 = null,
     transport_handshake: ?[]const u8 = null,
     transport_handshake_latency_ns: ?[]const u8 = null,
     transport_mode: ?[]const u8 = null,
@@ -44,6 +46,8 @@ pub fn parseRunMeta(allocator: std.mem.Allocator, root: std.json.Value) !RunMeta
     if (obj.get("transport")) |tv| switch (tv) {
         .object => |tr| {
             m.transport_mode = readOptString(tr, "mode");
+            m.guarded_opt_in = try readOptBoolString(allocator, tr, "guarded_opt_in");
+            m.guarded_state = readOptStringOrNull(tr, "guarded_state");
             m.transport_handshake = readHandshakeField(tr);
             m.transport_timeout_ms = try readOptNumberString(allocator, tr, "timeout_ms");
             m.transport_handshake_latency_ns = try readOptNumberString(allocator, tr, "handshake_latency_ns");
@@ -60,6 +64,14 @@ fn readHandshakeField(tr: std.json.ObjectMap) ?[]const u8 {
         .string => |s| s,
         .null => null,
         else => null,
+    };
+}
+
+fn readOptBoolString(allocator: std.mem.Allocator, obj: std.json.ObjectMap, key: []const u8) !?[]const u8 {
+    const v = obj.get(key) orelse return null;
+    return switch (v) {
+        .bool => |b| if (b) try allocator.dupe(u8, "true") else try allocator.dupe(u8, "false"),
+        else => return error.InvalidCompareMeta,
     };
 }
 
@@ -99,10 +111,12 @@ fn metaDelta(l: ?[]const u8, r: ?[]const u8) []const u8 {
 }
 
 /// Fixed field order for deterministic compare output.
-pub fn diffRunMeta(left: RunMeta, right: RunMeta) [11]MetaDiffRow {
+pub fn diffRunMeta(left: RunMeta, right: RunMeta) [13]MetaDiffRow {
     return .{
         .{ .field = "comparison_id", .left = left.comparison_id, .right = right.comparison_id, .delta = metaDelta(left.comparison_id, right.comparison_id) },
         .{ .field = "execution_mode", .left = left.execution_mode, .right = right.execution_mode, .delta = metaDelta(left.execution_mode, right.execution_mode) },
+        .{ .field = "guarded_opt_in", .left = left.guarded_opt_in, .right = right.guarded_opt_in, .delta = metaDelta(left.guarded_opt_in, right.guarded_opt_in) },
+        .{ .field = "guarded_state", .left = left.guarded_state, .right = right.guarded_state, .delta = metaDelta(left.guarded_state, right.guarded_state) },
         .{ .field = "platform", .left = left.platform, .right = right.platform, .delta = metaDelta(left.platform, right.platform) },
         .{ .field = "run_group", .left = left.run_group, .right = right.run_group, .delta = metaDelta(left.run_group, right.run_group) },
         .{ .field = "suite", .left = left.suite, .right = right.suite, .delta = metaDelta(left.suite, right.suite) },
@@ -348,8 +362,16 @@ test "diffRunMeta detects transport_mode mismatch" {
     const left = RunMeta{ .transport_mode = "none" };
     const right = RunMeta{ .transport_mode = "pty_stub" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("transport_mode", rows[9].field);
-    try std.testing.expectEqualStrings("changed", rows[9].delta);
+    try std.testing.expectEqualStrings("transport_mode", rows[11].field);
+    try std.testing.expectEqualStrings("changed", rows[11].delta);
+}
+
+test "diffRunMeta detects guarded_state mismatch" {
+    const left = RunMeta{ .guarded_state = "na" };
+    const right = RunMeta{ .guarded_state = "scaffold_only" };
+    const rows = diffRunMeta(left, right);
+    try std.testing.expectEqualStrings("guarded_state", rows[3].field);
+    try std.testing.expectEqualStrings("changed", rows[3].delta);
 }
 
 test "parseRunMeta formats transport numeric fields" {
@@ -357,12 +379,14 @@ test "parseRunMeta formats transport numeric fields" {
     defer arena.deinit();
     const a = arena.allocator();
     const text =
-        \\{"transport":{"handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":5000}}
+        \\{"transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":5000}}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
     const m = try parseRunMeta(a, parsed.value);
     try std.testing.expectEqualStrings("none", m.transport_mode.?);
+    try std.testing.expectEqualStrings("false", m.guarded_opt_in.?);
+    try std.testing.expectEqualStrings("na", m.guarded_state.?);
     try std.testing.expectEqualStrings("5000", m.transport_timeout_ms.?);
     try std.testing.expectEqualStrings("0", m.transport_handshake_latency_ns.?);
 }
