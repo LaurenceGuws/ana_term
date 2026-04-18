@@ -6,6 +6,7 @@ const run_json_validate = @import("run_json_validate.zig");
 const run_fingerprint = @import("run_fingerprint.zig");
 const specset_fingerprint = @import("specset_fingerprint.zig");
 const resultset_fingerprint = @import("resultset_fingerprint.zig");
+const transport_fingerprint = @import("transport_fingerprint.zig");
 
 fn appendJsonEncodedString(allocator: std.mem.Allocator, buf: *std.ArrayList(u8), bytes: []const u8) !void {
     var enc: std.io.Writer.Allocating = .init(allocator);
@@ -21,6 +22,7 @@ pub fn writePlaceholder(allocator: std.mem.Allocator, run_dir: []const u8, run_i
     try run_fingerprint.populate(&ctx, allocator, run_id, &.{});
     try specset_fingerprint.populate(&ctx, allocator, &.{});
     try resultset_fingerprint.populate(&ctx, allocator, &.{});
+    try transport_fingerprint.populate(&ctx, allocator, run_id);
     try writeRun(allocator, run_dir, run_id, &.{}, ctx);
 }
 
@@ -81,6 +83,9 @@ pub fn writeRun(
     try buf.appendSlice(allocator, ",\n  \"resultset_fingerprint_digest\": ");
     try appendJsonEncodedString(allocator, &buf, ctx.resultset_fingerprint_digest_hex[0..ctx.resultset_fingerprint_digest_len]);
     try buf.appendSlice(allocator, ",\n  \"resultset_fingerprint_version\": \"1\"");
+    try buf.appendSlice(allocator, ",\n  \"transport_fingerprint_digest\": ");
+    try appendJsonEncodedString(allocator, &buf, ctx.transport_fingerprint_digest_hex[0..ctx.transport_fingerprint_digest_len]);
+    try buf.appendSlice(allocator, ",\n  \"transport_fingerprint_version\": \"1\"");
 
     const guarded_opt_in = ctx.transport_mode == .pty_guarded;
     const guarded_state: []const u8 = blk: {
@@ -201,6 +206,7 @@ test "writeRun JSON-encodes guarded PTY host snapshot strings" {
     try run_fingerprint.populate(&ctx, std.testing.allocator, "rid-json-writer", &.{});
     try specset_fingerprint.populate(&ctx, std.testing.allocator, &.{});
     try resultset_fingerprint.populate(&ctx, std.testing.allocator, &.{});
+    try transport_fingerprint.populate(&ctx, std.testing.allocator, "rid-json-writer");
 
     const mach = "x86_64";
     const rel = "6.1.0-test";
@@ -224,6 +230,8 @@ test "writeRun JSON-encodes guarded PTY host snapshot strings" {
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"specset_fingerprint_digest\": \"") != null);
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"resultset_fingerprint_version\": \"1\"") != null);
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"resultset_fingerprint_digest\": \"") != null);
+    try std.testing.expect(std.mem.indexOf(u8, json_text, "\"transport_fingerprint_version\": \"1\"") != null);
+    try std.testing.expect(std.mem.indexOf(u8, json_text, "\"transport_fingerprint_digest\": \"") != null);
 
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, json_text, .{});
     defer parsed.deinit();
@@ -254,6 +262,7 @@ test "writeRun escapes quotes in guarded PTY host snapshot strings" {
     try run_fingerprint.populate(&ctx, std.testing.allocator, "rid-json-esc", &.{});
     try specset_fingerprint.populate(&ctx, std.testing.allocator, &.{});
     try resultset_fingerprint.populate(&ctx, std.testing.allocator, &.{});
+    try transport_fingerprint.populate(&ctx, std.testing.allocator, "rid-json-esc");
 
     const mach: []const u8 = &.{ 'a', 'b', '"', 'c' };
     @memcpy(ctx.pty_experiment_host_machine[0..mach.len], mach);
