@@ -1,0 +1,14 @@
+.{
+    .name = .ana_term,
+    .version = "0.0.0",
+    .fingerprint = 0x5f4af480ff83a333,
+    .minimum_zig_version = "0.15.2",
+    .dependencies = .{},
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+        "README.md",
+        "LICENSE",
+    },
+}
