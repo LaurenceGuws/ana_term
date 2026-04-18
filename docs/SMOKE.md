@@ -1,6 +1,6 @@
-# Smoke workflow (PH1-M2 through PH1-M6)
+# Smoke workflow (PH1-M2 through PH1-M7)
 
-Minimal operator path: run the **baseline-linux** suite twice with **different terminal identities**, then produce one **compare** report (markdown + JSON). **PH1-M3** adds strict `report` / `compare` checks and metadata-rich compare output. **PH1-M4** adds **execution modes** (`placeholder` vs `protocol_stub`), **`--dry-run`**, and deterministic stub **observations**—use **Section 6** when touching the runner seam. **PH1-M5** adds **transport** metadata (`none` vs **`pty_stub`**) and **`--timeout-ms`**—use **Section 7**. **PH1-M6** adds guarded transport scaffolding—use **Section 8**.
+Minimal operator path: run the **baseline-linux** suite twice with **different terminal identities**, then produce one **compare** report (markdown + JSON). **PH1-M3** adds strict `report` / `compare` checks and metadata-rich compare output. **PH1-M4** adds **execution modes** (`placeholder` vs `protocol_stub`), **`--dry-run`**, and deterministic stub **observations**—use **Section 6** when touching the runner seam. **PH1-M5** adds **transport** metadata (`none` vs **`pty_stub`**) and **`--timeout-ms`**—use **Section 7**. **PH1-M6** adds guarded transport scaffolding—use **Section 8**. **PH1-M7** adds a minimal Linux PTY open/close experiment—use **Section 9** (Linux host only).
 
 ## Prerequisites
 
@@ -106,9 +106,25 @@ zig-out/bin/ana_term run-suite baseline-linux --transport pty_guarded --terminal
 zig-out/bin/ana_term run-suite baseline-linux --transport pty_guarded --allow-guarded-transport --terminal wezterm
 ```
 
-Expect **`report` 0** on the run directory. In **`run.json`**, **`transport.mode`** is **`pty_guarded`**, **`guarded_opt_in`** is **`true`**, **`guarded_state`** is **`scaffold_only`**, and handshake fields match the deterministic guarded stub.
+- **Dry-run**: add **`--dry-run`** to the opt-in command above. Exit **0**; no artifact directory is created.
 
-- **Compare**: run once with **`pty_stub`** and once with **`pty_guarded`** (both with opt-in for the latter). Metadata should include **`guarded_opt_in`** / **`guarded_state`** deltas alongside transport rows.
+- **Full run (Linux)**: omit **`--dry-run`**. After the run, **`report`** on the artifact directory exits **0**. In **`run.json`**, **`guarded_state`** is **`experiment_linux_pty`**, **`pty_experiment_open_ok`** is **`true`** (or **`false`** with **`pty_experiment_error`** set on failure), and **`pty_capability_notes`** describes the POSIX path used.
+
+- **Compare**: run once with **`pty_stub`** and once with **`pty_guarded`** (with opt-in). Metadata should include **`guarded_opt_in`**, **`guarded_state`**, and **`pty_experiment_*`** deltas alongside transport rows.
+
+## 9. Guarded Linux PTY experiment (PH1-M7)
+
+**Host must be Linux** (see **`docs/PTY_EXPERIMENT_PLAN.md`**). On non-Linux, a full **`pty_guarded`** run (without **`--dry-run`**) exits **2** before artifacts.
+
+- **Negative (non-Linux or no opt-in)**: unchanged from **Section 8**; non-Linux full runs fail at preflight.
+
+- **Positive (Linux, opt-in, full run)**:
+
+```sh
+zig-out/bin/ana_term run-suite baseline-linux --transport pty_guarded --allow-guarded-transport --terminal wezterm
+```
+
+Confirm with **`report`** on the run directory. Inspect **`transport.guarded_state`** and **`pty_experiment_open_ok`** in **`run.json`**.
 
 ## References
 
@@ -119,3 +135,4 @@ Expect **`report` 0** on the run directory. In **`run.json`**, **`transport.mode
 - Protocol execution seam: `docs/PROTO_EXEC_PLAN.md`
 - Transport seam: `docs/TRANSPORT_PLAN.md`
 - Guarded transport: `docs/REAL_TRANSPORT_GUARD_PLAN.md`
+- Linux PTY experiment: `docs/PTY_EXPERIMENT_PLAN.md`
