@@ -50,7 +50,42 @@ pub fn validateRunReport(root: std.json.Value) ?[]const u8 {
         if (!std.mem.eql(u8, guarded_state, "na")) return "transport.guarded_state must be na when mode is pty_stub";
     } else {
         if (!guarded_opt_in) return "transport.guarded_opt_in must be true when mode is pty_guarded";
-        if (!std.mem.eql(u8, guarded_state, "scaffold_only")) return "transport.guarded_state must be scaffold_only when mode is pty_guarded";
+        const gs_ok = std.mem.eql(u8, guarded_state, "scaffold_only") or std.mem.eql(u8, guarded_state, "experiment_linux_pty");
+        if (!gs_ok) return "transport.guarded_state must be scaffold_only or experiment_linux_pty when mode is pty_guarded";
+
+        const po = tr.get("pty_experiment_open_ok") orelse return "missing transport.pty_experiment_open_ok";
+        const pe = tr.get("pty_experiment_error") orelse return "missing transport.pty_experiment_error";
+        const pn = tr.get("pty_capability_notes") orelse return "missing transport.pty_capability_notes";
+
+        if (std.mem.eql(u8, guarded_state, "scaffold_only")) {
+            switch (po) {
+                .null => {},
+                else => return "transport.pty_experiment_open_ok must be null when guarded_state is scaffold_only",
+            }
+            switch (pe) {
+                .null => {},
+                else => return "transport.pty_experiment_error must be null when guarded_state is scaffold_only",
+            }
+            switch (pn) {
+                .null => {},
+                else => return "transport.pty_capability_notes must be null when guarded_state is scaffold_only",
+            }
+        } else {
+            const open_ok = switch (po) {
+                .bool => |b| b,
+                else => return "transport.pty_experiment_open_ok must be a boolean when guarded_state is experiment_linux_pty",
+            };
+            const notes = getString(tr, "pty_capability_notes") orelse return "transport.pty_capability_notes must be a string for experiment_linux_pty";
+            if (notes.len == 0) return "transport.pty_capability_notes must be non-empty for experiment_linux_pty";
+            if (open_ok) {
+                switch (pe) {
+                    .null => {},
+                    else => return "transport.pty_experiment_error must be null when pty_experiment_open_ok is true",
+                }
+            } else {
+                if (getString(tr, "pty_experiment_error") == null) return "transport.pty_experiment_error must be a string when pty_experiment_open_ok is false";
+            }
+        }
     }
 
     const hs = tr.get("handshake") orelse return "transport.handshake required";
@@ -188,7 +223,16 @@ test "validateRunReport rejects non-integer transport.timeout_ms" {
 
 test "validateRunReport accepts pty_guarded transport" {
     const text =
-        \\{"schema_version":"0.2","run_id":"rid","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","transport":{"guarded_opt_in":true,"guarded_state":"scaffold_only","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","timeout_ms":30000},"results":[]}
+        \\{"schema_version":"0.2","run_id":"rid","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","transport":{"guarded_opt_in":true,"guarded_state":"scaffold_only","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":null,"pty_experiment_error":null,"pty_experiment_open_ok":null,"timeout_ms":30000},"results":[]}
+    ;
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
+    defer parsed.deinit();
+    try std.testing.expect(validateRunReport(parsed.value) == null);
+}
+
+test "validateRunReport accepts pty_guarded experiment_linux_pty success" {
+    const text =
+        \\{"schema_version":"0.2","run_id":"rid","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","transport":{"guarded_opt_in":true,"guarded_state":"experiment_linux_pty","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":"linux /dev/ptmx","pty_experiment_error":null,"pty_experiment_open_ok":true,"timeout_ms":30000},"results":[]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
@@ -197,7 +241,7 @@ test "validateRunReport accepts pty_guarded transport" {
 
 test "validateRunReport rejects pty_guarded without opt-in flag in json" {
     const text =
-        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","transport":{"guarded_opt_in":false,"guarded_state":"scaffold_only","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","timeout_ms":30000},"results":[]}
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","transport":{"guarded_opt_in":false,"guarded_state":"scaffold_only","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":null,"pty_experiment_error":null,"pty_experiment_open_ok":null,"timeout_ms":30000},"results":[]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
