@@ -1,6 +1,7 @@
 const std = @import("std");
 const run_execute = @import("../runner/run_execute.zig");
 const RunContext = @import("../cli/run_context.zig").RunContext;
+const run_json_validate = @import("run_json_validate.zig");
 const transport_stub = @import("../runner/transport_stub.zig");
 const run_fingerprint = @import("run_fingerprint.zig");
 const specset_fingerprint = @import("specset_fingerprint.zig");
@@ -265,6 +266,10 @@ test "writeRun JSON-encodes guarded PTY host snapshot strings" {
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"metadata_envelope_fingerprint_digest\": \"") != null);
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"artifact_bundle_fingerprint_version\": \"1\"") != null);
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"artifact_bundle_fingerprint_digest\": \"") != null);
+
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, json_text, .{});
+    defer parsed.deinit();
+    try std.testing.expect(run_json_validate.validateRunReport(parsed.value) == null);
 }
 
 test "writeRun embeds golden metadata_envelope digest for fixed upstream fingerprints" {
@@ -306,6 +311,10 @@ test "writeRun embeds golden metadata_envelope digest for fixed upstream fingerp
 
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"metadata_envelope_fingerprint_digest\": \"620d35500e035b198f5a81be6f0a99ba22eb2f86e483fa6abef0ab855f5c5754\"") != null);
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"artifact_bundle_fingerprint_digest\": \"45fb53d285231c8afb41b1153e866b829c28dcd80658b52f0c899948d6949d07\"") != null);
+
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, json_text, .{});
+    defer parsed.deinit();
+    try std.testing.expect(run_json_validate.validateRunReport(parsed.value) == null);
 }
 
 test "writeRun escapes quotes in guarded PTY host snapshot strings" {
@@ -354,4 +363,8 @@ test "writeRun escapes quotes in guarded PTY host snapshot strings" {
     defer std.testing.allocator.free(json_text);
 
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"pty_experiment_host_machine\": \"ab\\\"c\"") != null);
+
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, json_text, .{});
+    defer parsed.deinit();
+    try std.testing.expect(run_json_validate.validateRunReport(parsed.value) == null);
 }

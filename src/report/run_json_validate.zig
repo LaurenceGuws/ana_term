@@ -110,6 +110,17 @@ pub fn validateRunReport(root: std.json.Value) ?[]const u8 {
     const mefv = getString(obj, "metadata_envelope_fingerprint_version") orelse return "metadata_envelope_fingerprint_version must be a string";
     if (!std.mem.eql(u8, mefv, "1")) return "metadata_envelope_fingerprint_version must be 1";
 
+    const abfd = getString(obj, "artifact_bundle_fingerprint_digest") orelse return "artifact_bundle_fingerprint_digest must be a string";
+    if (abfd.len != 64) return "artifact_bundle_fingerprint_digest must be 64 lowercase hex characters";
+    for (abfd) |c| {
+        switch (c) {
+            '0'...'9', 'a'...'f' => {},
+            else => return "artifact_bundle_fingerprint_digest must be 64 lowercase hex characters",
+        }
+    }
+    const abfv = getString(obj, "artifact_bundle_fingerprint_version") orelse return "artifact_bundle_fingerprint_version must be a string";
+    if (!std.mem.eql(u8, abfv, "1")) return "artifact_bundle_fingerprint_version must be 1";
+
     const tr_o = obj.get("transport") orelse return "missing transport object";
     const tr = switch (tr_o) {
         .object => |t| t,
@@ -598,6 +609,33 @@ test "validateRunReport rejects wrong metadata_envelope_fingerprint_version" {
 test "validateRunReport rejects missing metadata_envelope_fingerprint_digest" {
     const text =
         \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","host_identity_machine":"x86_64","host_identity_release":"6.0.0","host_identity_sysname":"Linux","run_fingerprint_digest":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","run_fingerprint_version":"1","specset_fingerprint_digest":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc","specset_fingerprint_version":"1","resultset_fingerprint_digest":"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd","resultset_fingerprint_version":"1","transport_fingerprint_digest":"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee","transport_fingerprint_version":"1","exec_summary_fingerprint_digest":"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff","exec_summary_fingerprint_version":"1","context_summary_fingerprint_digest":"1111111111111111111111111111111111111111111111111111111111111111","context_summary_fingerprint_version":"1","transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":30000},"results":[]}
+    ;
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
+    defer parsed.deinit();
+    try std.testing.expect(validateRunReport(parsed.value) != null);
+}
+
+test "validateRunReport rejects artifact_bundle_fingerprint_digest with uppercase hex" {
+    const text =
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","host_identity_machine":"x86_64","host_identity_release":"6.0.0","host_identity_sysname":"Linux","run_fingerprint_digest":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","run_fingerprint_version":"1","specset_fingerprint_digest":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc","specset_fingerprint_version":"1","resultset_fingerprint_digest":"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd","resultset_fingerprint_version":"1","transport_fingerprint_digest":"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee","transport_fingerprint_version":"1","exec_summary_fingerprint_digest":"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff","exec_summary_fingerprint_version":"1","context_summary_fingerprint_digest":"1111111111111111111111111111111111111111111111111111111111111111","context_summary_fingerprint_version":"1","metadata_envelope_fingerprint_digest":"2222222222222222222222222222222222222222222222222222222222222222","metadata_envelope_fingerprint_version":"1","artifact_bundle_fingerprint_digest":"333333333333333333333333333333333333333333333333333333333333333B","artifact_bundle_fingerprint_version":"1","transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":30000},"results":[]}
+    ;
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
+    defer parsed.deinit();
+    try std.testing.expect(validateRunReport(parsed.value) != null);
+}
+
+test "validateRunReport rejects wrong artifact_bundle_fingerprint_version" {
+    const text =
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","host_identity_machine":"x86_64","host_identity_release":"6.0.0","host_identity_sysname":"Linux","run_fingerprint_digest":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","run_fingerprint_version":"1","specset_fingerprint_digest":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc","specset_fingerprint_version":"1","resultset_fingerprint_digest":"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd","resultset_fingerprint_version":"1","transport_fingerprint_digest":"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee","transport_fingerprint_version":"1","exec_summary_fingerprint_digest":"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff","exec_summary_fingerprint_version":"1","context_summary_fingerprint_digest":"1111111111111111111111111111111111111111111111111111111111111111","context_summary_fingerprint_version":"1","metadata_envelope_fingerprint_digest":"2222222222222222222222222222222222222222222222222222222222222222","metadata_envelope_fingerprint_version":"1","artifact_bundle_fingerprint_digest":"3333333333333333333333333333333333333333333333333333333333333333","artifact_bundle_fingerprint_version":"2","transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":30000},"results":[]}
+    ;
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
+    defer parsed.deinit();
+    try std.testing.expect(validateRunReport(parsed.value) != null);
+}
+
+test "validateRunReport rejects missing artifact_bundle_fingerprint_digest" {
+    const text =
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","host_identity_machine":"x86_64","host_identity_release":"6.0.0","host_identity_sysname":"Linux","run_fingerprint_digest":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","run_fingerprint_version":"1","specset_fingerprint_digest":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc","specset_fingerprint_version":"1","resultset_fingerprint_digest":"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd","resultset_fingerprint_version":"1","transport_fingerprint_digest":"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee","transport_fingerprint_version":"1","exec_summary_fingerprint_digest":"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff","exec_summary_fingerprint_version":"1","context_summary_fingerprint_digest":"1111111111111111111111111111111111111111111111111111111111111111","context_summary_fingerprint_version":"1","metadata_envelope_fingerprint_digest":"2222222222222222222222222222222222222222222222222222222222222222","metadata_envelope_fingerprint_version":"1","transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":30000},"results":[]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
