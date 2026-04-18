@@ -7,6 +7,7 @@ test {
     _ = @import("report/resultset_fingerprint.zig");
     _ = @import("report/transport_fingerprint.zig");
     _ = @import("report/exec_summary_fingerprint.zig");
+    _ = @import("report/context_summary_fingerprint.zig");
     _ = @import("report/run_json_validate.zig");
     _ = @import("compare/run_json.zig");
     _ = @import("compare/compare_json.zig");
