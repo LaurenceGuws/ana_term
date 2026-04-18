@@ -14,6 +14,11 @@ pub fn validateRunReport(root: std.json.Value) ?[]const u8 {
     if (getString(obj, "platform") == null) return "missing or invalid platform (string required)";
     if (getString(obj, "term") == null) return "missing or invalid term (string required)";
 
+    const exec_m = getString(obj, "execution_mode") orelse return "missing or invalid execution_mode (string required)";
+    if (!std.mem.eql(u8, exec_m, "placeholder") and !std.mem.eql(u8, exec_m, "protocol_stub")) {
+        return "execution_mode must be placeholder or protocol_stub";
+    }
+
     const term_o = obj.get("terminal") orelse return "missing terminal object";
     const term_obj = switch (term_o) {
         .object => |t| t,
@@ -58,7 +63,7 @@ fn getString(obj: std.json.ObjectMap, key: []const u8) ?[]const u8 {
 
 test "validateRunReport accepts minimal harness-shaped run.json" {
     const text =
-        \\{"schema_version":"0.2","run_id":"run-001","started_at":"","ended_at":"","platform":"linux","term":"xterm","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"results":[{"spec_id":"p","status":"manual","notes":"","capture_mode":"manual","observations":{}}]}
+        \\{"schema_version":"0.2","run_id":"run-001","started_at":"","ended_at":"","platform":"linux","term":"xterm","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","results":[{"spec_id":"p","status":"manual","notes":"","capture_mode":"manual","observations":{}}]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
@@ -76,7 +81,7 @@ test "validateRunReport rejects missing schema_version" {
 
 test "validateRunReport rejects result row missing observations" {
     const text =
-        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t"},"results":[{"spec_id":"p","status":"manual","notes":"","capture_mode":"manual"}]}
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t"},"execution_mode":"placeholder","results":[{"spec_id":"p","status":"manual","notes":"","capture_mode":"manual"}]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
@@ -85,7 +90,16 @@ test "validateRunReport rejects result row missing observations" {
 
 test "validateRunReport rejects non-object terminal" {
     const text =
-        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":"oops","results":[]}
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":"oops","execution_mode":"placeholder","results":[]}
+    ;
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
+    defer parsed.deinit();
+    try std.testing.expect(validateRunReport(parsed.value) != null);
+}
+
+test "validateRunReport rejects invalid execution_mode" {
+    const text =
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t"},"execution_mode":"bogus","results":[]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
