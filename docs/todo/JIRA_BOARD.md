@@ -50,9 +50,9 @@ This file is the canonical ticket board for active execution.
 
 ## Current State
 
-- `in_progress`: `ANA-120`
+- `in_progress`: none
 - `todo`: none
 - `blocked`: none
-- `review_gate`: none
+- `review_gate`: `ANA-GATE-20` (PH1-M1-S1 checkpoint — post `ANA-120`)
 - `done`: none
-- `implementation_complete` (Engineer; Architect promotes to `done` at gate): `ANA-101`, `ANA-102`, `ANA-103`, `ANA-104`, `ANA-105`, `ANA-106`, `ANA-107`, `ANA-108`, `ANA-109`, `ANA-110`, `ANA-111`, `ANA-112`, `ANA-113`, `ANA-114`, `ANA-115`, `ANA-116`, `ANA-117`, `ANA-118`, `ANA-119`
+- `implementation_complete` (Engineer; Architect promotes to `done` at gate): `ANA-101`..`ANA-120`

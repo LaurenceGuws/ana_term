@@ -1,2 +1,6 @@
 zig-cache/
 zig-out/
+
+# harness run output (keep `artifacts/.gitkeep`)
+artifacts/*
+!artifacts/.gitkeep
