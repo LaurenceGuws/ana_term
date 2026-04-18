@@ -1,6 +1,6 @@
-# Smoke workflow (PH1-M2 through PH1-M9)
+# Smoke workflow (PH1-M2 through PH1-M10)
 
-Minimal operator path: run the **baseline-linux** suite twice with **different terminal identities**, then produce one **compare** report (markdown + JSON). **PH1-M3** adds strict `report` / `compare` checks and metadata-rich compare output. **PH1-M4** adds **execution modes** (`placeholder` vs `protocol_stub`), **`--dry-run`**, and deterministic stub **observations**—use **Section 6** when touching the runner seam. **PH1-M5** adds **transport** metadata (`none` vs **`pty_stub`**) and **`--timeout-ms`**—use **Section 7**. **PH1-M6** adds guarded transport scaffolding—use **Section 8**. **PH1-M7** adds a minimal Linux PTY open/close experiment—use **Section 9** (Linux host only). **PH1-M8** adds deterministic telemetry for that experiment—use **Section 10**. **PH1-M9** adds host **`uname`** snapshots on the guarded experiment path—use **Section 11**.
+Minimal operator path: run the **baseline-linux** suite twice with **different terminal identities**, then produce one **compare** report (markdown + JSON). **PH1-M3** adds strict `report` / `compare` checks and metadata-rich compare output. **PH1-M4** adds **execution modes** (`placeholder` vs `protocol_stub`), **`--dry-run`**, and deterministic stub **observations**—use **Section 6** when touching the runner seam. **PH1-M5** adds **transport** metadata (`none` vs **`pty_stub`**) and **`--timeout-ms`**—use **Section 7**. **PH1-M6** adds guarded transport scaffolding—use **Section 8**. **PH1-M7** adds a minimal Linux PTY open/close experiment—use **Section 9** (Linux host only). **PH1-M8** adds deterministic telemetry for that experiment—use **Section 10**. **PH1-M9** adds host **`uname`** snapshots on the guarded experiment path—use **Section 11**. **PH1-M10** adds root **`host_identity_*`** fields on every artifact run—use **Section 12**.
 
 ## Prerequisites
 
@@ -150,6 +150,17 @@ Use the same full **`pty_guarded`** command as **Sections 9–10** (Linux host, 
 
 See **`docs/PTY_REPRODUCIBILITY_PLAN.md`**.
 
+## 12. PH1-M10 root host identity (artifact runs)
+
+After any full **`run-suite`** (or **`run`**) that writes **`run.json`** (**not** **`--dry-run`**), run **`report`** on the artifact directory and confirm exit **0**. Open **`run.json`** and verify root-level:
+
+- **`host_identity_machine`**, **`host_identity_release`**, **`host_identity_sysname`** — non-empty strings (runtime **`uname`** snapshots; JSON-escaped).
+- Serialization order: immediately after **`execution_mode`**, before **`transport`** (see **`docs/REPORT_FORMAT.md`**).
+
+**Compare**: two runs on the same machine should normally show **`unchanged`** for these three metadata rows unless the kernel identity changed.
+
+See **`docs/HOST_IDENTITY_PLAN.md`**.
+
 ## References
 
 - Terminal flags and behavior: `docs/CLI.md`
@@ -162,3 +173,4 @@ See **`docs/PTY_REPRODUCIBILITY_PLAN.md`**.
 - Linux PTY experiment: `docs/PTY_EXPERIMENT_PLAN.md`
 - PTY experiment hardening: `docs/PTY_EXPERIMENT_HARDENING_PLAN.md`
 - PTY reproducibility (PH1-M9): `docs/PTY_REPRODUCIBILITY_PLAN.md`
+- Host identity (PH1-M10): `docs/HOST_IDENTITY_PLAN.md`
