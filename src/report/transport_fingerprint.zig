@@ -83,3 +83,47 @@ pub fn populate(ctx: *RunContext, allocator: std.mem.Allocator, run_id: []const 
     writeHexLower(&ctx.transport_fingerprint_digest_hex, &digest);
     ctx.transport_fingerprint_digest_len = 64;
 }
+
+test "populate is deterministic for same transport context and run_id" {
+    var ctx = RunContext.initDefault();
+    var ctx2 = RunContext.initDefault();
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    const a = arena.allocator();
+
+    try populate(&ctx, a, "run-same");
+    try populate(&ctx2, a, "run-same");
+
+    try std.testing.expectEqualSlices(u8, ctx.transport_fingerprint_digest_hex[0..64], ctx2.transport_fingerprint_digest_hex[0..64]);
+}
+
+test "populate changes when transport mode changes" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    const a = arena.allocator();
+
+    var ctx_none = RunContext.initDefault();
+    try populate(&ctx_none, a, "rid");
+
+    var ctx_stub = RunContext.initDefault();
+    ctx_stub.transport_mode = .pty_stub;
+    try populate(&ctx_stub, a, "rid");
+
+    try std.testing.expect(!std.mem.eql(u8, ctx_none.transport_fingerprint_digest_hex[0..64], ctx_stub.transport_fingerprint_digest_hex[0..64]));
+}
+
+test "populate changes when run_id changes stub handshake latency" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    const a = arena.allocator();
+
+    var ctx_a = RunContext.initDefault();
+    ctx_a.transport_mode = .pty_stub;
+    try populate(&ctx_a, a, "run-aaa");
+
+    var ctx_b = RunContext.initDefault();
+    ctx_b.transport_mode = .pty_stub;
+    try populate(&ctx_b, a, "run-bbb");
+
+    try std.testing.expect(!std.mem.eql(u8, ctx_a.transport_fingerprint_digest_hex[0..64], ctx_b.transport_fingerprint_digest_hex[0..64]));
+}
