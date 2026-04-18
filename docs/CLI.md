@@ -68,6 +68,10 @@ On **non-Linux** hosts, `pty_guarded` (non-dry-run) fails with exit **2** before
 - **`pty_experiment_elapsed_ns`**: `null` for `scaffold_only`; non-negative nanoseconds (wall time) for the guarded PTY block on `experiment_linux_pty`, clamped for JSON integers.
 - Invariants and risks: **`docs/PTY_EXPERIMENT_HARDENING_PLAN.md`** and **`docs/REPORT_FORMAT.md`**.
 
+**PH1-M9 reproducibility (`transport` in `run.json`)**
+
+- **`pty_experiment_host_machine`**, **`pty_experiment_host_release`**: `null` for `scaffold_only`; on `experiment_linux_pty`, non-empty snapshots from `uname` (truncated to harness buffers). See **`docs/PTY_REPRODUCIBILITY_PLAN.md`**.
+
 ## `list`
 
 **Purpose**: Enumerate discovered `.toml` probe specs.
