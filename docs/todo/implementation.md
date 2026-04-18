@@ -54,7 +54,7 @@ Outcome:
 
 - Accepted at `ANA-GATE-70`.
 
-### `PH1-M6` (`review_gate`)
+### `PH1-M6` (`completed`)
 
 Purpose:
 
@@ -93,8 +93,52 @@ Queue lines (exact):
 - [x] Stop only at `ANA-GATE-80` (post `ANA-610`) unless truly blocked.
 - [x] Submit checkpoint packet in `docs/todo/PH1_M6_CHECKPOINT.md`.
 
-### `PH1-M7` (`pending`)
+Outcome:
+
+- Accepted at `ANA-GATE-80`.
+
+### `PH1-M7` (`review_gate`)
 
 Purpose:
 
-- decide promotion path from guarded scaffolding to first minimal real PTY experiment.
+- Promote guarded scaffolding to a first minimal real PTY experiment behind existing fail-closed controls.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M7_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- real PTY experiment plan with Linux-first constraints
+- explicit `guarded_state` promotion contract (`scaffold_only` -> `experiment_linux_pty`)
+- minimal POSIX PTY open/close lane behind guarded opt-in
+- run/report/compare evidence updates for experiment markers
+- PH1-M7 smoke and checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-701` through `ANA-710` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-90` reached and reported.
+
+Non-goals:
+
+- Windows ConPTY implementation
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [x] Execute `ANA-701` through `ANA-710` in order from `docs/todo/PH1_M7_TICKETS.md`.
+- [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [x] Stop only at `ANA-GATE-90` (post `ANA-710`) unless truly blocked.
+- [x] Submit checkpoint packet in `docs/todo/PH1_M7_CHECKPOINT.md`.
+
+### `PH1-M8` (`pending`)
+
+Purpose:
+
+- (Architect to define next promotion after `ANA-GATE-90`.)
