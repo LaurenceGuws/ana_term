@@ -444,6 +444,14 @@ test "diffRunMeta detects host_identity_release mismatch" {
     try std.testing.expectEqualStrings("changed", rows[3].delta);
 }
 
+test "diffRunMeta detects run_fingerprint_digest mismatch" {
+    const left = RunMeta{ .run_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
+    const right = RunMeta{ .run_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" };
+    const rows = diffRunMeta(left, right);
+    try std.testing.expectEqualStrings("run_fingerprint_digest", rows[15].field);
+    try std.testing.expectEqualStrings("changed", rows[15].delta);
+}
+
 test "parseRunMeta reads root host identity fields" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();

@@ -206,6 +206,8 @@ test "writeRun JSON-encodes guarded PTY host snapshot strings" {
 
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"pty_experiment_host_machine\": \"x86_64\"") != null);
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"pty_experiment_host_release\": \"6.1.0-test\"") != null);
+    try std.testing.expect(std.mem.indexOf(u8, json_text, "\"run_fingerprint_version\": \"1\"") != null);
+    try std.testing.expect(std.mem.indexOf(u8, json_text, "\"run_fingerprint_digest\": \"") != null);
 
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, json_text, .{});
     defer parsed.deinit();
