@@ -7,6 +7,7 @@ comptime {
     _ = @import("dsl/validator.zig");
     _ = @import("runner/run_plan.zig");
     _ = @import("runner/run_execute.zig");
+    _ = @import("capture/modes.zig");
 }
 
 pub fn main() u8 {
