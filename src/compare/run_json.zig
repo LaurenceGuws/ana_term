@@ -160,3 +160,35 @@ pub fn deinitDiffRows(allocator: std.mem.Allocator, rows: []DiffRow) void {
     for (rows) |*r| r.deinit(allocator);
     allocator.free(rows);
 }
+
+fn tdup(a: std.mem.Allocator, s: []const u8) ![]const u8 {
+    return try a.dupe(u8, s);
+}
+
+test "diffResults classifies added removed changed unchanged" {
+    const a = std.testing.allocator;
+    var left = std.StringArrayHashMap(Row).init(a);
+    defer deinitMap(a, &left);
+    var right = std.StringArrayHashMap(Row).init(a);
+    defer deinitMap(a, &right);
+
+    try left.put(try tdup(a, "gone"), .{ .status = try tdup(a, "x"), .notes = try tdup(a, "") });
+    try right.put(try tdup(a, "new"), .{ .status = try tdup(a, "y"), .notes = try tdup(a, "") });
+    try left.put(try tdup(a, "same"), .{ .status = try tdup(a, "ok"), .notes = try tdup(a, "") });
+    try right.put(try tdup(a, "same"), .{ .status = try tdup(a, "ok"), .notes = try tdup(a, "") });
+    try left.put(try tdup(a, "diff"), .{ .status = try tdup(a, "a"), .notes = try tdup(a, "") });
+    try right.put(try tdup(a, "diff"), .{ .status = try tdup(a, "b"), .notes = try tdup(a, "") });
+
+    const rows = try diffResults(a, &left, &right);
+    defer deinitDiffRows(a, rows);
+
+    try std.testing.expectEqual(@as(usize, 4), rows.len);
+    try std.testing.expectEqual(DiffKind.changed, rows[0].kind);
+    try std.testing.expectEqualStrings("diff", rows[0].spec_id);
+    try std.testing.expectEqual(DiffKind.removed, rows[1].kind);
+    try std.testing.expectEqualStrings("gone", rows[1].spec_id);
+    try std.testing.expectEqual(DiffKind.added, rows[2].kind);
+    try std.testing.expectEqualStrings("new", rows[2].spec_id);
+    try std.testing.expectEqual(DiffKind.unchanged, rows[3].kind);
+    try std.testing.expectEqualStrings("same", rows[3].spec_id);
+}
