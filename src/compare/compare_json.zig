@@ -296,3 +296,25 @@ test "writeFile includes compare_envelope_fingerprint_digest in metadata_deltas"
     try std.testing.expect(std.mem.indexOf(u8, text, "\"field\": \"compare_envelope_fingerprint_digest\"") != null);
     try std.testing.expect(std.mem.indexOf(u8, text, "\"delta\": \"changed\"") != null);
 }
+
+test "writeFile includes run_envelope_fingerprint_digest in metadata_deltas" {
+    var tmp = std.testing.tmpDir(.{});
+    defer tmp.cleanup();
+
+    const path = try std.fmt.allocPrint(std.testing.allocator, ".zig-cache/tmp/{s}/compare-run-envelope-fp.json", .{tmp.sub_path[0..]});
+    defer std.testing.allocator.free(path);
+
+    const rows: []const run_json.DiffRow = &.{};
+    const meta = run_json.diffRunMeta(
+        .{ .run_envelope_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" },
+        .{ .run_envelope_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" },
+    );
+
+    try writeFile(std.testing.allocator, path, rows, "a/run.json", "b/run.json", &meta);
+
+    const text = try std.fs.cwd().readFileAlloc(std.testing.allocator, path, 1 << 20);
+    defer std.testing.allocator.free(text);
+
+    try std.testing.expect(std.mem.indexOf(u8, text, "\"field\": \"run_envelope_fingerprint_digest\"") != null);
+    try std.testing.expect(std.mem.indexOf(u8, text, "\"delta\": \"changed\"") != null);
+}
