@@ -5,6 +5,7 @@ const modes = @import("../capture/modes.zig");
 const run_pipeline = @import("run_pipeline.zig");
 const RunContext = @import("run_context.zig").RunContext;
 const ExecutionMode = @import("../runner/execution_mode.zig").ExecutionMode;
+const TransportMode = @import("../runner/transport_mode.zig").TransportMode;
 
 pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
     var ctx = RunContext.initDefault();
@@ -33,6 +34,36 @@ pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
                 return errors.Category.invalid_spec.exitCode();
             };
             ctx.execution_mode = em;
+            i += 2;
+            continue;
+        }
+        if (std.mem.eql(u8, argv[i], "--transport")) {
+            if (i + 1 >= argv.len) {
+                printErr("--transport requires a value\n") catch {};
+                return errors.Category.unknown_command.exitCode();
+            }
+            const tm = TransportMode.parse(argv[i + 1]) orelse {
+                printErr("invalid --transport (use none or pty_stub)\n") catch {};
+                return errors.Category.invalid_spec.exitCode();
+            };
+            ctx.transport_mode = tm;
+            i += 2;
+            continue;
+        }
+        if (std.mem.eql(u8, argv[i], "--timeout-ms")) {
+            if (i + 1 >= argv.len) {
+                printErr("--timeout-ms requires a value\n") catch {};
+                return errors.Category.unknown_command.exitCode();
+            }
+            const n = std.fmt.parseUnsigned(u32, argv[i + 1], 10) catch {
+                printErr("--timeout-ms must be a positive integer\n") catch {};
+                return errors.Category.invalid_spec.exitCode();
+            };
+            if (n == 0) {
+                printErr("--timeout-ms must be > 0\n") catch {};
+                return errors.Category.invalid_spec.exitCode();
+            }
+            ctx.timeout_ms = n;
             i += 2;
             continue;
         }

@@ -1,6 +1,7 @@
 const std = @import("std");
 const run_execute = @import("../runner/run_execute.zig");
 const RunContext = @import("../cli/run_context.zig").RunContext;
+const transport_stub = @import("../runner/transport_stub.zig");
 
 /// Writes a minimal `run.json` placeholder (`docs/REPORT_FORMAT.md`).
 pub fn writePlaceholder(allocator: std.mem.Allocator, run_dir: []const u8, run_id: []const u8) !void {
@@ -47,6 +48,16 @@ pub fn writeRun(
     }
 
     try buf.print(allocator, ",\n  \"execution_mode\": \"{s}\"", .{ctx.execution_mode.tag()});
+
+    try buf.appendSlice(allocator, ",\n  \"transport\": {\n");
+    try buf.appendSlice(allocator, "    \"handshake\": ");
+    if (transport_stub.handshakeString(ctx.transport_mode)) |hs| {
+        try buf.print(allocator, "\"{s}\"", .{hs});
+    } else {
+        try buf.appendSlice(allocator, "null");
+    }
+    const lat_ns = transport_stub.handshakeLatencyNs(ctx.transport_mode, run_id);
+    try buf.print(allocator, ",\n    \"handshake_latency_ns\": {d},\n    \"mode\": \"{s}\",\n    \"timeout_ms\": {d}\n  }}", .{ lat_ns, ctx.transport_mode.tag(), ctx.timeout_ms });
 
     try buf.appendSlice(allocator, ",\n  \"started_at\": \"\",\n  \"ended_at\": \"\",\n  \"results\": [\n");
 
