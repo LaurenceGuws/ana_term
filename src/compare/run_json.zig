@@ -10,6 +10,9 @@ pub const RunMeta = struct {
     execution_mode: ?[]const u8 = null,
     guarded_opt_in: ?[]const u8 = null,
     guarded_state: ?[]const u8 = null,
+    pty_capability_notes: ?[]const u8 = null,
+    pty_experiment_error: ?[]const u8 = null,
+    pty_experiment_open_ok: ?[]const u8 = null,
     transport_handshake: ?[]const u8 = null,
     transport_handshake_latency_ns: ?[]const u8 = null,
     transport_mode: ?[]const u8 = null,
@@ -48,6 +51,9 @@ pub fn parseRunMeta(allocator: std.mem.Allocator, root: std.json.Value) !RunMeta
             m.transport_mode = readOptString(tr, "mode");
             m.guarded_opt_in = try readOptBoolString(allocator, tr, "guarded_opt_in");
             m.guarded_state = readOptStringOrNull(tr, "guarded_state");
+            m.pty_capability_notes = readOptStringOrNull(tr, "pty_capability_notes");
+            m.pty_experiment_error = readOptStringOrNull(tr, "pty_experiment_error");
+            m.pty_experiment_open_ok = try readOptBoolString(allocator, tr, "pty_experiment_open_ok");
             m.transport_handshake = readHandshakeField(tr);
             m.transport_timeout_ms = try readOptNumberString(allocator, tr, "timeout_ms");
             m.transport_handshake_latency_ns = try readOptNumberString(allocator, tr, "handshake_latency_ns");
@@ -71,6 +77,7 @@ fn readOptBoolString(allocator: std.mem.Allocator, obj: std.json.ObjectMap, key:
     const v = obj.get(key) orelse return null;
     return switch (v) {
         .bool => |b| if (b) try allocator.dupe(u8, "true") else try allocator.dupe(u8, "false"),
+        .null => null,
         else => return error.InvalidCompareMeta,
     };
 }
@@ -111,13 +118,16 @@ fn metaDelta(l: ?[]const u8, r: ?[]const u8) []const u8 {
 }
 
 /// Fixed field order for deterministic compare output.
-pub fn diffRunMeta(left: RunMeta, right: RunMeta) [13]MetaDiffRow {
+pub fn diffRunMeta(left: RunMeta, right: RunMeta) [16]MetaDiffRow {
     return .{
         .{ .field = "comparison_id", .left = left.comparison_id, .right = right.comparison_id, .delta = metaDelta(left.comparison_id, right.comparison_id) },
         .{ .field = "execution_mode", .left = left.execution_mode, .right = right.execution_mode, .delta = metaDelta(left.execution_mode, right.execution_mode) },
         .{ .field = "guarded_opt_in", .left = left.guarded_opt_in, .right = right.guarded_opt_in, .delta = metaDelta(left.guarded_opt_in, right.guarded_opt_in) },
         .{ .field = "guarded_state", .left = left.guarded_state, .right = right.guarded_state, .delta = metaDelta(left.guarded_state, right.guarded_state) },
         .{ .field = "platform", .left = left.platform, .right = right.platform, .delta = metaDelta(left.platform, right.platform) },
+        .{ .field = "pty_capability_notes", .left = left.pty_capability_notes, .right = right.pty_capability_notes, .delta = metaDelta(left.pty_capability_notes, right.pty_capability_notes) },
+        .{ .field = "pty_experiment_error", .left = left.pty_experiment_error, .right = right.pty_experiment_error, .delta = metaDelta(left.pty_experiment_error, right.pty_experiment_error) },
+        .{ .field = "pty_experiment_open_ok", .left = left.pty_experiment_open_ok, .right = right.pty_experiment_open_ok, .delta = metaDelta(left.pty_experiment_open_ok, right.pty_experiment_open_ok) },
         .{ .field = "run_group", .left = left.run_group, .right = right.run_group, .delta = metaDelta(left.run_group, right.run_group) },
         .{ .field = "suite", .left = left.suite, .right = right.suite, .delta = metaDelta(left.suite, right.suite) },
         .{ .field = "term", .left = left.term, .right = right.term, .delta = metaDelta(left.term, right.term) },
@@ -362,8 +372,16 @@ test "diffRunMeta detects transport_mode mismatch" {
     const left = RunMeta{ .transport_mode = "none" };
     const right = RunMeta{ .transport_mode = "pty_stub" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("transport_mode", rows[11].field);
-    try std.testing.expectEqualStrings("changed", rows[11].delta);
+    try std.testing.expectEqualStrings("transport_mode", rows[14].field);
+    try std.testing.expectEqualStrings("changed", rows[14].delta);
+}
+
+test "diffRunMeta detects pty_experiment_open_ok mismatch" {
+    const left = RunMeta{ .pty_experiment_open_ok = "true" };
+    const right = RunMeta{ .pty_experiment_open_ok = "false" };
+    const rows = diffRunMeta(left, right);
+    try std.testing.expectEqualStrings("pty_experiment_open_ok", rows[7].field);
+    try std.testing.expectEqualStrings("changed", rows[7].delta);
 }
 
 test "diffRunMeta detects guarded_state mismatch" {
