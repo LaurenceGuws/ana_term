@@ -56,6 +56,8 @@ pub fn validateRunReport(root: std.json.Value) ?[]const u8 {
         const po = tr.get("pty_experiment_open_ok") orelse return "missing transport.pty_experiment_open_ok";
         const pe = tr.get("pty_experiment_error") orelse return "missing transport.pty_experiment_error";
         const pn = tr.get("pty_capability_notes") orelse return "missing transport.pty_capability_notes";
+        const p_att = tr.get("pty_experiment_attempt") orelse return "missing transport.pty_experiment_attempt";
+        const p_el = tr.get("pty_experiment_elapsed_ns") orelse return "missing transport.pty_experiment_elapsed_ns";
 
         if (std.mem.eql(u8, guarded_state, "scaffold_only")) {
             switch (po) {
@@ -70,6 +72,14 @@ pub fn validateRunReport(root: std.json.Value) ?[]const u8 {
                 .null => {},
                 else => return "transport.pty_capability_notes must be null when guarded_state is scaffold_only",
             }
+            switch (p_att) {
+                .null => {},
+                else => return "transport.pty_experiment_attempt must be null when guarded_state is scaffold_only",
+            }
+            switch (p_el) {
+                .null => {},
+                else => return "transport.pty_experiment_elapsed_ns must be null when guarded_state is scaffold_only",
+            }
         } else {
             const open_ok = switch (po) {
                 .bool => |b| b,
@@ -77,6 +87,11 @@ pub fn validateRunReport(root: std.json.Value) ?[]const u8 {
             };
             const notes = getString(tr, "pty_capability_notes") orelse return "transport.pty_capability_notes must be a string for experiment_linux_pty";
             if (notes.len == 0) return "transport.pty_capability_notes must be non-empty for experiment_linux_pty";
+            const att = getInteger(tr, "pty_experiment_attempt") orelse return "transport.pty_experiment_attempt must be an integer";
+            if (att != 1) return "transport.pty_experiment_attempt must be 1";
+            const elap = getInteger(tr, "pty_experiment_elapsed_ns") orelse return "transport.pty_experiment_elapsed_ns must be an integer";
+            if (elap < 0) return "transport.pty_experiment_elapsed_ns must be non-negative";
+            if (elap > std.math.maxInt(i64)) return "transport.pty_experiment_elapsed_ns out of range";
             if (open_ok) {
                 switch (pe) {
                     .null => {},
@@ -223,7 +238,7 @@ test "validateRunReport rejects non-integer transport.timeout_ms" {
 
 test "validateRunReport accepts pty_guarded transport" {
     const text =
-        \\{"schema_version":"0.2","run_id":"rid","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","transport":{"guarded_opt_in":true,"guarded_state":"scaffold_only","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":null,"pty_experiment_error":null,"pty_experiment_open_ok":null,"timeout_ms":30000},"results":[]}
+        \\{"schema_version":"0.2","run_id":"rid","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","transport":{"guarded_opt_in":true,"guarded_state":"scaffold_only","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":null,"pty_experiment_attempt":null,"pty_experiment_elapsed_ns":null,"pty_experiment_error":null,"pty_experiment_open_ok":null,"timeout_ms":30000},"results":[]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
@@ -232,7 +247,7 @@ test "validateRunReport accepts pty_guarded transport" {
 
 test "validateRunReport accepts pty_guarded experiment_linux_pty success" {
     const text =
-        \\{"schema_version":"0.2","run_id":"rid","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","transport":{"guarded_opt_in":true,"guarded_state":"experiment_linux_pty","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":"linux /dev/ptmx","pty_experiment_error":null,"pty_experiment_open_ok":true,"timeout_ms":30000},"results":[]}
+        \\{"schema_version":"0.2","run_id":"rid","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","transport":{"guarded_opt_in":true,"guarded_state":"experiment_linux_pty","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":"linux /dev/ptmx","pty_experiment_attempt":1,"pty_experiment_elapsed_ns":42,"pty_experiment_error":null,"pty_experiment_open_ok":true,"timeout_ms":30000},"results":[]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
@@ -241,7 +256,16 @@ test "validateRunReport accepts pty_guarded experiment_linux_pty success" {
 
 test "validateRunReport rejects pty_guarded without opt-in flag in json" {
     const text =
-        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","transport":{"guarded_opt_in":false,"guarded_state":"scaffold_only","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":null,"pty_experiment_error":null,"pty_experiment_open_ok":null,"timeout_ms":30000},"results":[]}
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","transport":{"guarded_opt_in":false,"guarded_state":"scaffold_only","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":null,"pty_experiment_attempt":null,"pty_experiment_elapsed_ns":null,"pty_experiment_error":null,"pty_experiment_open_ok":null,"timeout_ms":30000},"results":[]}
+    ;
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
+    defer parsed.deinit();
+    try std.testing.expect(validateRunReport(parsed.value) != null);
+}
+
+test "validateRunReport rejects pty_guarded experiment with wrong attempt count" {
+    const text =
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","transport":{"guarded_opt_in":true,"guarded_state":"experiment_linux_pty","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":"linux /dev/ptmx","pty_experiment_attempt":2,"pty_experiment_elapsed_ns":1,"pty_experiment_error":null,"pty_experiment_open_ok":true,"timeout_ms":30000},"results":[]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
