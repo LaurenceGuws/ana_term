@@ -26,6 +26,13 @@ pub fn validateRunReport(root: std.json.Value) ?[]const u8 {
     };
     if (getString(term_obj, "name") == null) return "terminal.name must be a string";
 
+    const him = getString(obj, "host_identity_machine") orelse return "host_identity_machine must be a string";
+    if (him.len == 0) return "host_identity_machine must be non-empty";
+    const hir = getString(obj, "host_identity_release") orelse return "host_identity_release must be a string";
+    if (hir.len == 0) return "host_identity_release must be non-empty";
+    const his = getString(obj, "host_identity_sysname") orelse return "host_identity_sysname must be a string";
+    if (his.len == 0) return "host_identity_sysname must be non-empty";
+
     const tr_o = obj.get("transport") orelse return "missing transport object";
     const tr = switch (tr_o) {
         .object => |t| t,
@@ -189,7 +196,7 @@ fn getBool(obj: std.json.ObjectMap, key: []const u8) ?bool {
 
 test "validateRunReport accepts minimal harness-shaped run.json" {
     const text =
-        \\{"schema_version":"0.2","run_id":"run-001","started_at":"","ended_at":"","platform":"linux","term":"xterm","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":30000},"results":[{"spec_id":"p","status":"manual","notes":"","capture_mode":"manual","observations":{}}]}
+        \\{"schema_version":"0.2","run_id":"run-001","started_at":"","ended_at":"","platform":"linux","term":"xterm","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","host_identity_machine":"x86_64","host_identity_release":"6.0.0","host_identity_sysname":"Linux","transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":30000},"results":[{"spec_id":"p","status":"manual","notes":"","capture_mode":"manual","observations":{}}]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
@@ -207,7 +214,7 @@ test "validateRunReport rejects missing schema_version" {
 
 test "validateRunReport rejects result row missing observations" {
     const text =
-        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t"},"execution_mode":"placeholder","transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":30000},"results":[{"spec_id":"p","status":"manual","notes":"","capture_mode":"manual"}]}
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t"},"execution_mode":"placeholder","host_identity_machine":"x86_64","host_identity_release":"6.0.0","host_identity_sysname":"Linux","transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":30000},"results":[{"spec_id":"p","status":"manual","notes":"","capture_mode":"manual"}]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
@@ -216,7 +223,7 @@ test "validateRunReport rejects result row missing observations" {
 
 test "validateRunReport rejects non-object terminal" {
     const text =
-        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":"oops","execution_mode":"placeholder","transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":30000},"results":[]}
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":"oops","execution_mode":"placeholder","host_identity_machine":"x86_64","host_identity_release":"6.0.0","host_identity_sysname":"Linux","transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":30000},"results":[]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
@@ -234,7 +241,7 @@ test "validateRunReport rejects invalid execution_mode" {
 
 test "validateRunReport rejects invalid transport.mode" {
     const text =
-        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t"},"execution_mode":"placeholder","transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"bogus","timeout_ms":30000},"results":[]}
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t"},"execution_mode":"placeholder","host_identity_machine":"x86_64","host_identity_release":"6.0.0","host_identity_sysname":"Linux","transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"bogus","timeout_ms":30000},"results":[]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
@@ -243,7 +250,7 @@ test "validateRunReport rejects invalid transport.mode" {
 
 test "validateRunReport rejects non-integer transport.timeout_ms" {
     const text =
-        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t"},"execution_mode":"placeholder","transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":3.5},"results":[]}
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t"},"execution_mode":"placeholder","host_identity_machine":"x86_64","host_identity_release":"6.0.0","host_identity_sysname":"Linux","transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":3.5},"results":[]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
@@ -252,7 +259,7 @@ test "validateRunReport rejects non-integer transport.timeout_ms" {
 
 test "validateRunReport accepts pty_guarded transport" {
     const text =
-        \\{"schema_version":"0.2","run_id":"rid","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","transport":{"guarded_opt_in":true,"guarded_state":"scaffold_only","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":null,"pty_experiment_attempt":null,"pty_experiment_elapsed_ns":null,"pty_experiment_error":null,"pty_experiment_host_machine":null,"pty_experiment_host_release":null,"pty_experiment_open_ok":null,"timeout_ms":30000},"results":[]}
+        \\{"schema_version":"0.2","run_id":"rid","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","host_identity_machine":"x86_64","host_identity_release":"6.0.0","host_identity_sysname":"Linux","transport":{"guarded_opt_in":true,"guarded_state":"scaffold_only","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":null,"pty_experiment_attempt":null,"pty_experiment_elapsed_ns":null,"pty_experiment_error":null,"pty_experiment_host_machine":null,"pty_experiment_host_release":null,"pty_experiment_open_ok":null,"timeout_ms":30000},"results":[]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
@@ -261,7 +268,7 @@ test "validateRunReport accepts pty_guarded transport" {
 
 test "validateRunReport accepts pty_guarded experiment_linux_pty success" {
     const text =
-        \\{"schema_version":"0.2","run_id":"rid","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","transport":{"guarded_opt_in":true,"guarded_state":"experiment_linux_pty","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":"linux /dev/ptmx","pty_experiment_attempt":1,"pty_experiment_elapsed_ns":42,"pty_experiment_error":null,"pty_experiment_host_machine":"x86_64","pty_experiment_host_release":"6.1.0-test","pty_experiment_open_ok":true,"timeout_ms":30000},"results":[]}
+        \\{"schema_version":"0.2","run_id":"rid","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","host_identity_machine":"x86_64","host_identity_release":"6.0.0","host_identity_sysname":"Linux","transport":{"guarded_opt_in":true,"guarded_state":"experiment_linux_pty","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":"linux /dev/ptmx","pty_experiment_attempt":1,"pty_experiment_elapsed_ns":42,"pty_experiment_error":null,"pty_experiment_host_machine":"x86_64","pty_experiment_host_release":"6.1.0-test","pty_experiment_open_ok":true,"timeout_ms":30000},"results":[]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
@@ -270,7 +277,7 @@ test "validateRunReport accepts pty_guarded experiment_linux_pty success" {
 
 test "validateRunReport rejects pty_guarded without opt-in flag in json" {
     const text =
-        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","transport":{"guarded_opt_in":false,"guarded_state":"scaffold_only","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":null,"pty_experiment_attempt":null,"pty_experiment_elapsed_ns":null,"pty_experiment_error":null,"pty_experiment_host_machine":null,"pty_experiment_host_release":null,"pty_experiment_open_ok":null,"timeout_ms":30000},"results":[]}
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","host_identity_machine":"x86_64","host_identity_release":"6.0.0","host_identity_sysname":"Linux","transport":{"guarded_opt_in":false,"guarded_state":"scaffold_only","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":null,"pty_experiment_attempt":null,"pty_experiment_elapsed_ns":null,"pty_experiment_error":null,"pty_experiment_host_machine":null,"pty_experiment_host_release":null,"pty_experiment_open_ok":null,"timeout_ms":30000},"results":[]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
@@ -279,7 +286,7 @@ test "validateRunReport rejects pty_guarded without opt-in flag in json" {
 
 test "validateRunReport accepts pty_guarded experiment failure telemetry" {
     const text =
-        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","transport":{"guarded_opt_in":true,"guarded_state":"experiment_linux_pty","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":"linux /dev/ptmx","pty_experiment_attempt":1,"pty_experiment_elapsed_ns":0,"pty_experiment_error":"grantpt","pty_experiment_host_machine":"aarch64","pty_experiment_host_release":"6.6.0","pty_experiment_open_ok":false,"timeout_ms":30000},"results":[]}
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","host_identity_machine":"x86_64","host_identity_release":"6.0.0","host_identity_sysname":"Linux","transport":{"guarded_opt_in":true,"guarded_state":"experiment_linux_pty","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":"linux /dev/ptmx","pty_experiment_attempt":1,"pty_experiment_elapsed_ns":0,"pty_experiment_error":"grantpt","pty_experiment_host_machine":"aarch64","pty_experiment_host_release":"6.6.0","pty_experiment_open_ok":false,"timeout_ms":30000},"results":[]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
@@ -288,7 +295,7 @@ test "validateRunReport accepts pty_guarded experiment failure telemetry" {
 
 test "validateRunReport rejects pty_guarded experiment with wrong attempt count" {
     const text =
-        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","transport":{"guarded_opt_in":true,"guarded_state":"experiment_linux_pty","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":"linux /dev/ptmx","pty_experiment_attempt":2,"pty_experiment_elapsed_ns":1,"pty_experiment_error":null,"pty_experiment_host_machine":"x86_64","pty_experiment_host_release":"1.0","pty_experiment_open_ok":true,"timeout_ms":30000},"results":[]}
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","host_identity_machine":"x86_64","host_identity_release":"6.0.0","host_identity_sysname":"Linux","transport":{"guarded_opt_in":true,"guarded_state":"experiment_linux_pty","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":"linux /dev/ptmx","pty_experiment_attempt":2,"pty_experiment_elapsed_ns":1,"pty_experiment_error":null,"pty_experiment_host_machine":"x86_64","pty_experiment_host_release":"1.0","pty_experiment_open_ok":true,"timeout_ms":30000},"results":[]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
@@ -297,7 +304,7 @@ test "validateRunReport rejects pty_guarded experiment with wrong attempt count"
 
 test "validateRunReport rejects pty_stub with guarded_state scaffold_only" {
     const text =
-        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","transport":{"guarded_opt_in":false,"guarded_state":"scaffold_only","handshake":"stub-handshake-v1","handshake_latency_ns":1,"mode":"pty_stub","timeout_ms":30000},"results":[]}
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","host_identity_machine":"x86_64","host_identity_release":"6.0.0","host_identity_sysname":"Linux","transport":{"guarded_opt_in":false,"guarded_state":"scaffold_only","handshake":"stub-handshake-v1","handshake_latency_ns":1,"mode":"pty_stub","timeout_ms":30000},"results":[]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
@@ -306,7 +313,7 @@ test "validateRunReport rejects pty_stub with guarded_state scaffold_only" {
 
 test "validateRunReport rejects pty_guarded experiment missing host_machine" {
     const text =
-        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","transport":{"guarded_opt_in":true,"guarded_state":"experiment_linux_pty","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":"linux /dev/ptmx","pty_experiment_attempt":1,"pty_experiment_elapsed_ns":0,"pty_experiment_error":null,"pty_experiment_host_release":"6.6.0","pty_experiment_open_ok":true,"timeout_ms":30000},"results":[]}
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","host_identity_machine":"x86_64","host_identity_release":"6.0.0","host_identity_sysname":"Linux","transport":{"guarded_opt_in":true,"guarded_state":"experiment_linux_pty","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":"linux /dev/ptmx","pty_experiment_attempt":1,"pty_experiment_elapsed_ns":0,"pty_experiment_error":null,"pty_experiment_host_release":"6.6.0","pty_experiment_open_ok":true,"timeout_ms":30000},"results":[]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
@@ -315,7 +322,7 @@ test "validateRunReport rejects pty_guarded experiment missing host_machine" {
 
 test "validateRunReport rejects pty_guarded scaffold with non-null host_release" {
     const text =
-        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","transport":{"guarded_opt_in":true,"guarded_state":"scaffold_only","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":null,"pty_experiment_attempt":null,"pty_experiment_elapsed_ns":null,"pty_experiment_error":null,"pty_experiment_host_machine":null,"pty_experiment_host_release":"6.6.0","pty_experiment_open_ok":null,"timeout_ms":30000},"results":[]}
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","host_identity_machine":"x86_64","host_identity_release":"6.0.0","host_identity_sysname":"Linux","transport":{"guarded_opt_in":true,"guarded_state":"scaffold_only","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":null,"pty_experiment_attempt":null,"pty_experiment_elapsed_ns":null,"pty_experiment_error":null,"pty_experiment_host_machine":null,"pty_experiment_host_release":"6.6.0","pty_experiment_open_ok":null,"timeout_ms":30000},"results":[]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
