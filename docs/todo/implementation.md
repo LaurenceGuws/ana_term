@@ -97,7 +97,7 @@ Outcome:
 
 - Accepted at `ANA-GATE-80`.
 
-### `PH1-M7` (`review_gate`)
+### `PH1-M7` (`completed`)
 
 Purpose:
 
@@ -137,8 +137,52 @@ Queue lines (exact):
 - [x] Stop only at `ANA-GATE-90` (post `ANA-710`) unless truly blocked.
 - [x] Submit checkpoint packet in `docs/todo/PH1_M7_CHECKPOINT.md`.
 
-### `PH1-M8` (`pending`)
+Outcome:
+
+- Accepted at `ANA-GATE-90`.
+
+### `PH1-M8` (`review_gate`)
 
 Purpose:
 
-- (Architect to define next promotion after `ANA-GATE-90`.)
+- Stabilize the guarded Linux PTY experiment by adding deterministic experiment metadata, stricter invariants, and repeatable smoke evidence.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M8_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- document PH1-M8 experiment hardening boundaries
+- add deterministic PTY experiment telemetry fields in `run.json`
+- validate/report/compare coverage for new PTY experiment telemetry
+- expand regression tests for Linux-only guarded path
+- PH1-M8 smoke and checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-801` through `ANA-810` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-100` reached and reported.
+
+Non-goals:
+
+- Windows ConPTY implementation
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [x] Execute `ANA-801` through `ANA-810` in order from `docs/todo/PH1_M8_TICKETS.md`.
+- [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [x] Stop only at `ANA-GATE-100` (post `ANA-810`) unless truly blocked.
+- [x] Submit checkpoint packet in `docs/todo/PH1_M8_CHECKPOINT.md`.
+
+### `PH1-M9` (`pending`)
+
+Purpose:
+
+- (Architect to define after `ANA-GATE-100`.)
