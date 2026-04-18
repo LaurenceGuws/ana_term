@@ -1,6 +1,6 @@
-# Smoke workflow (PH1-M2 through PH1-M10)
+# Smoke workflow (PH1-M2 through PH1-M11)
 
-Minimal operator path: run the **baseline-linux** suite twice with **different terminal identities**, then produce one **compare** report (markdown + JSON). **PH1-M3** adds strict `report` / `compare` checks and metadata-rich compare output. **PH1-M4** adds **execution modes** (`placeholder` vs `protocol_stub`), **`--dry-run`**, and deterministic stub **observations**—use **Section 6** when touching the runner seam. **PH1-M5** adds **transport** metadata (`none` vs **`pty_stub`**) and **`--timeout-ms`**—use **Section 7**. **PH1-M6** adds guarded transport scaffolding—use **Section 8**. **PH1-M7** adds a minimal Linux PTY open/close experiment—use **Section 9** (Linux host only). **PH1-M8** adds deterministic telemetry for that experiment—use **Section 10**. **PH1-M9** adds host **`uname`** snapshots on the guarded experiment path—use **Section 11**. **PH1-M10** adds root **`host_identity_*`** fields on every artifact run—use **Section 12**.
+Minimal operator path: run the **baseline-linux** suite twice with **different terminal identities**, then produce one **compare** report (markdown + JSON). **PH1-M3** adds strict `report` / `compare` checks and metadata-rich compare output. **PH1-M4** adds **execution modes** (`placeholder` vs `protocol_stub`), **`--dry-run`**, and deterministic stub **observations**—use **Section 6** when touching the runner seam. **PH1-M5** adds **transport** metadata (`none` vs **`pty_stub`**) and **`--timeout-ms`**—use **Section 7**. **PH1-M6** adds guarded transport scaffolding—use **Section 8**. **PH1-M7** adds a minimal Linux PTY open/close experiment—use **Section 9** (Linux host only). **PH1-M8** adds deterministic telemetry for that experiment—use **Section 10**. **PH1-M9** adds host **`uname`** snapshots on the guarded experiment path—use **Section 11**. **PH1-M10** adds root **`host_identity_*`** fields on every artifact run—use **Section 12**. **PH1-M11** adds deterministic **`run_fingerprint_*`** fields—use **Section 13**.
 
 ## Prerequisites
 
@@ -161,6 +161,18 @@ After any full **`run-suite`** (or **`run`**) that writes **`run.json`** (**not*
 
 See **`docs/HOST_IDENTITY_PLAN.md`**.
 
+## 13. PH1-M11 run fingerprint (artifact runs)
+
+After a full run that writes **`run.json`**, **`report`** must exit **0**. In **`run.json`** root metadata verify:
+
+- **`run_fingerprint_digest`**: **64** lowercase hex characters.
+- **`run_fingerprint_version`**: **`1`**.
+- Serialization order: after **`host_identity_sysname`**, before **`transport`** (see **`docs/REPORT_FORMAT.md`**).
+
+**Compare**: identical runs (same **`run_id`**, suite, and ordered **`spec_id`** list, same host identity context) should yield the same digest; changing any canonical input should change **`run_fingerprint_digest`**.
+
+See **`docs/RUN_FINGERPRINT_PLAN.md`**.
+
 ## References
 
 - Terminal flags and behavior: `docs/CLI.md`
@@ -174,3 +186,4 @@ See **`docs/HOST_IDENTITY_PLAN.md`**.
 - PTY experiment hardening: `docs/PTY_EXPERIMENT_HARDENING_PLAN.md`
 - PTY reproducibility (PH1-M9): `docs/PTY_REPRODUCIBILITY_PLAN.md`
 - Host identity (PH1-M10): `docs/HOST_IDENTITY_PLAN.md`
+- Run fingerprint (PH1-M11): `docs/RUN_FINGERPRINT_PLAN.md`
