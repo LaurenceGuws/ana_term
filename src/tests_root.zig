@@ -4,6 +4,7 @@ test {
     _ = @import("report/json_writer.zig");
     _ = @import("report/run_fingerprint.zig");
     _ = @import("report/specset_fingerprint.zig");
+    _ = @import("report/resultset_fingerprint.zig");
     _ = @import("report/run_json_validate.zig");
     _ = @import("compare/run_json.zig");
     _ = @import("compare/compare_json.zig");
