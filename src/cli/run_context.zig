@@ -141,3 +141,14 @@ test "capturePtyHostSnapshot fills machine and release on Linux" {
     try std.testing.expect(ctx.pty_experiment_host_machine_len > 0);
     try std.testing.expect(ctx.pty_experiment_host_release_len > 0);
 }
+
+test "captureHostIdentity fills machine release and sysname on Linux" {
+    const builtin = @import("builtin");
+    if (builtin.target.os.tag != .linux) return error.SkipZigTest;
+
+    var ctx = RunContext.initDefault();
+    ctx.captureHostIdentity();
+    try std.testing.expect(ctx.host_identity_machine_len > 0);
+    try std.testing.expect(ctx.host_identity_release_len > 0);
+    try std.testing.expect(ctx.host_identity_sysname_len > 0);
+}
