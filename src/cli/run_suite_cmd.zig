@@ -22,6 +22,16 @@ pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
 
     var i: usize = 1;
     while (i < argv.len) {
+        if (std.mem.eql(u8, argv[i], "--dry-run")) {
+            ctx.dry_run = true;
+            i += 1;
+            continue;
+        }
+        if (std.mem.eql(u8, argv[i], "--strict")) {
+            ctx.strict = true;
+            i += 1;
+            continue;
+        }
         if (std.mem.eql(u8, argv[i], "--capture")) {
             if (i + 1 >= argv.len) {
                 printErr("--capture requires a value\n") catch {};

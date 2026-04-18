@@ -28,6 +28,13 @@ These flags identify **which terminal** is under test and how it would be invoke
 - `--terminal-cmd` is optional metadata for reproducibility; it does not override `--terminal` identity.
 - Unknown or missing `--terminal` is recorded as `unknown` in artifacts unless a default is documented per command.
 
+## Execution control flags (`run`, `run-suite`, PH1-M4+)
+
+| Flag | Meaning |
+|------|---------|
+| `--dry-run` | Boolean flag (no value). Validates specs and runs the planning/execution path in memory, then exits **without** creating a run directory or writing `run.json` / `summary.md` / `env.json`. Exit **0** when planning succeeds. |
+| `--strict` | Boolean flag (no value). Enables stricter validation for the invocation (exact rules evolve by milestone; see `docs/PROTO_EXEC_PLAN.md`). |
+
 ## `list`
 
 **Purpose**: Enumerate discovered `.toml` probe specs.
@@ -56,6 +63,8 @@ These flags identify **which terminal** is under test and how it would be invoke
 | `--terminal-cmd <string>` | Optional; launch command string for future automation. |
 | `--platform <name>` | Optional; OS tag recorded in artifacts. |
 | `--capture <mode>` | Optional; one of `manual`, `text_observation`, `timed`. |
+| `--dry-run` | Optional; validate and simulate without writing artifacts (PH1-M4+). |
+| `--strict` | Optional; stricter validation where implemented (PH1-M4+). |
 
 | Output | Description |
 |--------|-------------|

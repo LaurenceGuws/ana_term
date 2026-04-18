@@ -9,6 +9,10 @@ pub const RunContext = struct {
     comparison_id: ?[]const u8,
     /// Optional batch label for grouping multiple comparisons (e.g. CI matrix key).
     run_group: ?[]const u8,
+    /// When true, plan and execute in memory only (no artifact directory).
+    dry_run: bool,
+    /// Stricter validation when supported (PH1-M4+).
+    strict: bool,
 
     pub fn initDefault() RunContext {
         return .{
@@ -19,6 +23,8 @@ pub const RunContext = struct {
             .suite_name = null,
             .comparison_id = null,
             .run_group = null,
+            .dry_run = false,
+            .strict = false,
         };
     }
 };
