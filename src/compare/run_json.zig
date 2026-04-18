@@ -413,6 +413,14 @@ test "diffRunMeta detects guarded_state mismatch" {
     try std.testing.expectEqualStrings("changed", rows[3].delta);
 }
 
+test "diffRunMeta detects pty_experiment_host_machine mismatch" {
+    const left = RunMeta{ .pty_experiment_host_machine = "x86_64" };
+    const right = RunMeta{ .pty_experiment_host_machine = "aarch64" };
+    const rows = diffRunMeta(left, right);
+    try std.testing.expectEqualStrings("pty_experiment_host_machine", rows[9].field);
+    try std.testing.expectEqualStrings("changed", rows[9].delta);
+}
+
 test "parseRunMeta reads PTY experiment telemetry numbers" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
@@ -427,6 +435,20 @@ test "parseRunMeta reads PTY experiment telemetry numbers" {
     try std.testing.expectEqualStrings("99", m.pty_experiment_elapsed_ns.?);
     try std.testing.expectEqualStrings("x86_64", m.pty_experiment_host_machine.?);
     try std.testing.expectEqualStrings("6.1.0", m.pty_experiment_host_release.?);
+}
+
+test "parseRunMeta reads null PTY host fields for scaffold_only" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    const a = arena.allocator();
+    const text =
+        \\{"transport":{"guarded_opt_in":true,"guarded_state":"scaffold_only","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":null,"pty_experiment_attempt":null,"pty_experiment_elapsed_ns":null,"pty_experiment_error":null,"pty_experiment_host_machine":null,"pty_experiment_host_release":null,"pty_experiment_open_ok":null,"timeout_ms":30000}}
+    ;
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
+    defer parsed.deinit();
+    const m = try parseRunMeta(a, parsed.value);
+    try std.testing.expect(m.pty_experiment_host_machine == null);
+    try std.testing.expect(m.pty_experiment_host_release == null);
 }
 
 test "parseRunMeta formats transport numeric fields" {
