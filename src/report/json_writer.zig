@@ -2,6 +2,7 @@ const std = @import("std");
 const run_execute = @import("../runner/run_execute.zig");
 const RunContext = @import("../cli/run_context.zig").RunContext;
 const transport_stub = @import("../runner/transport_stub.zig");
+const run_json_validate = @import("run_json_validate.zig");
 
 /// Writes a minimal `run.json` placeholder (`docs/REPORT_FORMAT.md`).
 pub fn writePlaceholder(allocator: std.mem.Allocator, run_dir: []const u8, run_id: []const u8) !void {
@@ -142,4 +143,89 @@ pub fn writeRun(
     try buf.appendSlice(allocator, "\n  ]\n}\n");
 
     try std.fs.cwd().writeFile(.{ .sub_path = path, .data = buf.items });
+}
+
+test "writeRun JSON-encodes guarded PTY host snapshot strings" {
+    const builtin = @import("builtin");
+    if (builtin.target.os.tag != .linux) return error.SkipZigTest;
+
+    var tmp = std.testing.tmpDir(.{});
+    defer tmp.cleanup();
+
+    const run_dir = try std.fmt.allocPrint(std.testing.allocator, ".zig-cache/tmp/{s}", .{tmp.sub_path[0..]});
+    defer std.testing.allocator.free(run_dir);
+
+    var ctx = RunContext.initDefault();
+    ctx.platform = "linux";
+    ctx.terminal_name = "t";
+    ctx.transport_mode = .pty_guarded;
+    ctx.dry_run = false;
+    ctx.pty_capability_notes = "linux /dev/ptmx";
+    ctx.pty_experiment_attempt = 1;
+    ctx.pty_experiment_elapsed_ns = 0;
+    ctx.pty_experiment_open_ok = true;
+    ctx.pty_experiment_error = null;
+
+    const mach = "x86_64";
+    const rel = "6.1.0-test";
+    @memcpy(ctx.pty_experiment_host_machine[0..mach.len], mach);
+    ctx.pty_experiment_host_machine_len = @intCast(mach.len);
+    @memcpy(ctx.pty_experiment_host_release[0..rel.len], rel);
+    ctx.pty_experiment_host_release_len = @intCast(rel.len);
+
+    try writeRun(std.testing.allocator, run_dir, "rid-json-writer", &.{}, ctx);
+
+    const json_path = try std.fmt.allocPrint(std.testing.allocator, "{s}/run.json", .{run_dir});
+    defer std.testing.allocator.free(json_path);
+    const json_text = try std.fs.cwd().readFileAlloc(std.testing.allocator, json_path, 1 << 20);
+    defer std.testing.allocator.free(json_text);
+
+    try std.testing.expect(std.mem.indexOf(u8, json_text, "\"pty_experiment_host_machine\": \"x86_64\"") != null);
+    try std.testing.expect(std.mem.indexOf(u8, json_text, "\"pty_experiment_host_release\": \"6.1.0-test\"") != null);
+
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, json_text, .{});
+    defer parsed.deinit();
+    try std.testing.expect(run_json_validate.validateRunReport(parsed.value) == null);
+}
+
+test "writeRun escapes quotes in guarded PTY host snapshot strings" {
+    const builtin = @import("builtin");
+    if (builtin.target.os.tag != .linux) return error.SkipZigTest;
+
+    var tmp = std.testing.tmpDir(.{});
+    defer tmp.cleanup();
+
+    const run_dir = try std.fmt.allocPrint(std.testing.allocator, ".zig-cache/tmp/{s}", .{tmp.sub_path[0..]});
+    defer std.testing.allocator.free(run_dir);
+
+    var ctx = RunContext.initDefault();
+    ctx.platform = "linux";
+    ctx.terminal_name = "t";
+    ctx.transport_mode = .pty_guarded;
+    ctx.dry_run = false;
+    ctx.pty_capability_notes = "linux /dev/ptmx";
+    ctx.pty_experiment_attempt = 1;
+    ctx.pty_experiment_elapsed_ns = 0;
+    ctx.pty_experiment_open_ok = true;
+    ctx.pty_experiment_error = null;
+
+    const mach: []const u8 = &.{ 'a', 'b', '"', 'c' };
+    @memcpy(ctx.pty_experiment_host_machine[0..mach.len], mach);
+    ctx.pty_experiment_host_machine_len = @intCast(mach.len);
+    const rel = "ok";
+    @memcpy(ctx.pty_experiment_host_release[0..rel.len], rel);
+    ctx.pty_experiment_host_release_len = @intCast(rel.len);
+
+    try writeRun(std.testing.allocator, run_dir, "rid-json-esc", &.{}, ctx);
+
+    const json_path = try std.fmt.allocPrint(std.testing.allocator, "{s}/run.json", .{run_dir});
+    defer std.testing.allocator.free(json_path);
+    const json_text = try std.fs.cwd().readFileAlloc(std.testing.allocator, json_path, 1 << 20);
+    defer std.testing.allocator.free(json_text);
+
+    try std.testing.expect(std.mem.indexOf(u8, json_text, "\"pty_experiment_host_machine\": \"ab\\\"c\"") != null);
+
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, json_text, .{});
+    defer parsed.deinit();
+    try std.testing.expect(run_json_validate.validateRunReport(parsed.value) == null);
 }
