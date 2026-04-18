@@ -42,13 +42,25 @@ These flags describe the **transport seam** (how the harness would attach to a t
 
 | Flag | Meaning |
 |------|---------|
-| `--transport <mode>` | `none` (default): transport metadata reflects **no** stub handshake. `pty_stub`: emit deterministic **stub** handshake and synthetic latency in `run.json` under `transport` (still **no** real PTY; see `docs/TRANSPORT_PLAN.md`). `pty_guarded`: guarded real-transport **scaffold** (PH1-M6+): same style of deterministic handshake/latency in artifacts until a real PTY exists; see `docs/REAL_TRANSPORT_GUARD_PLAN.md`. |
+| `--transport <mode>` | `none` (default): transport metadata reflects **no** stub handshake. `pty_stub`: emit deterministic **stub** handshake and synthetic latency in `run.json` under `transport` (still **no** real PTY; see `docs/TRANSPORT_PLAN.md`). `pty_guarded`: guarded transport (PH1-M6+): deterministic handshake/latency plus optional **Linux PTY experiment** (PH1-M7+); see `docs/REAL_TRANSPORT_GUARD_PLAN.md` and `docs/PTY_EXPERIMENT_PLAN.md`. |
 | `--allow-guarded-transport` | Boolean flag (no value). **Required** (or env below) when `--transport pty_guarded` is set; otherwise the run fails closed before artifacts. |
 | `--timeout-ms <n>` | Positive integer: deadline budget in milliseconds, stored as `transport.timeout_ms`. PH1-M5 records the value; wall-clock enforcement is deferred. |
 
 **Environment (guarded transport)**
 
 - `ANA_TERM_ALLOW_GUARDED_TRANSPORT=1` — satisfies the guarded-transport opt-in gate when set exactly to `1`, same as passing `--allow-guarded-transport`.
+
+**`transport.guarded_state` promotion (PH1-M7+)**
+
+Recorded under `transport` in `run.json` (see `docs/REPORT_FORMAT.md`):
+
+| Value | When |
+|-------|------|
+| `na` | `none` or `pty_stub`. |
+| `scaffold_only` | `pty_guarded` with **`--dry-run`**, or before a real PTY experiment runs. |
+| `experiment_linux_pty` | `pty_guarded`, not dry-run, on a **Linux host** (per `uname`), after the minimal PTY open/close attempt. |
+
+On **non-Linux** hosts, `pty_guarded` (non-dry-run) fails with exit **2** before writing artifacts. Opt-in rules are unchanged.
 
 ## `list`
 

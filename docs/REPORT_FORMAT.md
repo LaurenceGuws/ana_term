@@ -42,6 +42,27 @@ Each **result** object includes:
 
 Phase-1 placeholder runs may use minimal values but must preserve these keys for tooling stability.
 
+## `transport` object (`run.json`, PH1-M5+)
+
+The harness emits a **`transport`** object alongside core run fields. Keys are stable for `report` / `compare`.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `mode` | string | `none`, `pty_stub`, or `pty_guarded`. |
+| `timeout_ms` | integer | Positive deadline budget (milliseconds). |
+| `handshake` | string or `null` | Stub handshake token when applicable. |
+| `handshake_latency_ns` | integer | Synthetic latency; `0` when `mode` is `none`. |
+| `guarded_opt_in` | boolean | `true` only for `pty_guarded` runs that passed the opt-in gate. |
+| `guarded_state` | string | `na` \| `scaffold_only` \| `experiment_linux_pty` (see `docs/CLI.md`). |
+
+**PH1-M7+ (guarded Linux PTY experiment)** — present when `mode` is `pty_guarded`:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `pty_experiment_open_ok` | boolean or `null` | `null` when `guarded_state` is `scaffold_only`; otherwise whether the minimal PTY pair opened. |
+| `pty_experiment_error` | string or `null` | Short static reason when open failed; `null` on success or when not applicable. |
+| `pty_capability_notes` | string or `null` | Human-readable note on what was attempted (e.g. Linux `/dev/ptmx` path); `null` when not applicable. |
+
 ## `summary.md` (required)
 
 Markdown document with:
