@@ -56,6 +56,8 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
 
     if (ctx.transport_mode == .pty_guarded and !ctx.dry_run) {
         ctx.pty_capability_notes = "linux /dev/ptmx grantpt unlockpt ptsname_r slave open";
+        ctx.pty_experiment_attempt = 1;
+        const t_start = std.time.Instant.now() catch null;
         blk: {
             var pair = posix_pty.openMinimal() catch |err| {
                 ctx.pty_experiment_open_ok = false;
@@ -66,6 +68,11 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
             ctx.pty_experiment_open_ok = true;
             ctx.pty_experiment_error = null;
         }
+        const elapsed_raw: ?u64 = if (t_start) |ts| blk: {
+            if (std.time.Instant.now()) |te| break :blk te.since(ts) else |_| break :blk null;
+        } else null;
+        const cap: u64 = @intCast(std.math.maxInt(i64));
+        ctx.pty_experiment_elapsed_ns = @min(elapsed_raw orelse 0, cap);
     }
 
     if (ctx.dry_run) {

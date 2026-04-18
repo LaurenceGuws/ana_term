@@ -75,6 +75,18 @@ pub fn writeRun(
         } else {
             try buf.appendSlice(allocator, "null");
         }
+        try buf.appendSlice(allocator, ",\n    \"pty_experiment_attempt\": ");
+        if (ctx.pty_experiment_attempt) |a| {
+            try buf.print(allocator, "{d}", .{a});
+        } else {
+            try buf.appendSlice(allocator, "null");
+        }
+        try buf.appendSlice(allocator, ",\n    \"pty_experiment_elapsed_ns\": ");
+        if (ctx.pty_experiment_elapsed_ns) |e| {
+            try buf.print(allocator, "{d}", .{e});
+        } else {
+            try buf.appendSlice(allocator, "null");
+        }
         try buf.appendSlice(allocator, ",\n    \"pty_experiment_error\": ");
         if (ctx.pty_experiment_error) |e| {
             try buf.print(allocator, "\"{s}\"", .{e});
