@@ -1,6 +1,6 @@
-# Smoke workflow (PH1-M2 through PH1-M17)
+# Smoke workflow (PH1-M2 through PH1-M18)
 
-Minimal operator path: run the **baseline-linux** suite twice with **different terminal identities**, then produce one **compare** report (markdown + JSON). **PH1-M3** adds strict `report` / `compare` checks and metadata-rich compare output. **PH1-M4** adds **execution modes** (`placeholder` vs `protocol_stub`), **`--dry-run`**, and deterministic stub **observations**—use **Section 6** when touching the runner seam. **PH1-M5** adds **transport** metadata (`none` vs **`pty_stub`**) and **`--timeout-ms`**—use **Section 7**. **PH1-M6** adds guarded transport scaffolding—use **Section 8**. **PH1-M7** adds a minimal Linux PTY open/close experiment—use **Section 9** (Linux host only). **PH1-M8** adds deterministic telemetry for that experiment—use **Section 10**. **PH1-M9** adds host **`uname`** snapshots on the guarded experiment path—use **Section 11**. **PH1-M10** adds root **`host_identity_*`** fields on every artifact run—use **Section 12**. **PH1-M11** adds deterministic **`run_fingerprint_*`** fields—use **Section 13**. **PH1-M12** adds deterministic **`specset_fingerprint_*`** fields—use **Section 14**. **PH1-M13** adds deterministic **`resultset_fingerprint_*`** fields—use **Section 15**. **PH1-M14** adds deterministic root **`transport_fingerprint_*`** fields—use **Section 16**. **PH1-M15** adds deterministic root **`exec_summary_fingerprint_*`** fields—use **Section 17**. **PH1-M16** adds deterministic root **`context_summary_fingerprint_*`** fields—use **Section 18**. **PH1-M17** adds deterministic root **`metadata_envelope_fingerprint_*`** fields—use **Section 19**.
+Minimal operator path: run the **baseline-linux** suite twice with **different terminal identities**, then produce one **compare** report (markdown + JSON). **PH1-M3** adds strict `report` / `compare` checks and metadata-rich compare output. **PH1-M4** adds **execution modes** (`placeholder` vs `protocol_stub`), **`--dry-run`**, and deterministic stub **observations**—use **Section 6** when touching the runner seam. **PH1-M5** adds **transport** metadata (`none` vs **`pty_stub`**) and **`--timeout-ms`**—use **Section 7**. **PH1-M6** adds guarded transport scaffolding—use **Section 8**. **PH1-M7** adds a minimal Linux PTY open/close experiment—use **Section 9** (Linux host only). **PH1-M8** adds deterministic telemetry for that experiment—use **Section 10**. **PH1-M9** adds host **`uname`** snapshots on the guarded experiment path—use **Section 11**. **PH1-M10** adds root **`host_identity_*`** fields on every artifact run—use **Section 12**. **PH1-M11** adds deterministic **`run_fingerprint_*`** fields—use **Section 13**. **PH1-M12** adds deterministic **`specset_fingerprint_*`** fields—use **Section 14**. **PH1-M13** adds deterministic **`resultset_fingerprint_*`** fields—use **Section 15**. **PH1-M14** adds deterministic root **`transport_fingerprint_*`** fields—use **Section 16**. **PH1-M15** adds deterministic root **`exec_summary_fingerprint_*`** fields—use **Section 17**. **PH1-M16** adds deterministic root **`context_summary_fingerprint_*`** fields—use **Section 18**. **PH1-M17** adds deterministic root **`metadata_envelope_fingerprint_*`** fields—use **Section 19**. **PH1-M18** adds deterministic root **`artifact_bundle_fingerprint_*`** fields—use **Section 20**.
 
 ## Prerequisites
 
@@ -239,11 +239,23 @@ After a full run that writes **`run.json`**, **`report`** must exit **0**. In **
 
 - **`metadata_envelope_fingerprint_digest`**: **64** lowercase hex characters (SHA-256 over the canonical ordered stack of the six upstream root digests plus literal **`1`** version lines; see **`docs/METADATA_ENVELOPE_FINGERPRINT_PLAN.md`**).
 - **`metadata_envelope_fingerprint_version`**: **`1`**.
-- Serialization order: immediately after **`context_summary_fingerprint_version`**, before the nested **`transport`** object (see **`docs/REPORT_FORMAT.md`**).
+- Serialization order: immediately after **`context_summary_fingerprint_version`**, before root **`artifact_bundle_fingerprint_*`** and the nested **`transport`** object (see **`docs/REPORT_FORMAT.md`**).
 
 **Compare**: when any upstream root digest (**`run`**, **`specset`**, **`resultset`**, **`transport`**, **`exec_summary`**, or **`context_summary`**) differs between runs, **`metadata_envelope_fingerprint_digest`** should differ. **`metadata_deltas`** should include **`metadata_envelope_fingerprint_digest`** when left and right digests differ.
 
 See **`docs/METADATA_ENVELOPE_FINGERPRINT_PLAN.md`**.
+
+## 20. PH1-M18 artifact-bundle fingerprint (artifact runs)
+
+After a full run that writes **`run.json`**, **`report`** must exit **0**. In **`run.json`** root metadata verify:
+
+- **`artifact_bundle_fingerprint_digest`**: **64** lowercase hex characters (SHA-256 over **`metadata_envelope_fingerprint_digest`** plus the phase-1 companion artifact manifest; see **`docs/ARTIFACT_BUNDLE_FINGERPRINT_PLAN.md`**).
+- **`artifact_bundle_fingerprint_version`**: **`1`**.
+- Serialization order: immediately after **`metadata_envelope_fingerprint_version`**, before the nested **`transport`** object (see **`docs/REPORT_FORMAT.md`**).
+
+**Compare**: when **`metadata_envelope_fingerprint_digest`** differs, **`artifact_bundle_fingerprint_digest`** should differ. **`metadata_deltas`** should include **`artifact_bundle_fingerprint_digest`** when left and right digests differ.
+
+See **`docs/ARTIFACT_BUNDLE_FINGERPRINT_PLAN.md`**.
 
 ## References
 
@@ -265,3 +277,4 @@ See **`docs/METADATA_ENVELOPE_FINGERPRINT_PLAN.md`**.
 - Execution-summary fingerprint (PH1-M15): `docs/EXEC_SUMMARY_FINGERPRINT_PLAN.md`
 - Context-summary fingerprint (PH1-M16): `docs/CONTEXT_SUMMARY_FINGERPRINT_PLAN.md`
 - Metadata-envelope fingerprint (PH1-M17): `docs/METADATA_ENVELOPE_FINGERPRINT_PLAN.md`
+- Artifact-bundle fingerprint (PH1-M18): `docs/ARTIFACT_BUNDLE_FINGERPRINT_PLAN.md`
