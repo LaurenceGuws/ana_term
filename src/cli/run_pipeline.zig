@@ -12,8 +12,10 @@ const markdown_writer = @import("../report/markdown_writer.zig");
 const env_writer = @import("../report/env_writer.zig");
 const RunContext = @import("run_context.zig").RunContext;
 const transport_guard_preflight = @import("../runner/transport_guard_preflight.zig");
+const posix_pty = @import("../runner/posix_pty.zig");
 
-pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []const u8, ctx: RunContext) u8 {
+pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []const u8, ctx_in: RunContext) u8 {
+    var ctx = ctx_in;
     if (spec_paths.len == 0) {
         printErr("no probe specs to run\n") catch {};
         return errors.Category.invalid_spec.exitCode();
@@ -50,6 +52,20 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
             .protocol_stub => protocol_stub.executeProtocolStub(allocator, plan) catch return errors.Category.runtime_failure.exitCode(),
         };
         records.append(allocator, rec) catch return errors.Category.runtime_failure.exitCode();
+    }
+
+    if (ctx.transport_mode == .pty_guarded and !ctx.dry_run) {
+        ctx.pty_capability_notes = "linux /dev/ptmx grantpt unlockpt ptsname_r slave open";
+        blk: {
+            var pair = posix_pty.openMinimal() catch |err| {
+                ctx.pty_experiment_open_ok = false;
+                ctx.pty_experiment_error = posix_pty.openErrorTag(err);
+                break :blk;
+            };
+            defer pair.deinit();
+            ctx.pty_experiment_open_ok = true;
+            ctx.pty_experiment_error = null;
+        }
     }
 
     if (ctx.dry_run) {

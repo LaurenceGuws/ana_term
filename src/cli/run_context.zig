@@ -21,6 +21,10 @@ pub const RunContext = struct {
     timeout_ms: u32,
     /// Explicit opt-in for `pty_guarded` (or set `ANA_TERM_ALLOW_GUARDED_TRANSPORT=1`).
     allow_guarded_transport: bool,
+    /// Filled for non-dry-run `pty_guarded` on Linux after the minimal PTY experiment.
+    pty_experiment_open_ok: ?bool,
+    pty_experiment_error: ?[]const u8,
+    pty_capability_notes: ?[]const u8,
 
     pub fn initDefault() RunContext {
         return .{
@@ -37,6 +41,9 @@ pub const RunContext = struct {
             .transport_mode = .none,
             .timeout_ms = 30_000,
             .allow_guarded_transport = false,
+            .pty_experiment_open_ok = null,
+            .pty_experiment_error = null,
+            .pty_capability_notes = null,
         };
     }
 };

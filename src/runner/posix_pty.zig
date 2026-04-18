@@ -34,6 +34,17 @@ pub fn runtimeHostIsLinux() bool {
     return std.mem.eql(u8, sys, "Linux");
 }
 
+pub fn openErrorTag(err: OpenError) []const u8 {
+    return switch (err) {
+        error.UnsupportedHost => "unsupported_host",
+        error.OpenPtmx => "open_ptmx",
+        error.GrantPt => "grantpt",
+        error.UnlockPt => "unlockpt",
+        error.PtsName => "ptsname_r",
+        error.OpenSlave => "open_slave",
+    };
+}
+
 pub fn openMinimal() OpenError!PtyPair {
     if (!runtimeHostIsLinux()) return error.UnsupportedHost;
 
