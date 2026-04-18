@@ -17,6 +17,18 @@ pub fn nextRunDirectory(allocator: std.mem.Allocator, artifact_root: []const u8)
     var dir = try std.fs.cwd().openDir(day_path, .{ .iterate = true });
     defer dir.close();
 
+    const max_run = try maxRunIndexIn(&dir);
+    const next = max_run + 1;
+    const label = try std.fmt.allocPrint(allocator, "run-{d:0>3}", .{next});
+    defer allocator.free(label);
+
+    const full = try std.fs.path.join(allocator, &.{ artifact_root, date_slice, label });
+    try std.fs.cwd().makePath(full);
+    return full;
+}
+
+/// Largest `N` among child directories named `run-N` (decimal), or `0` if none.
+pub fn maxRunIndexIn(dir: *const std.fs.Dir) !u32 {
     var max_run: u32 = 0;
     var it = dir.iterate();
     while (try it.next()) |e| {
@@ -25,14 +37,7 @@ pub fn nextRunDirectory(allocator: std.mem.Allocator, artifact_root: []const u8)
         const n = parseRunSuffix(e.name) orelse continue;
         max_run = @max(max_run, n);
     }
-
-    const next = max_run + 1;
-    const label = try std.fmt.allocPrint(allocator, "run-{d:0>3}", .{next});
-    defer allocator.free(label);
-
-    const full = try std.fs.path.join(allocator, &.{ artifact_root, date_slice, label });
-    try std.fs.cwd().makePath(full);
-    return full;
+    return max_run;
 }
 
 fn formatDate(buf: []u8, unix_secs: u64) ![]const u8 {
@@ -44,6 +49,27 @@ fn formatDate(buf: []u8, unix_secs: u64) ![]const u8 {
         md.month.numeric(),
         md.day_index + 1,
     });
+}
+
+test "maxRunIndexIn scans run-N directories" {
+    var tmp = std.testing.tmpDir(.{});
+    defer tmp.cleanup();
+
+    try tmp.dir.makeDir("run-001");
+    try tmp.dir.makeDir("run-007");
+    try tmp.dir.makeDir("noise");
+    var dir = try tmp.dir.openDir(".", .{ .iterate = true });
+    defer dir.close();
+    const m = try maxRunIndexIn(&dir);
+    try std.testing.expectEqual(@as(u32, 7), m);
+}
+
+test "parseRunSuffix" {
+    try std.testing.expectEqual(@as(?u32, 1), parseRunSuffix("run-1"));
+    try std.testing.expectEqual(@as(?u32, 42), parseRunSuffix("run-42"));
+    try std.testing.expect(parseRunSuffix("run-") == null);
+    try std.testing.expect(parseRunSuffix("run-x") == null);
+    try std.testing.expect(parseRunSuffix("other-1") == null);
 }
 
 fn parseRunSuffix(name: []const u8) ?u32 {
