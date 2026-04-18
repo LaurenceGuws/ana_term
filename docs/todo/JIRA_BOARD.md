@@ -20,28 +20,28 @@ This file is the canonical ticket board for active execution.
 
 ## Current Sprint
 
-- Sprint ID: `PH1-M7-S1`
-- Objective: minimal real PTY experiment behind guarded transport (`ANA-701`..`ANA-710`)
+- Sprint ID: `PH1-M8-S1`
+- Objective: guarded Linux PTY experiment hardening and evidence quality (`ANA-801`..`ANA-810`)
 - Commit budget before checkpoint: `10`
-- Super-gate: `ANA-GATE-90`
+- Super-gate: `ANA-GATE-100`
 
-## Ticket Order (`PH1-M7-S1`)
+## Ticket Order (`PH1-M8-S1`)
 
-1. `ANA-701`
-2. `ANA-702`
-3. `ANA-703`
-4. `ANA-704`
-5. `ANA-705`
-6. `ANA-706`
-7. `ANA-707`
-8. `ANA-708`
-9. `ANA-709`
-10. `ANA-710`
+1. `ANA-801`
+2. `ANA-802`
+3. `ANA-803`
+4. `ANA-804`
+5. `ANA-805`
+6. `ANA-806`
+7. `ANA-807`
+8. `ANA-808`
+9. `ANA-809`
+10. `ANA-810`
 
 ## Current State
 
-- `in_progress`: none
-- `todo`: none
+- `in_progress`: `ANA-802`
+- `todo`: `ANA-803`..`ANA-810`
 - `blocked`: none
-- `review_gate`: `ANA-GATE-90` (PH1-M7-S1 — `ANA-701`..`ANA-710` committed; Architect review)
-- `done`: `ANA-101`..`ANA-123`, `ANA-201`..`ANA-223`, `ANA-301`..`ANA-310`, `ANA-401`..`ANA-410`, `ANA-501`..`ANA-510`, `ANA-601`..`ANA-610` (accepted)
+- `review_gate`: none
+- `done`: `ANA-101`..`ANA-123`, `ANA-201`..`ANA-223`, `ANA-301`..`ANA-310`, `ANA-401`..`ANA-410`, `ANA-501`..`ANA-510`, `ANA-601`..`ANA-610`, `ANA-701`..`ANA-710` (accepted)
