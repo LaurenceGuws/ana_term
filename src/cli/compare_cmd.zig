@@ -1,5 +1,7 @@
 const std = @import("std");
 const errors = @import("../core/errors.zig");
+const run_json = @import("../compare/run_json.zig");
+const compare_markdown = @import("../compare/compare_markdown.zig");
 
 const max_read = 4 * 1024 * 1024;
 
@@ -54,7 +56,25 @@ pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
         },
     }
 
-    printStdout("compare: stub OK — {s} vs {s}\n", .{ path_a, path_b }) catch return errors.Category.runtime_failure.exitCode();
+    var map_a = run_json.parseResultsMap(allocator, parsed_a.value) catch {
+        printErr("could not parse results from first run.json\n") catch {};
+        return errors.Category.invalid_spec.exitCode();
+    };
+    defer run_json.deinitMap(allocator, &map_a);
+
+    var map_b = run_json.parseResultsMap(allocator, parsed_b.value) catch {
+        printErr("could not parse results from second run.json\n") catch {};
+        return errors.Category.invalid_spec.exitCode();
+    };
+    defer run_json.deinitMap(allocator, &map_b);
+
+    const rows = run_json.diffResults(allocator, &map_a, &map_b) catch return errors.Category.runtime_failure.exitCode();
+    defer run_json.deinitDiffRows(allocator, rows);
+
+    std.fs.cwd().makePath("artifacts/compare") catch return errors.Category.runtime_failure.exitCode();
+    compare_markdown.writeFile(allocator, "artifacts/compare/compare.md", rows, path_a, path_b) catch return errors.Category.runtime_failure.exitCode();
+
+    printStdout("compare: wrote artifacts/compare/compare.md\n", .{}) catch return errors.Category.runtime_failure.exitCode();
     return 0;
 }
 
