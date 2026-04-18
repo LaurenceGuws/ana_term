@@ -1,6 +1,6 @@
-# Smoke workflow (PH1-M2 through PH1-M5)
+# Smoke workflow (PH1-M2 through PH1-M6)
 
-Minimal operator path: run the **baseline-linux** suite twice with **different terminal identities**, then produce one **compare** report (markdown + JSON). **PH1-M3** adds strict `report` / `compare` checks and metadata-rich compare output. **PH1-M4** adds **execution modes** (`placeholder` vs `protocol_stub`), **`--dry-run`**, and deterministic stub **observations**—use §6 when touching the runner seam. **PH1-M5** adds **transport** metadata (`none` vs **`pty_stub`**) and **`--timeout-ms`**—use §7.
+Minimal operator path: run the **baseline-linux** suite twice with **different terminal identities**, then produce one **compare** report (markdown + JSON). **PH1-M3** adds strict `report` / `compare` checks and metadata-rich compare output. **PH1-M4** adds **execution modes** (`placeholder` vs `protocol_stub`), **`--dry-run`**, and deterministic stub **observations**—use **Section 6** when touching the runner seam. **PH1-M5** adds **transport** metadata (`none` vs **`pty_stub`**) and **`--timeout-ms`**—use **Section 7**. **PH1-M6** adds guarded transport scaffolding—use **Section 8**.
 
 ## Prerequisites
 
@@ -90,6 +90,26 @@ Expect `report` **0**; `transport.handshake` is a fixed stub string, `handshake_
 
 - **Compare**: run once with **`none`** and once with **`pty_stub`** (same suite). **`compare`** metadata should show **`transport_mode`** (and related **`transport_*`** rows) as **changed**.
 
+## 8. Guarded transport scaffolding (PH1-M6)
+
+Still **no** real PTY; see **`docs/REAL_TRANSPORT_GUARD_PLAN.md`**.
+
+- **Fail closed (negative)**: guarded mode without opt-in must exit **2** before writing artifacts:
+
+```sh
+zig-out/bin/ana_term run-suite baseline-linux --transport pty_guarded --terminal wezterm
+```
+
+- **Explicit opt-in (positive)**: pass **`--allow-guarded-transport`** or set **`ANA_TERM_ALLOW_GUARDED_TRANSPORT=1`**:
+
+```sh
+zig-out/bin/ana_term run-suite baseline-linux --transport pty_guarded --allow-guarded-transport --terminal wezterm
+```
+
+Expect **`report` 0** on the run directory. In **`run.json`**, **`transport.mode`** is **`pty_guarded`**, **`guarded_opt_in`** is **`true`**, **`guarded_state`** is **`scaffold_only`**, and handshake fields match the deterministic guarded stub.
+
+- **Compare**: run once with **`pty_stub`** and once with **`pty_guarded`** (both with opt-in for the latter). Metadata should include **`guarded_opt_in`** / **`guarded_state`** deltas alongside transport rows.
+
 ## References
 
 - Terminal flags and behavior: `docs/CLI.md`
@@ -98,3 +118,4 @@ Expect `report` **0**; `transport.handshake` is a fixed stub string, `handshake_
 - Run artifact fields: `docs/REPORT_FORMAT.md`
 - Protocol execution seam: `docs/PROTO_EXEC_PLAN.md`
 - Transport seam: `docs/TRANSPORT_PLAN.md`
+- Guarded transport: `docs/REAL_TRANSPORT_GUARD_PLAN.md`
