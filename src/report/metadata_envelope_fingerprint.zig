@@ -35,3 +35,44 @@ pub fn populate(ctx: *RunContext, allocator: std.mem.Allocator) !void {
     writeHexLower(&ctx.metadata_envelope_fingerprint_digest_hex, &digest);
     ctx.metadata_envelope_fingerprint_digest_len = 64;
 }
+
+fn fillDigest(dst: *[64]u8, len: *u8, hex_lower_64: *const [64]u8) void {
+    @memcpy(dst, hex_lower_64);
+    len.* = 64;
+}
+
+fn testCtxWithUpstreamDigests(run_a: *const [64]u8) RunContext {
+    var ctx = RunContext.initDefault();
+    fillDigest(&ctx.run_fingerprint_digest_hex, &ctx.run_fingerprint_digest_len, run_a);
+    fillDigest(&ctx.specset_fingerprint_digest_hex, &ctx.specset_fingerprint_digest_len, &"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc".*);
+    fillDigest(&ctx.resultset_fingerprint_digest_hex, &ctx.resultset_fingerprint_digest_len, &"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd".*);
+    fillDigest(&ctx.transport_fingerprint_digest_hex, &ctx.transport_fingerprint_digest_len, &"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee".*);
+    fillDigest(&ctx.exec_summary_fingerprint_digest_hex, &ctx.exec_summary_fingerprint_digest_len, &"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff".*);
+    fillDigest(&ctx.context_summary_fingerprint_digest_hex, &ctx.context_summary_fingerprint_digest_len, &"1111111111111111111111111111111111111111111111111111111111111111".*);
+    return ctx;
+}
+
+test "metadata envelope fingerprint is deterministic for fixed upstream digests" {
+    var a = testCtxWithUpstreamDigests(&"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".*);
+    var b = testCtxWithUpstreamDigests(&"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".*);
+    try populate(&a, std.testing.allocator);
+    try populate(&b, std.testing.allocator);
+    try std.testing.expectEqual(a.metadata_envelope_fingerprint_digest_len, b.metadata_envelope_fingerprint_digest_len);
+    try std.testing.expectEqualSlices(
+        u8,
+        a.metadata_envelope_fingerprint_digest_hex[0..a.metadata_envelope_fingerprint_digest_len],
+        b.metadata_envelope_fingerprint_digest_hex[0..b.metadata_envelope_fingerprint_digest_len],
+    );
+}
+
+test "metadata envelope fingerprint changes when an upstream digest changes" {
+    var a = testCtxWithUpstreamDigests(&"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".*);
+    var b = testCtxWithUpstreamDigests(&"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb".*);
+    try populate(&a, std.testing.allocator);
+    try populate(&b, std.testing.allocator);
+    try std.testing.expect(!std.mem.eql(
+        u8,
+        a.metadata_envelope_fingerprint_digest_hex[0..a.metadata_envelope_fingerprint_digest_len],
+        b.metadata_envelope_fingerprint_digest_hex[0..b.metadata_envelope_fingerprint_digest_len],
+    ));
+}
