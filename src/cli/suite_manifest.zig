@@ -26,7 +26,26 @@ pub fn loadManifestFile(allocator: std.mem.Allocator, path: []const u8) ![][]con
         try list.append(allocator, try allocator.dupe(u8, line));
     }
 
+    if (list.items.len == 0) return error.EmptyManifest;
+
+    try validateManifestPaths(allocator, list.items);
+
     return try list.toOwnedSlice(allocator);
+}
+
+fn validateManifestPaths(allocator: std.mem.Allocator, paths: [][]const u8) !void {
+    var seen = std.StringArrayHashMap(void).init(allocator);
+    defer seen.deinit();
+
+    for (paths) |p| {
+        if (!std.mem.endsWith(u8, p, ".toml")) return error.NonTomlEntry;
+        const gop = try seen.getOrPut(p);
+        if (gop.found_existing) return error.DuplicateEntry;
+    }
+
+    for (paths) |p| {
+        std.fs.cwd().access(p, .{}) catch return error.MissingFile;
+    }
 }
 
 pub fn freePathList(allocator: std.mem.Allocator, paths: [][]const u8) void {

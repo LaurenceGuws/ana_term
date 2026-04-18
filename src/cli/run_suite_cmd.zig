@@ -88,7 +88,21 @@ pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
         return errors.Category.unknown_command.exitCode();
     }
 
-    const paths = suite_manifest.loadBaselineLinux(allocator) catch return errors.Category.runtime_failure.exitCode();
+    const paths = suite_manifest.loadBaselineLinux(allocator) catch |err| {
+        const msg: []const u8 = switch (err) {
+            error.EmptyManifest => "suite manifest has no probe paths",
+            error.DuplicateEntry => "suite manifest has a duplicate path",
+            error.NonTomlEntry => "suite manifest entries must be .toml paths",
+            error.MissingFile => "suite manifest references a missing file",
+            else => "could not load suite manifest",
+        };
+        printErr(msg) catch {};
+        const cat: errors.Category = switch (err) {
+            error.EmptyManifest, error.DuplicateEntry, error.NonTomlEntry, error.MissingFile => .invalid_spec,
+            else => .runtime_failure,
+        };
+        return cat.exitCode();
+    };
     defer suite_manifest.freePathList(allocator, paths);
 
     return run_pipeline.executeSpecPaths(allocator, paths, ctx);
