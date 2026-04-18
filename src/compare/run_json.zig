@@ -500,6 +500,14 @@ test "diffRunMeta detects transport_fingerprint_digest mismatch" {
     try std.testing.expectEqualStrings("changed", rows[21].delta);
 }
 
+test "diffRunMeta detects exec_summary_fingerprint_digest mismatch" {
+    const left = RunMeta{ .exec_summary_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
+    const right = RunMeta{ .exec_summary_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" };
+    const rows = diffRunMeta(left, right);
+    try std.testing.expectEqualStrings("exec_summary_fingerprint_digest", rows[23].field);
+    try std.testing.expectEqualStrings("changed", rows[23].delta);
+}
+
 test "parseRunMeta reads root host identity fields" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
