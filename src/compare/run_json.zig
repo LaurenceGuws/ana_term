@@ -19,6 +19,8 @@ pub const RunMeta = struct {
     resultset_fingerprint_version: ?[]const u8 = null,
     transport_fingerprint_digest: ?[]const u8 = null,
     transport_fingerprint_version: ?[]const u8 = null,
+    exec_summary_fingerprint_digest: ?[]const u8 = null,
+    exec_summary_fingerprint_version: ?[]const u8 = null,
     guarded_opt_in: ?[]const u8 = null,
     guarded_state: ?[]const u8 = null,
     pty_capability_notes: ?[]const u8 = null,
@@ -65,6 +67,8 @@ pub fn parseRunMeta(allocator: std.mem.Allocator, root: std.json.Value) !RunMeta
     m.resultset_fingerprint_version = readOptString(obj, "resultset_fingerprint_version");
     m.transport_fingerprint_digest = readOptString(obj, "transport_fingerprint_digest");
     m.transport_fingerprint_version = readOptString(obj, "transport_fingerprint_version");
+    m.exec_summary_fingerprint_digest = readOptString(obj, "exec_summary_fingerprint_digest");
+    m.exec_summary_fingerprint_version = readOptString(obj, "exec_summary_fingerprint_version");
     if (obj.get("terminal")) |t| switch (t) {
         .object => |term_o| {
             m.terminal_name = readOptString(term_o, "name");
@@ -157,7 +161,7 @@ fn metaDelta(l: ?[]const u8, r: ?[]const u8) []const u8 {
 }
 
 /// Fixed field order for deterministic compare output.
-pub fn diffRunMeta(left: RunMeta, right: RunMeta) [31]MetaDiffRow {
+pub fn diffRunMeta(left: RunMeta, right: RunMeta) [33]MetaDiffRow {
     return .{
         .{ .field = "comparison_id", .left = left.comparison_id, .right = right.comparison_id, .delta = metaDelta(left.comparison_id, right.comparison_id) },
         .{ .field = "execution_mode", .left = left.execution_mode, .right = right.execution_mode, .delta = metaDelta(left.execution_mode, right.execution_mode) },
@@ -182,6 +186,8 @@ pub fn diffRunMeta(left: RunMeta, right: RunMeta) [31]MetaDiffRow {
         .{ .field = "resultset_fingerprint_version", .left = left.resultset_fingerprint_version, .right = right.resultset_fingerprint_version, .delta = metaDelta(left.resultset_fingerprint_version, right.resultset_fingerprint_version) },
         .{ .field = "transport_fingerprint_digest", .left = left.transport_fingerprint_digest, .right = right.transport_fingerprint_digest, .delta = metaDelta(left.transport_fingerprint_digest, right.transport_fingerprint_digest) },
         .{ .field = "transport_fingerprint_version", .left = left.transport_fingerprint_version, .right = right.transport_fingerprint_version, .delta = metaDelta(left.transport_fingerprint_version, right.transport_fingerprint_version) },
+        .{ .field = "exec_summary_fingerprint_digest", .left = left.exec_summary_fingerprint_digest, .right = right.exec_summary_fingerprint_digest, .delta = metaDelta(left.exec_summary_fingerprint_digest, right.exec_summary_fingerprint_digest) },
+        .{ .field = "exec_summary_fingerprint_version", .left = left.exec_summary_fingerprint_version, .right = right.exec_summary_fingerprint_version, .delta = metaDelta(left.exec_summary_fingerprint_version, right.exec_summary_fingerprint_version) },
         .{ .field = "run_group", .left = left.run_group, .right = right.run_group, .delta = metaDelta(left.run_group, right.run_group) },
         .{ .field = "suite", .left = left.suite, .right = right.suite, .delta = metaDelta(left.suite, right.suite) },
         .{ .field = "term", .left = left.term, .right = right.term, .delta = metaDelta(left.term, right.term) },
@@ -426,8 +432,8 @@ test "diffRunMeta detects transport_mode mismatch" {
     const left = RunMeta{ .transport_mode = "none" };
     const right = RunMeta{ .transport_mode = "pty_stub" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("transport_mode", rows[29].field);
-    try std.testing.expectEqualStrings("changed", rows[29].delta);
+    try std.testing.expectEqualStrings("transport_mode", rows[31].field);
+    try std.testing.expectEqualStrings("changed", rows[31].delta);
 }
 
 test "diffRunMeta detects pty_experiment_open_ok mismatch" {
@@ -499,7 +505,7 @@ test "parseRunMeta reads root host identity fields" {
     defer arena.deinit();
     const a = arena.allocator();
     const text =
-        \\{"host_identity_machine":"aarch64","host_identity_release":"6.6.0","host_identity_sysname":"Linux","run_fingerprint_digest":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","run_fingerprint_version":"1","specset_fingerprint_digest":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc","specset_fingerprint_version":"1","resultset_fingerprint_digest":"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd","resultset_fingerprint_version":"1","transport_fingerprint_digest":"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee","transport_fingerprint_version":"1","transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":1}}
+        \\{"host_identity_machine":"aarch64","host_identity_release":"6.6.0","host_identity_sysname":"Linux","run_fingerprint_digest":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","run_fingerprint_version":"1","specset_fingerprint_digest":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc","specset_fingerprint_version":"1","resultset_fingerprint_digest":"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd","resultset_fingerprint_version":"1","transport_fingerprint_digest":"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee","transport_fingerprint_version":"1","exec_summary_fingerprint_digest":"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff","exec_summary_fingerprint_version":"1","transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":1}}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
@@ -515,6 +521,8 @@ test "parseRunMeta reads root host identity fields" {
     try std.testing.expectEqualStrings("1", m.resultset_fingerprint_version.?);
     try std.testing.expectEqualStrings("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", m.transport_fingerprint_digest.?);
     try std.testing.expectEqualStrings("1", m.transport_fingerprint_version.?);
+    try std.testing.expectEqualStrings("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", m.exec_summary_fingerprint_digest.?);
+    try std.testing.expectEqualStrings("1", m.exec_summary_fingerprint_version.?);
 }
 
 test "parseRunMeta reads PTY experiment telemetry numbers" {
