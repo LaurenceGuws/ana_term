@@ -92,6 +92,7 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
         "",
     );
 
+    ctx.captureHostIdentity();
     json_writer.writeRun(allocator, run_dir, run_id, records.items, ctx) catch return errors.Category.runtime_failure.exitCode();
     markdown_writer.writeRunSummary(allocator, run_dir, run_id, records.items, ctx) catch return errors.Category.runtime_failure.exitCode();
     env_writer.writeEnvJson(allocator, run_dir, ctx) catch return errors.Category.runtime_failure.exitCode();

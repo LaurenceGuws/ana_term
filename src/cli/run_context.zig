@@ -8,6 +8,13 @@ pub const pty_host_machine_cap: usize = 64;
 /// Truncated copy of `uname.release` during guarded PTY experiment (PH1-M9).
 pub const pty_host_release_cap: usize = 256;
 
+/// Root `run.json` host identity: `uname.machine` (PH1-M10).
+pub const host_identity_machine_cap: usize = 64;
+/// Root `run.json` host identity: `uname.release` (PH1-M10).
+pub const host_identity_release_cap: usize = 256;
+/// Root `run.json` host identity: `uname.sysname` (PH1-M10).
+pub const host_identity_sysname_cap: usize = 64;
+
 pub const RunContext = struct {
     capture_mode: []const u8,
     terminal_name: []const u8,
@@ -40,6 +47,13 @@ pub const RunContext = struct {
     pty_experiment_host_machine_len: u8,
     pty_experiment_host_release: [pty_host_release_cap]u8,
     pty_experiment_host_release_len: u16,
+    /// PH1-M10: runtime `uname` for artifact runs; lengths 0 until `captureHostIdentity`.
+    host_identity_machine: [host_identity_machine_cap]u8,
+    host_identity_machine_len: u8,
+    host_identity_release: [host_identity_release_cap]u8,
+    host_identity_release_len: u16,
+    host_identity_sysname: [host_identity_sysname_cap]u8,
+    host_identity_sysname_len: u8,
 
     pub fn initDefault() RunContext {
         return .{
@@ -65,7 +79,32 @@ pub const RunContext = struct {
             .pty_experiment_host_machine_len = 0,
             .pty_experiment_host_release = std.mem.zeroes([pty_host_release_cap]u8),
             .pty_experiment_host_release_len = 0,
+            .host_identity_machine = std.mem.zeroes([host_identity_machine_cap]u8),
+            .host_identity_machine_len = 0,
+            .host_identity_release = std.mem.zeroes([host_identity_release_cap]u8),
+            .host_identity_release_len = 0,
+            .host_identity_sysname = std.mem.zeroes([host_identity_sysname_cap]u8),
+            .host_identity_sysname_len = 0,
         };
+    }
+
+    /// Snapshot `uname` for root `run.json` host identity; call once per artifact-producing run.
+    pub fn captureHostIdentity(ctx: *RunContext) void {
+        const u = std.posix.uname();
+        const sys = std.mem.sliceTo(&u.sysname, 0);
+        const n_sys = @min(sys.len, host_identity_sysname_cap);
+        @memcpy(ctx.host_identity_sysname[0..n_sys], sys[0..n_sys]);
+        ctx.host_identity_sysname_len = @intCast(n_sys);
+
+        const m = std.mem.sliceTo(&u.machine, 0);
+        const n_m = @min(m.len, host_identity_machine_cap);
+        @memcpy(ctx.host_identity_machine[0..n_m], m[0..n_m]);
+        ctx.host_identity_machine_len = @intCast(n_m);
+
+        const r = std.mem.sliceTo(&u.release, 0);
+        const n_r = @min(r.len, host_identity_release_cap);
+        @memcpy(ctx.host_identity_release[0..n_r], r[0..n_r]);
+        ctx.host_identity_release_len = @intCast(n_r);
     }
 
     /// Snapshot `uname` for reproducibility; call once per guarded experiment run.
