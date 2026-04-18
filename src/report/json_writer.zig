@@ -53,8 +53,8 @@ pub fn writeRun(
     for (records, 0..) |r, i| {
         if (i > 0) try buf.appendSlice(allocator, ",\n");
         try buf.print(allocator,
-            "    {{\"spec_id\":\"{s}\",\"status\":\"{s}\",\"notes\":\"{s}\",\"capture_mode\":\"{s}\",\"observations\":{{}}}}",
-            .{ r.spec_id, r.status, r.notes, r.capture_mode },
+            "    {{\"spec_id\":\"{s}\",\"status\":\"{s}\",\"notes\":\"{s}\",\"capture_mode\":\"{s}\",\"observations\":{s}}}",
+            .{ r.spec_id, r.status, r.notes, r.capture_mode, r.observations_json },
         );
     }
     try buf.appendSlice(allocator, "\n  ]\n}\n");
