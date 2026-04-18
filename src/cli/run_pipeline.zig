@@ -19,7 +19,7 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
         return errors.Category.invalid_spec.exitCode();
     }
 
-    if (transport_guard_preflight.preflightMessage(ctx.transport_mode, ctx.allow_guarded_transport)) |msg| {
+    if (transport_guard_preflight.preflightMessage(ctx.transport_mode, ctx.allow_guarded_transport, ctx.dry_run)) |msg| {
         printErr(msg) catch {};
         printErr("\n") catch {};
         return errors.Category.invalid_spec.exitCode();
