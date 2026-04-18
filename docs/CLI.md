@@ -42,8 +42,13 @@ These flags describe the **transport seam** (how the harness would attach to a t
 
 | Flag | Meaning |
 |------|---------|
-| `--transport <mode>` | `none` (default): transport metadata reflects **no** stub handshake. `pty_stub`: emit deterministic **stub** handshake and synthetic latency in `run.json` under `transport` (still **no** real PTY in PH1-M5; see `docs/TRANSPORT_PLAN.md`). |
+| `--transport <mode>` | `none` (default): transport metadata reflects **no** stub handshake. `pty_stub`: emit deterministic **stub** handshake and synthetic latency in `run.json` under `transport` (still **no** real PTY; see `docs/TRANSPORT_PLAN.md`). `pty_guarded`: guarded real-transport **scaffold** (PH1-M6+): same style of deterministic handshake/latency in artifacts until a real PTY exists; see `docs/REAL_TRANSPORT_GUARD_PLAN.md`. |
+| `--allow-guarded-transport` | Boolean flag (no value). **Required** (or env below) when `--transport pty_guarded` is set; otherwise the run fails closed before artifacts. |
 | `--timeout-ms <n>` | Positive integer: deadline budget in milliseconds, stored as `transport.timeout_ms`. PH1-M5 records the value; wall-clock enforcement is deferred. |
+
+**Environment (guarded transport)**
+
+- `ANA_TERM_ALLOW_GUARDED_TRANSPORT=1` — satisfies the guarded-transport opt-in gate when set exactly to `1`, same as passing `--allow-guarded-transport`.
 
 ## `list`
 
@@ -76,7 +81,8 @@ These flags describe the **transport seam** (how the harness would attach to a t
 | `--dry-run` | Optional; validate and simulate without writing artifacts (PH1-M4+). |
 | `--strict` | Optional; stricter validation where implemented (PH1-M4+). |
 | `--exec-mode <mode>` | Optional; `placeholder` or `protocol_stub` (PH1-M4+). |
-| `--transport <mode>` | Optional; `none` or `pty_stub` (PH1-M5+). |
+| `--transport <mode>` | Optional; `none`, `pty_stub`, or `pty_guarded` (PH1-M5+ / PH1-M6+). |
+| `--allow-guarded-transport` | Optional; required for `pty_guarded` unless env opt-in is set (PH1-M6+). |
 | `--timeout-ms <n>` | Optional; positive integer milliseconds (PH1-M5+). |
 
 | Output | Description |
@@ -96,6 +102,7 @@ These flags describe the **transport seam** (how the harness would attach to a t
 | Input | Description |
 |-------|-------------|
 | Suite name | Required identifier (phase-1 may stub with placeholder). |
+| Optional flags | Same as **`run`** where applicable (`--capture`, `--terminal`, `--exec-mode`, `--transport`, `--allow-guarded-transport`, `--timeout-ms`, `--dry-run`, …). |
 
 | Exit | Condition |
 |------|-----------|

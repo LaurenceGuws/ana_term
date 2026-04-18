@@ -40,8 +40,8 @@ This file is the canonical ticket board for active execution.
 
 ## Current State
 
-- `in_progress`: `ANA-602`
-- `todo`: `ANA-603`..`ANA-610`
+- `in_progress`: `ANA-603`
+- `todo`: `ANA-604`..`ANA-610`
 - `blocked`: none
 - `review_gate`: none
 - `done`: `ANA-101`..`ANA-123`, `ANA-201`..`ANA-223`, `ANA-301`..`ANA-310`, `ANA-401`..`ANA-410`, `ANA-501`..`ANA-510` (accepted)
