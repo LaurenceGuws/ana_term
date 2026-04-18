@@ -38,3 +38,48 @@ pub fn populate(ctx: *RunContext, allocator: std.mem.Allocator, run_id: []const 
     writeHexLower(&ctx.run_fingerprint_digest_hex, &digest);
     ctx.run_fingerprint_digest_len = 64;
 }
+
+test "populate is deterministic for same inputs" {
+    const builtin = @import("builtin");
+    if (builtin.target.os.tag != .linux) return error.SkipZigTest;
+
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    const a = arena.allocator();
+
+    var ctx = RunContext.initDefault();
+    ctx.platform = "linux";
+    ctx.captureHostIdentity();
+    try populate(&ctx, a, "run-abc", &.{});
+
+    var ctx2 = RunContext.initDefault();
+    ctx2.platform = "linux";
+    ctx2.captureHostIdentity();
+    try populate(&ctx2, a, "run-abc", &.{});
+
+    try std.testing.expectEqualSlices(u8, ctx.run_fingerprint_digest_hex[0..64], ctx2.run_fingerprint_digest_hex[0..64]);
+}
+
+test "populate changes when spec_id list changes" {
+    const builtin = @import("builtin");
+    if (builtin.target.os.tag != .linux) return error.SkipZigTest;
+
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    const a = arena.allocator();
+
+    var r1 = [_]run_execute.RunRecord{.{ .spec_id = "p1", .status = "manual", .notes = "", .capture_mode = "manual", .observations_json = "{}" }};
+    var r2 = [_]run_execute.RunRecord{.{ .spec_id = "p2", .status = "manual", .notes = "", .capture_mode = "manual", .observations_json = "{}" }};
+
+    var ctx_a = RunContext.initDefault();
+    ctx_a.platform = "linux";
+    ctx_a.captureHostIdentity();
+    try populate(&ctx_a, a, "rid", &r1);
+
+    var ctx_b = RunContext.initDefault();
+    ctx_b.platform = "linux";
+    ctx_b.captureHostIdentity();
+    try populate(&ctx_b, a, "rid", &r2);
+
+    try std.testing.expect(!std.mem.eql(u8, ctx_a.run_fingerprint_digest_hex[0..64], ctx_b.run_fingerprint_digest_hex[0..64]));
+}
