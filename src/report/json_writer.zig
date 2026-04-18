@@ -188,6 +188,7 @@ test "writeRun JSON-encodes guarded PTY host snapshot strings" {
     ctx.pty_experiment_open_ok = true;
     ctx.pty_experiment_error = null;
     ctx.captureHostIdentity();
+    try run_fingerprint.populate(&ctx, std.testing.allocator, "rid-json-writer", &.{});
 
     const mach = "x86_64";
     const rel = "6.1.0-test";
@@ -232,6 +233,7 @@ test "writeRun escapes quotes in guarded PTY host snapshot strings" {
     ctx.pty_experiment_open_ok = true;
     ctx.pty_experiment_error = null;
     ctx.captureHostIdentity();
+    try run_fingerprint.populate(&ctx, std.testing.allocator, "rid-json-esc", &.{});
 
     const mach: []const u8 = &.{ 'a', 'b', '"', 'c' };
     @memcpy(ctx.pty_experiment_host_machine[0..mach.len], mach);
