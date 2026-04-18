@@ -497,7 +497,7 @@ Outcome:
 
 - Accepted at `ANA-GATE-170`.
 
-### `PH1-M16` (`review_gate`)
+### `PH1-M16` (`completed`)
 
 Purpose:
 
@@ -539,4 +539,44 @@ Queue lines (exact):
 
 Outcome:
 
-- Engineering complete at `ANA-GATE-180` (awaiting Architect acceptance).
+- Accepted at `ANA-GATE-180`.
+
+### `PH1-M17` (`in_progress`)
+
+Purpose:
+
+- Improve audit reproducibility with a deterministic metadata-envelope fingerprint that composes root execution metadata into one compare/report handle.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M17_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- define PH1-M17 metadata-envelope fingerprint plan and boundaries
+- emit root metadata-envelope fingerprint fields in `run.json`
+- add report schema invariants and compare metadata coverage for metadata-envelope fingerprint fields
+- expand regression tests and smoke coverage
+- PH1-M17 checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-1701` through `ANA-1710` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-190` reached and reported.
+
+Non-goals:
+
+- Windows ConPTY implementation
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [ ] Execute `ANA-1701` through `ANA-1710` in order from `docs/todo/PH1_M17_TICKETS.md`.
+- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [ ] Stop only at `ANA-GATE-190` (post `ANA-1710`) unless truly blocked.
+- [ ] Submit checkpoint packet in `docs/todo/PH1_M17_CHECKPOINT.md`.
