@@ -36,6 +36,15 @@ These flags identify **which terminal** is under test and how it would be invoke
 | `--strict` | Boolean flag (no value). Enables stricter validation for the invocation (exact rules evolve by milestone; see `docs/PROTO_EXEC_PLAN.md`). |
 | `--exec-mode <mode>` | `placeholder` (default) or `protocol_stub` (PH1-M4+). Recorded in `run.json` as `execution_mode`. |
 
+## Transport configuration (`run`, `run-suite`, PH1-M5+)
+
+These flags describe the **transport seam** (how the harness would attach to a terminal for I/O). They complement **`--terminal`**, which names the *logical* terminal identity for comparison metadata.
+
+| Flag | Meaning |
+|------|---------|
+| `--transport <mode>` | `none` (default): transport metadata reflects **no** stub handshake. `pty_stub`: emit deterministic **stub** handshake and synthetic latency in `run.json` under `transport` (still **no** real PTY in PH1-M5; see `docs/TRANSPORT_PLAN.md`). |
+| `--timeout-ms <n>` | Positive integer: deadline budget in milliseconds, stored as `transport.timeout_ms`. PH1-M5 records the value; wall-clock enforcement is deferred. |
+
 ## `list`
 
 **Purpose**: Enumerate discovered `.toml` probe specs.
@@ -67,6 +76,8 @@ These flags identify **which terminal** is under test and how it would be invoke
 | `--dry-run` | Optional; validate and simulate without writing artifacts (PH1-M4+). |
 | `--strict` | Optional; stricter validation where implemented (PH1-M4+). |
 | `--exec-mode <mode>` | Optional; `placeholder` or `protocol_stub` (PH1-M4+). |
+| `--transport <mode>` | Optional; `none` or `pty_stub` (PH1-M5+). |
+| `--timeout-ms <n>` | Optional; positive integer milliseconds (PH1-M5+). |
 
 | Output | Description |
 |--------|-------------|
