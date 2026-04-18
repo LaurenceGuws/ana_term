@@ -141,7 +141,7 @@ Outcome:
 
 - Accepted at `ANA-GATE-90`.
 
-### `PH1-M8` (`review_gate`)
+### `PH1-M8` (`completed`)
 
 Purpose:
 
@@ -181,7 +181,11 @@ Queue lines (exact):
 - [x] Stop only at `ANA-GATE-100` (post `ANA-810`) unless truly blocked.
 - [x] Submit checkpoint packet in `docs/todo/PH1_M8_CHECKPOINT.md`.
 
-### `PH1-M9` (`review_gate`)
+Outcome:
+
+- Accepted at `ANA-GATE-100`.
+
+### `PH1-M9` (`completed`)
 
 Purpose:
 
@@ -228,3 +232,47 @@ Corrective queue lines (post review rejection):
 - [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
 - [x] Stop only at `ANA-GATE-110` (post `ANA-913`) unless truly blocked.
 - [x] Update `docs/todo/PH1_M9_CHECKPOINT.md` with corrective evidence and re-request Architect review.
+
+Outcome:
+
+- Accepted at `ANA-GATE-110` after corrective closeout (`ANA-911`..`ANA-913`).
+
+### `PH1-M10` (`review_gate`)
+
+Purpose:
+
+- Improve reproducibility evidence quality by adding deterministic run-host identity and compare/report surfacing for operator audits.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M10_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- define PH1-M10 host-identity evidence plan
+- add host identity fields to run artifacts
+- enforce schema invariants and compare metadata coverage for those fields
+- add regression tests and smoke path updates
+- PH1-M10 checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-1001` through `ANA-1010` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-120` reached and reported.
+
+Non-goals:
+
+- Windows ConPTY implementation
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [x] Execute `ANA-1001` through `ANA-1010` in order from `docs/todo/PH1_M10_TICKETS.md`.
+- [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [x] Stop only at `ANA-GATE-120` (post `ANA-1010`) unless truly blocked.
+- [x] Submit checkpoint packet in `docs/todo/PH1_M10_CHECKPOINT.md`.
