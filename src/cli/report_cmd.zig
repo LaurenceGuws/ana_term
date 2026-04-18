@@ -26,9 +26,23 @@ pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
     defer allocator.free(data);
 
     const trimmed = std.mem.trim(u8, data, " \n\r\t");
-    if (trimmed.len == 0 or trimmed[0] != '{') {
-        printErr("invalid run.json (expected JSON object)\n") catch {};
+    if (trimmed.len == 0) {
+        printErr("invalid run.json (empty)\n") catch {};
         return errors.Category.invalid_spec.exitCode();
+    }
+
+    const parsed = std.json.parseFromSlice(std.json.Value, allocator, trimmed, .{}) catch {
+        printErr("invalid run.json (malformed JSON)\n") catch {};
+        return errors.Category.invalid_spec.exitCode();
+    };
+    defer parsed.deinit();
+
+    switch (parsed.value) {
+        .object => {},
+        else => {
+            printErr("invalid run.json (expected top-level JSON object)\n") catch {};
+            return errors.Category.invalid_spec.exitCode();
+        },
     }
 
     printStdout("ok: validated {s}\n", .{json_path}) catch return errors.Category.runtime_failure.exitCode();
