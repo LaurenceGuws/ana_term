@@ -1,6 +1,6 @@
-# Smoke workflow (PH1-M2 + PH1-M3 + PH1-M4)
+# Smoke workflow (PH1-M2 through PH1-M5)
 
-Minimal operator path: run the **baseline-linux** suite twice with **different terminal identities**, then produce one **compare** report (markdown + JSON). **PH1-M3** adds strict `report` / `compare` checks and metadata-rich compare output. **PH1-M4** adds **execution modes** (`placeholder` vs `protocol_stub`), **`--dry-run`**, and deterministic stub **observations**—use §6 when touching the runner seam.
+Minimal operator path: run the **baseline-linux** suite twice with **different terminal identities**, then produce one **compare** report (markdown + JSON). **PH1-M3** adds strict `report` / `compare` checks and metadata-rich compare output. **PH1-M4** adds **execution modes** (`placeholder` vs `protocol_stub`), **`--dry-run`**, and deterministic stub **observations**—use §6 when touching the runner seam. **PH1-M5** adds **transport** metadata (`none` vs **`pty_stub`**) and **`--timeout-ms`**—use §7.
 
 ## Prerequisites
 
@@ -76,6 +76,20 @@ Then `report` on that run directory must exit **0**.
 
 - **Metadata compare**: run the suite once with default **`placeholder`** (omit `--exec-mode`) and once with **`--exec-mode protocol_stub`** (same or different `--terminal` as you like). Run **`compare`** on the two `run.json` paths. In **`compare.md`**, the **`execution_mode`** metadata row should show **`changed`** (and the same appears under **`metadata_deltas`** in **`compare.json`**).
 
+## 7. Transport-stub regression (PH1-M5)
+
+- **Default (`none`)**: omit **`--transport`** (or pass **`--transport none`**). `run.json` includes a **`transport`** object with `mode: none`, `handshake: null`, `handshake_latency_ns: 0`, and `timeout_ms` from defaults (see **`docs/CLI.md`**).
+
+- **Stub transport** (still **no** real PTY; see **`docs/TRANSPORT_PLAN.md`**):
+
+```sh
+zig-out/bin/ana_term run-suite baseline-linux --transport pty_stub --timeout-ms 8000 --terminal wezterm
+```
+
+Expect `report` **0**; `transport.handshake` is a fixed stub string, `handshake_latency_ns` is deterministic from the run id.
+
+- **Compare**: run once with **`none`** and once with **`pty_stub`** (same suite). **`compare`** metadata should show **`transport_mode`** (and related **`transport_*`** rows) as **changed**.
+
 ## References
 
 - Terminal flags and behavior: `docs/CLI.md`
@@ -83,3 +97,4 @@ Then `report` on that run directory must exit **0**.
 - Comparison scope: `docs/COMPARE_PLAN.md`
 - Run artifact fields: `docs/REPORT_FORMAT.md`
 - Protocol execution seam: `docs/PROTO_EXEC_PLAN.md`
+- Transport seam: `docs/TRANSPORT_PLAN.md`
