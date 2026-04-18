@@ -44,47 +44,57 @@ Outcome:
 
 - Accepted at `ANA-GATE-60`.
 
-### `PH1-M5` (`in_progress`)
+### `PH1-M5` (`completed`)
 
 Purpose:
 
 - Begin terminal transport ownership seams via deterministic stub transport contracts.
 
+Outcome:
+
+- Accepted at `ANA-GATE-70`.
+
+### `PH1-M6` (`review_gate`)
+
+Purpose:
+
+- Prototype guarded real-transport scaffolding behind explicit opt-in and fail-closed defaults.
+
 Owner docs:
 
 - `docs/Vision.md`
 - `docs/todo/JIRA_BOARD.md`
-- `docs/todo/PH1_M5_TICKETS.md`
+- `docs/todo/PH1_M6_TICKETS.md`
 - `docs/todo/ENGINEER_ENTRYPOINT.md`
 
 Scope:
 
-- transport mode model + stub transport seam
-- run/run-suite transport metadata threading
-- report/compare metadata + validation hardening for transport fields
-- PH1-M5 smoke and checkpoint evidence
+- guarded transport mode + preflight gating
+- transport metadata and schema invariants for guarded state
+- compare visibility + tests for guarded state
+- PH1-M6 smoke and checkpoint evidence
 
 Acceptance criteria:
 
-- tickets `ANA-501` through `ANA-510` complete in order.
+- tickets `ANA-601` through `ANA-610` complete in order.
 - one commit per ticket with `[ANA-###]` subject prefix.
-- `ANA-GATE-70` reached and reported.
+- `ANA-GATE-80` reached and reported.
 
 Non-goals:
 
-- production PTY/ConPTY integration
+- production PTY/ConPTY data plane
 - screenshot/OCR systems
 - rich TUI frontend
 
 Queue lines (exact):
 
-- [x] Execute `ANA-501` through `ANA-510` in order from `docs/todo/PH1_M5_TICKETS.md`.
+- [x] Execute `ANA-601` through `ANA-610` in order from `docs/todo/PH1_M6_TICKETS.md`.
 - [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
-- [x] Stop only at `ANA-GATE-70` (post `ANA-510`) unless truly blocked.
-- [x] Submit checkpoint packet in `docs/todo/PH1_M5_CHECKPOINT.md`.
+- [x] Stop only at `ANA-GATE-80` (post `ANA-610`) unless truly blocked.
+- [x] Submit checkpoint packet in `docs/todo/PH1_M6_CHECKPOINT.md`.
 
-### `PH1-M6` (`pending`)
+### `PH1-M7` (`pending`)
 
 Purpose:
 
-- evaluate transition from stub transport to guarded real transport prototype.
+- decide promotion path from guarded scaffolding to first minimal real PTY experiment.

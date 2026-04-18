@@ -40,8 +40,8 @@ This file is the canonical ticket board for active execution.
 
 ## Current State
 
-- `in_progress`: `ANA-610`
+- `in_progress`: none
 - `todo`: none
 - `blocked`: none
-- `review_gate`: none
+- `review_gate`: `ANA-GATE-80` (PH1-M6-S1 — `ANA-601`..`ANA-610` committed; Architect review)
 - `done`: `ANA-101`..`ANA-123`, `ANA-201`..`ANA-223`, `ANA-301`..`ANA-310`, `ANA-401`..`ANA-410`, `ANA-501`..`ANA-510` (accepted)
