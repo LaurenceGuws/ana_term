@@ -458,6 +458,14 @@ test "diffRunMeta detects run_fingerprint_digest mismatch" {
     try std.testing.expectEqualStrings("changed", rows[15].delta);
 }
 
+test "diffRunMeta detects specset_fingerprint_digest mismatch" {
+    const left = RunMeta{ .specset_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
+    const right = RunMeta{ .specset_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" };
+    const rows = diffRunMeta(left, right);
+    try std.testing.expectEqualStrings("specset_fingerprint_digest", rows[17].field);
+    try std.testing.expectEqualStrings("changed", rows[17].delta);
+}
+
 test "parseRunMeta reads root host identity fields" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();

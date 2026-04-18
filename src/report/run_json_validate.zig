@@ -404,3 +404,12 @@ test "validateRunReport rejects wrong specset_fingerprint_version" {
     defer parsed.deinit();
     try std.testing.expect(validateRunReport(parsed.value) != null);
 }
+
+test "validateRunReport rejects missing specset_fingerprint_digest" {
+    const text =
+        \\{"schema_version":"0.2","run_id":"r","started_at":"","ended_at":"","platform":"linux","term":"x","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","host_identity_machine":"x86_64","host_identity_release":"6.0.0","host_identity_sysname":"Linux","run_fingerprint_digest":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","run_fingerprint_version":"1","transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":30000},"results":[]}
+    ;
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
+    defer parsed.deinit();
+    try std.testing.expect(validateRunReport(parsed.value) != null);
+}
