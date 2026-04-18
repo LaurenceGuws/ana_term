@@ -4,6 +4,7 @@ const loader = @import("../dsl/loader.zig");
 const validator = @import("../dsl/validator.zig");
 const run_plan_mod = @import("../runner/run_plan.zig");
 const run_execute = @import("../runner/run_execute.zig");
+const TerminalInvocation = @import("../runner/terminal_invocation.zig").TerminalInvocation;
 const artifact_paths = @import("../report/artifact_paths.zig");
 const json_writer = @import("../report/json_writer.zig");
 const markdown_writer = @import("../report/markdown_writer.zig");
@@ -43,6 +44,12 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
     defer allocator.free(run_dir);
 
     const run_id = std.fs.path.basename(run_dir);
+
+    _ = TerminalInvocation.init(
+        if (ctx.terminal_cmd.len > 0) ctx.terminal_cmd else ctx.terminal_name,
+        &.{},
+        "",
+    );
 
     json_writer.writeRun(allocator, run_dir, run_id, records.items) catch return errors.Category.runtime_failure.exitCode();
     markdown_writer.writeRunSummary(allocator, run_dir, run_id, records.items) catch return errors.Category.runtime_failure.exitCode();
