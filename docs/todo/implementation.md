@@ -497,7 +497,7 @@ Outcome:
 
 - Accepted at `ANA-GATE-170`.
 
-### `PH1-M16` (`in_progress`)
+### `PH1-M16` (`review_gate`)
 
 Purpose:
 
@@ -532,7 +532,11 @@ Non-goals:
 
 Queue lines (exact):
 
-- [ ] Execute `ANA-1601` through `ANA-1610` in order from `docs/todo/PH1_M16_TICKETS.md`.
-- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
-- [ ] Stop only at `ANA-GATE-180` (post `ANA-1610`) unless truly blocked.
-- [ ] Submit checkpoint packet in `docs/todo/PH1_M16_CHECKPOINT.md`.
+- [x] Execute `ANA-1601` through `ANA-1610` in order from `docs/todo/PH1_M16_TICKETS.md`.
+- [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [x] Stop only at `ANA-GATE-180` (post `ANA-1610`) unless truly blocked.
+- [x] Submit checkpoint packet in `docs/todo/PH1_M16_CHECKPOINT.md`.
+
+Outcome:
+
+- Engineering complete at `ANA-GATE-180` (awaiting Architect acceptance).
