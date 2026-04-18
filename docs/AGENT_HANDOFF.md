@@ -5,8 +5,8 @@ Session entrypoint only. Keep this file short and current.
 ## Active Focus
 
 - Product lane: text-first terminal harness
-- Active macro batch (`in_progress`): `PH1-M18` (`PH1-M18-S1`) — artifact-bundle fingerprint integrity hardening (`ANA-1801`..`ANA-1810`)
-- Super-gate (Architect review): `ANA-GATE-200`
+- **Paused at super-gate** `ANA-GATE-200` — sprint `PH1-M18-S1` engineer delivery complete; checkpoint `docs/todo/PH1_M18_CHECKPOINT.md`
+- Next: Architect acceptance of `PH1-M18` or new direction
 - Active queue authority: `docs/todo/implementation.md`
 - Ticket board authority: `docs/todo/JIRA_BOARD.md`
 - Engineer entrypoint: `docs/todo/ENGINEER_ENTRYPOINT.md`
@@ -22,6 +22,4 @@ Session entrypoint only. Keep this file short and current.
 
 ## Execution Contract
 
-- Execute only `ANA-1801`..`ANA-1810` in order.
-- One ticket per commit with `[ANA-###]` prefix.
-- Stop at `ANA-GATE-200` or hard blocker.
+- Engineer batch complete; resume execution only after Architect gate closure or new queue.
