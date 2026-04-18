@@ -40,8 +40,10 @@ This file is the canonical ticket board for active execution.
 
 ## Current State
 
-- `in_progress`: `ANA-310`
+- `in_progress`: none
 - `todo`: none
 - `blocked`: none
 - `review_gate`: none
 - `done`: `ANA-101`..`ANA-123`, `ANA-201`..`ANA-223` (accepted)
+
+Engineer note: sprint `PH1-M3-S1` tickets `ANA-301`..`ANA-310` are committed; checkpoint packet in `docs/todo/PH1_M3_CHECKPOINT.md`. Super-gate: `ANA-GATE-50` (Architect review).
