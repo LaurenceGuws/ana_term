@@ -11,6 +11,7 @@ const json_writer = @import("../report/json_writer.zig");
 const run_fingerprint = @import("../report/run_fingerprint.zig");
 const specset_fingerprint = @import("../report/specset_fingerprint.zig");
 const resultset_fingerprint = @import("../report/resultset_fingerprint.zig");
+const transport_fingerprint = @import("../report/transport_fingerprint.zig");
 const markdown_writer = @import("../report/markdown_writer.zig");
 const env_writer = @import("../report/env_writer.zig");
 const RunContext = @import("run_context.zig").RunContext;
@@ -99,6 +100,7 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
     run_fingerprint.populate(&ctx, allocator, run_id, records.items) catch return errors.Category.runtime_failure.exitCode();
     specset_fingerprint.populate(&ctx, allocator, records.items) catch return errors.Category.runtime_failure.exitCode();
     resultset_fingerprint.populate(&ctx, allocator, records.items) catch return errors.Category.runtime_failure.exitCode();
+    transport_fingerprint.populate(&ctx, allocator, run_id) catch return errors.Category.runtime_failure.exitCode();
     json_writer.writeRun(allocator, run_dir, run_id, records.items, ctx) catch return errors.Category.runtime_failure.exitCode();
     markdown_writer.writeRunSummary(allocator, run_dir, run_id, records.items, ctx) catch return errors.Category.runtime_failure.exitCode();
     env_writer.writeEnvJson(allocator, run_dir, ctx) catch return errors.Category.runtime_failure.exitCode();
