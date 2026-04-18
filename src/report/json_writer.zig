@@ -99,6 +99,9 @@ pub fn writeRun(
     try buf.appendSlice(allocator, ",\n  \"context_summary_fingerprint_digest\": ");
     try appendJsonEncodedString(allocator, &buf, ctx.context_summary_fingerprint_digest_hex[0..ctx.context_summary_fingerprint_digest_len]);
     try buf.appendSlice(allocator, ",\n  \"context_summary_fingerprint_version\": \"1\"");
+    try buf.appendSlice(allocator, ",\n  \"metadata_envelope_fingerprint_digest\": ");
+    try appendJsonEncodedString(allocator, &buf, ctx.metadata_envelope_fingerprint_digest_hex[0..ctx.metadata_envelope_fingerprint_digest_len]);
+    try buf.appendSlice(allocator, ",\n  \"metadata_envelope_fingerprint_version\": \"1\"");
 
     const guarded_opt_in = ctx.transport_mode == .pty_guarded;
     const guarded_state: []const u8 = blk: {
@@ -223,6 +226,7 @@ test "writeRun JSON-encodes guarded PTY host snapshot strings" {
     try exec_summary_fingerprint.populate(&ctx, std.testing.allocator);
     const term_w = std.posix.getenv("TERM") orelse "";
     try context_summary_fingerprint.populate(&ctx, std.testing.allocator, term_w);
+    try metadata_envelope_fingerprint.populate(&ctx, std.testing.allocator);
 
     const mach = "x86_64";
     const rel = "6.1.0-test";
@@ -252,6 +256,8 @@ test "writeRun JSON-encodes guarded PTY host snapshot strings" {
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"exec_summary_fingerprint_digest\": \"") != null);
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"context_summary_fingerprint_version\": \"1\"") != null);
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"context_summary_fingerprint_digest\": \"") != null);
+    try std.testing.expect(std.mem.indexOf(u8, json_text, "\"metadata_envelope_fingerprint_version\": \"1\"") != null);
+    try std.testing.expect(std.mem.indexOf(u8, json_text, "\"metadata_envelope_fingerprint_digest\": \"") != null);
 
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, json_text, .{});
     defer parsed.deinit();
@@ -286,6 +292,7 @@ test "writeRun escapes quotes in guarded PTY host snapshot strings" {
     try exec_summary_fingerprint.populate(&ctx, std.testing.allocator);
     const term_e = std.posix.getenv("TERM") orelse "";
     try context_summary_fingerprint.populate(&ctx, std.testing.allocator, term_e);
+    try metadata_envelope_fingerprint.populate(&ctx, std.testing.allocator);
 
     const mach: []const u8 = &.{ 'a', 'b', '"', 'c' };
     @memcpy(ctx.pty_experiment_host_machine[0..mach.len], mach);
