@@ -8,6 +8,7 @@ const protocol_stub = @import("../runner/protocol_stub.zig");
 const TerminalInvocation = @import("../runner/terminal_invocation.zig").TerminalInvocation;
 const artifact_paths = @import("../report/artifact_paths.zig");
 const json_writer = @import("../report/json_writer.zig");
+const run_fingerprint = @import("../report/run_fingerprint.zig");
 const markdown_writer = @import("../report/markdown_writer.zig");
 const env_writer = @import("../report/env_writer.zig");
 const RunContext = @import("run_context.zig").RunContext;
@@ -93,6 +94,7 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
     );
 
     ctx.captureHostIdentity();
+    run_fingerprint.populate(&ctx, allocator, run_id, records.items) catch return errors.Category.runtime_failure.exitCode();
     json_writer.writeRun(allocator, run_dir, run_id, records.items, ctx) catch return errors.Category.runtime_failure.exitCode();
     markdown_writer.writeRunSummary(allocator, run_dir, run_id, records.items, ctx) catch return errors.Category.runtime_failure.exitCode();
     env_writer.writeEnvJson(allocator, run_dir, ctx) catch return errors.Category.runtime_failure.exitCode();

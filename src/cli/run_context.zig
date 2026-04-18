@@ -54,6 +54,9 @@ pub const RunContext = struct {
     host_identity_release_len: u16,
     host_identity_sysname: [host_identity_sysname_cap]u8,
     host_identity_sysname_len: u8,
+    /// PH1-M11: 64-char lowercase SHA-256 hex; length 0 until `run_fingerprint.populate`.
+    run_fingerprint_digest_hex: [64]u8,
+    run_fingerprint_digest_len: u8,
 
     pub fn initDefault() RunContext {
         return .{
@@ -85,6 +88,8 @@ pub const RunContext = struct {
             .host_identity_release_len = 0,
             .host_identity_sysname = std.mem.zeroes([host_identity_sysname_cap]u8),
             .host_identity_sysname_len = 0,
+            .run_fingerprint_digest_hex = std.mem.zeroes([64]u8),
+            .run_fingerprint_digest_len = 0,
         };
     }
 
