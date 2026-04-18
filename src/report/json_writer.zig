@@ -4,9 +4,18 @@ const RunContext = @import("../cli/run_context.zig").RunContext;
 const transport_stub = @import("../runner/transport_stub.zig");
 const run_json_validate = @import("run_json_validate.zig");
 
+fn appendJsonEncodedString(allocator: std.mem.Allocator, buf: *std.ArrayList(u8), bytes: []const u8) !void {
+    var enc: std.io.Writer.Allocating = .init(allocator);
+    defer enc.deinit();
+    try std.json.Stringify.encodeJsonString(bytes, .{}, &enc.writer);
+    try buf.appendSlice(allocator, enc.written());
+}
+
 /// Writes a minimal `run.json` placeholder (`docs/REPORT_FORMAT.md`).
 pub fn writePlaceholder(allocator: std.mem.Allocator, run_dir: []const u8, run_id: []const u8) !void {
-    try writeRun(allocator, run_dir, run_id, &.{}, RunContext.initDefault());
+    var ctx = RunContext.initDefault();
+    ctx.captureHostIdentity();
+    try writeRun(allocator, run_dir, run_id, &.{}, ctx);
 }
 
 /// Writes `run.json` including one entry per `RunRecord` and PH1-M2 identity fields.
@@ -49,6 +58,13 @@ pub fn writeRun(
     }
 
     try buf.print(allocator, ",\n  \"execution_mode\": \"{s}\"", .{ctx.execution_mode.tag()});
+
+    try buf.appendSlice(allocator, ",\n  \"host_identity_machine\": ");
+    try appendJsonEncodedString(allocator, &buf, ctx.host_identity_machine[0..ctx.host_identity_machine_len]);
+    try buf.appendSlice(allocator, ",\n  \"host_identity_release\": ");
+    try appendJsonEncodedString(allocator, &buf, ctx.host_identity_release[0..ctx.host_identity_release_len]);
+    try buf.appendSlice(allocator, ",\n  \"host_identity_sysname\": ");
+    try appendJsonEncodedString(allocator, &buf, ctx.host_identity_sysname[0..ctx.host_identity_sysname_len]);
 
     const guarded_opt_in = ctx.transport_mode == .pty_guarded;
     const guarded_state: []const u8 = blk: {
@@ -165,6 +181,7 @@ test "writeRun JSON-encodes guarded PTY host snapshot strings" {
     ctx.pty_experiment_elapsed_ns = 0;
     ctx.pty_experiment_open_ok = true;
     ctx.pty_experiment_error = null;
+    ctx.captureHostIdentity();
 
     const mach = "x86_64";
     const rel = "6.1.0-test";
@@ -208,6 +225,7 @@ test "writeRun escapes quotes in guarded PTY host snapshot strings" {
     ctx.pty_experiment_elapsed_ns = 0;
     ctx.pty_experiment_open_ok = true;
     ctx.pty_experiment_error = null;
+    ctx.captureHostIdentity();
 
     const mach: []const u8 = &.{ 'a', 'b', '"', 'c' };
     @memcpy(ctx.pty_experiment_host_machine[0..mach.len], mach);
