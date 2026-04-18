@@ -93,7 +93,7 @@ Top-level JSON object with at least:
 | `context_summary_fingerprint_digest` | string | **64**-character lowercase hex SHA-256 of the canonical payload (`docs/CONTEXT_SUMMARY_FINGERPRINT_PLAN.md`). |
 | `context_summary_fingerprint_version` | string | Fingerprint schema revision; phase-1 value **`1`**. |
 
-**Serialization order**: after `exec_summary_fingerprint_version`, before root **`metadata_envelope_fingerprint_*`** and the nested `transport` object: `context_summary_fingerprint_digest`, `context_summary_fingerprint_version` (lexicographic).
+**Serialization order**: after `exec_summary_fingerprint_version`, before root **`metadata_envelope_fingerprint_*`**, root **`artifact_bundle_fingerprint_*`**, and the nested `transport` object: `context_summary_fingerprint_digest`, `context_summary_fingerprint_version` (lexicographic).
 
 **PH1-M17+ (metadata-envelope fingerprint)** — present on every harness `run.json` that writes artifacts:
 
@@ -102,7 +102,16 @@ Top-level JSON object with at least:
 | `metadata_envelope_fingerprint_digest` | string | **64**-character lowercase hex SHA-256 of the canonical payload (`docs/METADATA_ENVELOPE_FINGERPRINT_PLAN.md`). |
 | `metadata_envelope_fingerprint_version` | string | Fingerprint schema revision; phase-1 value **`1`**. |
 
-**Serialization order**: after `context_summary_fingerprint_version`, before the nested `transport` object: `metadata_envelope_fingerprint_digest`, `metadata_envelope_fingerprint_version` (lexicographic).
+**Serialization order**: after `context_summary_fingerprint_version`, before root **`artifact_bundle_fingerprint_*`** and the nested `transport` object: `metadata_envelope_fingerprint_digest`, `metadata_envelope_fingerprint_version` (lexicographic).
+
+**PH1-M18+ (artifact-bundle fingerprint)** — present on every harness `run.json` that writes artifacts:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `artifact_bundle_fingerprint_digest` | string | **64**-character lowercase hex SHA-256 of the canonical payload (`docs/ARTIFACT_BUNDLE_FINGERPRINT_PLAN.md`). |
+| `artifact_bundle_fingerprint_version` | string | Fingerprint schema revision; phase-1 value **`1`**. |
+
+**Serialization order**: after `metadata_envelope_fingerprint_version`, before the nested `transport` object: `artifact_bundle_fingerprint_digest`, `artifact_bundle_fingerprint_version` (lexicographic).
 
 Each **result** object includes:
 

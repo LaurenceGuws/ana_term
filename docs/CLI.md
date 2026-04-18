@@ -76,6 +76,11 @@ These flags identify **which terminal** is under test and how it would be invoke
 - Full runs include **`metadata_envelope_fingerprint_digest`** (64-char lowercase hex) and **`metadata_envelope_fingerprint_version`** (**`1`**) derived from a documented canonical payload (see **`docs/METADATA_ENVELOPE_FINGERPRINT_PLAN.md`**).
 - **`--dry-run`** does not write `run.json`; metadata-envelope fingerprint keys are not applicable.
 
+**PH1-M18 artifact-bundle fingerprint (`run.json` root)**
+
+- Full runs include **`artifact_bundle_fingerprint_digest`** (64-char lowercase hex) and **`artifact_bundle_fingerprint_version`** (**`1`**) derived from a documented canonical payload (see **`docs/ARTIFACT_BUNDLE_FINGERPRINT_PLAN.md`**).
+- **`--dry-run`** does not write `run.json`; artifact-bundle fingerprint keys are not applicable.
+
 ## Transport configuration (`run`, `run-suite`, PH1-M5+)
 
 These flags describe the **transport seam** (how the harness would attach to a terminal for I/O). They complement **`--terminal`**, which names the *logical* terminal identity for comparison metadata.
