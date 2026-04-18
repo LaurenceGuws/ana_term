@@ -4,23 +4,23 @@ Read this file first in Dual Agent Mode.
 
 ## Active Batch
 
-- **Paused at super-gate** — sprint `PH1-M15-S1` engineering queue is complete; Architect owns `ANA-GATE-170`.
-- Ticket source (closed batch): `docs/todo/PH1_M15_TICKETS.md`.
-- Evidence: `docs/todo/PH1_M15_CHECKPOINT.md`.
+- Execute only `PH1-M16` / sprint `PH1-M16-S1`.
+- Super-gate: `ANA-GATE-180` (report after `ANA-1610` or hard blocker).
+- Ticket source: `docs/todo/PH1_M16_TICKETS.md`.
 - Board source: `docs/todo/JIRA_BOARD.md`.
 
 ## Required Read Order
 
 1. `docs/todo/implementation.md`
 2. `docs/todo/JIRA_BOARD.md`
-3. `docs/todo/PH1_M15_TICKETS.md`
+3. `docs/todo/PH1_M16_TICKETS.md`
 4. `docs/AGENT_HANDOFF.md`
 5. `docs/Vision.md`
 6. `docs/WORKFLOW.md`
 
 ## Execution Contract
 
-- Execute tickets `ANA-1501` through `ANA-1510` in strict order.
+- Execute tickets `ANA-1601` through `ANA-1610` in strict order.
 - Keep one ticket per commit.
 - Use commit subjects: `[ANA-###] <summary>`.
 - Update `docs/todo/JIRA_BOARD.md` as ticket status changes.
@@ -30,7 +30,7 @@ Read this file first in Dual Agent Mode.
 
 Report only when:
 
-- `ANA-GATE-170` reached (post `ANA-1510`), or
+- `ANA-GATE-180` reached (post `ANA-1610`), or
 - hard blocker needs architecture/product decision.
 
 Include:

@@ -453,7 +453,7 @@ Outcome:
 
 - Accepted at `ANA-GATE-160`.
 
-### `PH1-M15` (`review_gate`)
+### `PH1-M15` (`completed`)
 
 Purpose:
 
@@ -495,4 +495,44 @@ Queue lines (exact):
 
 Outcome:
 
-- Engineering complete at `ANA-GATE-170` (awaiting Architect acceptance).
+- Accepted at `ANA-GATE-170`.
+
+### `PH1-M16` (`in_progress`)
+
+Purpose:
+
+- Improve execution reproducibility auditing by adding deterministic context-summary fingerprint fields and compare/report visibility.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M16_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- define PH1-M16 context-summary fingerprint plan and boundaries
+- emit root context-summary fingerprint fields in `run.json`
+- add report schema invariants and compare metadata coverage for context-summary fingerprint fields
+- expand regression tests and smoke coverage
+- PH1-M16 checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-1601` through `ANA-1610` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-180` reached and reported.
+
+Non-goals:
+
+- Windows ConPTY implementation
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [ ] Execute `ANA-1601` through `ANA-1610` in order from `docs/todo/PH1_M16_TICKETS.md`.
+- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [ ] Stop only at `ANA-GATE-180` (post `ANA-1610`) unless truly blocked.
+- [ ] Submit checkpoint packet in `docs/todo/PH1_M16_CHECKPOINT.md`.
