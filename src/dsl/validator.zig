@@ -24,7 +24,7 @@ pub fn validate(path: []const u8, text: []const u8) ?Violation {
     if (!stepsContainWrite(text)) {
         return .{ .path = path, .field = "steps", .message = "each step must include a `write` assignment (phase-1)" };
     }
-    const kind = extractKindValue(text) orelse {
+    const kind = extractStringField(text, "kind") orelse {
         return .{ .path = path, .field = "kind", .message = "could not parse `kind` string value" };
     };
     if (!categories.isKnown(kind)) {
@@ -62,13 +62,17 @@ fn stepsContainWrite(text: []const u8) bool {
         (std.mem.indexOf(u8, after, "write =") != null or std.mem.indexOf(u8, after, "write=") != null);
 }
 
-fn extractKindValue(text: []const u8) ?[]const u8 {
+pub fn extractId(text: []const u8) ?[]const u8 {
+    return extractStringField(text, "id");
+}
+
+fn extractStringField(text: []const u8, key: []const u8) ?[]const u8 {
     var iter = std.mem.splitScalar(u8, text, '\n');
     while (iter.next()) |raw| {
         const line = trimEnd(raw);
         if (line.len == 0 or line[0] == '#' or line[0] == ';') continue;
         if (line[0] == '[') continue;
-        if (!keyAssignment(line, "kind")) continue;
+        if (!keyAssignment(line, key)) continue;
         const eq = std.mem.indexOfScalar(u8, line, '=') orelse continue;
         const rhs = std.mem.trim(u8, line[eq + 1 ..], " \t");
         if (rhs.len < 2) return null;

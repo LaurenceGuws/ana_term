@@ -2,6 +2,8 @@ const std = @import("std");
 const errors = @import("../core/errors.zig");
 const categories = @import("../probes/categories.zig");
 const discovery = @import("../dsl/discovery.zig");
+const run_cmd = @import("run_cmd.zig");
+const report_cmd = @import("report_cmd.zig");
 
 fn printListStub(allocator: std.mem.Allocator, roots: []const []const u8) !void {
     const paths = try discovery.discover(allocator, roots);
@@ -46,11 +48,7 @@ pub fn run(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
         return 0;
     }
     if (std.mem.eql(u8, cmd, "run")) {
-        printStdout(
-            "run: placeholder — full pipeline wires in ANA-119+ (extra args: {d})\n",
-            .{argv.len - 1},
-        ) catch return errors.Category.runtime_failure.exitCode();
-        return 0;
+        return run_cmd.execute(allocator, argv[1..]);
     }
     if (std.mem.eql(u8, cmd, "run-suite")) {
         printStdout(
@@ -60,11 +58,7 @@ pub fn run(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
         return 0;
     }
     if (std.mem.eql(u8, cmd, "report")) {
-        printStdout(
-            "report: placeholder — pass path to run.json (extra args: {d})\n",
-            .{argv.len - 1},
-        ) catch return errors.Category.runtime_failure.exitCode();
-        return 0;
+        return report_cmd.execute(allocator, argv[1..]);
     }
     if (std.mem.eql(u8, cmd, "doctor")) {
         printStdout(
