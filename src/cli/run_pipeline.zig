@@ -7,8 +7,9 @@ const run_execute = @import("../runner/run_execute.zig");
 const artifact_paths = @import("../report/artifact_paths.zig");
 const json_writer = @import("../report/json_writer.zig");
 const markdown_writer = @import("../report/markdown_writer.zig");
+const RunContext = @import("run_context.zig").RunContext;
 
-pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []const u8, capture_mode: []const u8) u8 {
+pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []const u8, ctx: RunContext) u8 {
     if (spec_paths.len == 0) {
         printErr("no probe specs to run\n") catch {};
         return errors.Category.invalid_spec.exitCode();
@@ -33,7 +34,7 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
             return errors.Category.invalid_spec.exitCode();
         };
 
-        const plan = run_plan_mod.buildPlan(allocator, path, sid, capture_mode) catch return errors.Category.runtime_failure.exitCode();
+        const plan = run_plan_mod.buildPlan(allocator, path, sid, ctx.capture_mode) catch return errors.Category.runtime_failure.exitCode();
         const rec = run_execute.executePlaceholder(allocator, plan) catch return errors.Category.runtime_failure.exitCode();
         records.append(allocator, rec) catch return errors.Category.runtime_failure.exitCode();
     }

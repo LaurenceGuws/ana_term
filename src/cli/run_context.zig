@@ -1,0 +1,31 @@
+const modes = @import("../capture/modes.zig");
+
+pub const RunContext = struct {
+    capture_mode: []const u8,
+    terminal_name: []const u8,
+    terminal_cmd: []const u8,
+    platform: []const u8,
+    suite_name: ?[]const u8,
+    comparison_id: ?[]const u8,
+
+    pub fn initDefault() RunContext {
+        return .{
+            .capture_mode = modes.defaultMode(),
+            .terminal_name = "unknown",
+            .terminal_cmd = "",
+            .platform = defaultPlatformTag(),
+            .suite_name = null,
+            .comparison_id = null,
+        };
+    }
+};
+
+pub fn defaultPlatformTag() []const u8 {
+    const builtin = @import("builtin");
+    return switch (builtin.target.os.tag) {
+        .linux => "linux",
+        .windows => "windows",
+        .macos, .ios, .tvos, .watchos => "darwin",
+        else => "unknown",
+    };
+}

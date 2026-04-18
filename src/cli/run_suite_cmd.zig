@@ -3,10 +3,11 @@ const errors = @import("../core/errors.zig");
 const modes = @import("../capture/modes.zig");
 const suite_manifest = @import("suite_manifest.zig");
 const run_pipeline = @import("run_pipeline.zig");
+const RunContext = @import("run_context.zig").RunContext;
 
 pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
     if (argv.len == 0) {
-        printErr("usage: ana_term run-suite <name> [--capture <mode>]\n") catch {};
+        printErr("usage: ana_term run-suite <name> [--capture <mode>] [--terminal <name>] ...\n") catch {};
         return errors.Category.unknown_command.exitCode();
     }
 
@@ -16,7 +17,9 @@ pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
         return errors.Category.unknown_command.exitCode();
     }
 
-    var capture_mode: []const u8 = modes.defaultMode();
+    var ctx = RunContext.initDefault();
+    ctx.suite_name = suite_name;
+
     var i: usize = 1;
     while (i < argv.len) {
         if (std.mem.eql(u8, argv[i], "--capture")) {
@@ -24,16 +27,43 @@ pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
                 printErr("--capture requires a value\n") catch {};
                 return errors.Category.unknown_command.exitCode();
             }
-            capture_mode = argv[i + 1];
-            if (!modes.isKnown(capture_mode)) {
+            ctx.capture_mode = argv[i + 1];
+            if (!modes.isKnown(ctx.capture_mode)) {
                 printErr("invalid --capture mode\n") catch {};
                 return errors.Category.invalid_spec.exitCode();
             }
             i += 2;
             continue;
         }
+        if (std.mem.eql(u8, argv[i], "--terminal")) {
+            if (i + 1 >= argv.len) {
+                printErr("--terminal requires a value\n") catch {};
+                return errors.Category.unknown_command.exitCode();
+            }
+            ctx.terminal_name = argv[i + 1];
+            i += 2;
+            continue;
+        }
+        if (std.mem.eql(u8, argv[i], "--terminal-cmd")) {
+            if (i + 1 >= argv.len) {
+                printErr("--terminal-cmd requires a value\n") catch {};
+                return errors.Category.unknown_command.exitCode();
+            }
+            ctx.terminal_cmd = argv[i + 1];
+            i += 2;
+            continue;
+        }
+        if (std.mem.eql(u8, argv[i], "--platform")) {
+            if (i + 1 >= argv.len) {
+                printErr("--platform requires a value\n") catch {};
+                return errors.Category.unknown_command.exitCode();
+            }
+            ctx.platform = argv[i + 1];
+            i += 2;
+            continue;
+        }
         if (argv[i].len > 0 and argv[i][0] == '-') {
-            printErr("unknown flag (terminal flags come in later tickets)\n") catch {};
+            printErr("unknown flag\n") catch {};
             return errors.Category.unknown_command.exitCode();
         }
         printErr("unexpected positional argument\n") catch {};
@@ -43,7 +73,7 @@ pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
     const paths = suite_manifest.loadBaselineLinux(allocator) catch return errors.Category.runtime_failure.exitCode();
     defer suite_manifest.freePathList(allocator, paths);
 
-    return run_pipeline.executeSpecPaths(allocator, paths, capture_mode);
+    return run_pipeline.executeSpecPaths(allocator, paths, ctx);
 }
 
 fn printErr(msg: []const u8) !void {
