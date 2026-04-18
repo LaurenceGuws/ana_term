@@ -8,6 +8,8 @@ comptime {
     _ = @import("runner/run_plan.zig");
     _ = @import("runner/run_execute.zig");
     _ = @import("capture/modes.zig");
+    _ = @import("report/json_writer.zig");
+    _ = @import("report/markdown_writer.zig");
 }
 
 pub fn main() u8 {
