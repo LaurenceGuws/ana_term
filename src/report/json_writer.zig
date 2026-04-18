@@ -8,6 +8,7 @@ const specset_fingerprint = @import("specset_fingerprint.zig");
 const resultset_fingerprint = @import("resultset_fingerprint.zig");
 const transport_fingerprint = @import("transport_fingerprint.zig");
 const exec_summary_fingerprint = @import("exec_summary_fingerprint.zig");
+const context_summary_fingerprint = @import("context_summary_fingerprint.zig");
 
 fn appendJsonEncodedString(allocator: std.mem.Allocator, buf: *std.ArrayList(u8), bytes: []const u8) !void {
     var enc: std.io.Writer.Allocating = .init(allocator);
@@ -25,6 +26,8 @@ pub fn writePlaceholder(allocator: std.mem.Allocator, run_dir: []const u8, run_i
     try resultset_fingerprint.populate(&ctx, allocator, &.{});
     try transport_fingerprint.populate(&ctx, allocator, run_id);
     try exec_summary_fingerprint.populate(&ctx, allocator);
+    const term_ph = std.posix.getenv("TERM") orelse "";
+    try context_summary_fingerprint.populate(&ctx, allocator, term_ph);
     try writeRun(allocator, run_dir, run_id, &.{}, ctx);
 }
 
