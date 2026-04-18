@@ -1,6 +1,6 @@
-# Smoke workflow (PH1-M2 through PH1-M7)
+# Smoke workflow (PH1-M2 through PH1-M8)
 
-Minimal operator path: run the **baseline-linux** suite twice with **different terminal identities**, then produce one **compare** report (markdown + JSON). **PH1-M3** adds strict `report` / `compare` checks and metadata-rich compare output. **PH1-M4** adds **execution modes** (`placeholder` vs `protocol_stub`), **`--dry-run`**, and deterministic stub **observations**—use **Section 6** when touching the runner seam. **PH1-M5** adds **transport** metadata (`none` vs **`pty_stub`**) and **`--timeout-ms`**—use **Section 7**. **PH1-M6** adds guarded transport scaffolding—use **Section 8**. **PH1-M7** adds a minimal Linux PTY open/close experiment—use **Section 9** (Linux host only).
+Minimal operator path: run the **baseline-linux** suite twice with **different terminal identities**, then produce one **compare** report (markdown + JSON). **PH1-M3** adds strict `report` / `compare` checks and metadata-rich compare output. **PH1-M4** adds **execution modes** (`placeholder` vs `protocol_stub`), **`--dry-run`**, and deterministic stub **observations**—use **Section 6** when touching the runner seam. **PH1-M5** adds **transport** metadata (`none` vs **`pty_stub`**) and **`--timeout-ms`**—use **Section 7**. **PH1-M6** adds guarded transport scaffolding—use **Section 8**. **PH1-M7** adds a minimal Linux PTY open/close experiment—use **Section 9** (Linux host only). **PH1-M8** adds deterministic telemetry for that experiment—use **Section 10**.
 
 ## Prerequisites
 
@@ -108,9 +108,9 @@ zig-out/bin/ana_term run-suite baseline-linux --transport pty_guarded --allow-gu
 
 - **Dry-run**: add **`--dry-run`** to the opt-in command above. Exit **0**; no artifact directory is created.
 
-- **Full run (Linux)**: omit **`--dry-run`**. After the run, **`report`** on the artifact directory exits **0**. In **`run.json`**, **`guarded_state`** is **`experiment_linux_pty`**, **`pty_experiment_open_ok`** is **`true`** (or **`false`** with **`pty_experiment_error`** set on failure), and **`pty_capability_notes`** describes the POSIX path used.
+- **Full run (Linux)**: omit **`--dry-run`**. After the run, **`report`** on the artifact directory exits **0**. In **`run.json`**, **`guarded_state`** is **`experiment_linux_pty`**, **`pty_experiment_open_ok`** is **`true`** (or **`false`** with **`pty_experiment_error`** set on failure), **`pty_capability_notes`** describes the POSIX path, and **PH1-M8** adds **`pty_experiment_attempt`** (**`1`**) and **`pty_experiment_elapsed_ns`** (non-negative wall time; see **Section 10**).
 
-- **Compare**: run once with **`pty_stub`** and once with **`pty_guarded`** (with opt-in). Metadata should include **`guarded_opt_in`**, **`guarded_state`**, and **`pty_experiment_*`** deltas alongside transport rows.
+- **Compare**: run once with **`pty_stub`** and once with **`pty_guarded`** (with opt-in). Metadata should include **`guarded_opt_in`**, **`guarded_state`**, and **`pty_experiment_*`** (including attempt/elapsed) deltas alongside transport rows.
 
 ## 9. Guarded Linux PTY experiment (PH1-M7)
 
@@ -126,6 +126,18 @@ zig-out/bin/ana_term run-suite baseline-linux --transport pty_guarded --allow-gu
 
 Confirm with **`report`** on the run directory. Inspect **`transport.guarded_state`** and **`pty_experiment_open_ok`** in **`run.json`**.
 
+## 10. PH1-M8 hardened PTY telemetry (Linux)
+
+Same commands as **Section 9**. After a successful full run, open **`run.json`** and verify:
+
+- **`pty_experiment_attempt`** is **`1`**.
+- **`pty_experiment_elapsed_ns`** is present, non-negative, and fits a signed JSON integer (harness clamps if needed).
+- Transport keys follow the lexicographic order documented in **`docs/REPORT_FORMAT.md`**.
+
+**Compare**: two guarded full runs on the same host may show **`changed`** on **`pty_experiment_elapsed_ns`** (wall time); **`pty_experiment_attempt`** should remain **`1`** for both.
+
+See **`docs/PTY_EXPERIMENT_HARDENING_PLAN.md`**.
+
 ## References
 
 - Terminal flags and behavior: `docs/CLI.md`
@@ -136,3 +148,4 @@ Confirm with **`report`** on the run directory. Inspect **`transport.guarded_sta
 - Transport seam: `docs/TRANSPORT_PLAN.md`
 - Guarded transport: `docs/REAL_TRANSPORT_GUARD_PLAN.md`
 - Linux PTY experiment: `docs/PTY_EXPERIMENT_PLAN.md`
+- PTY experiment hardening: `docs/PTY_EXPERIMENT_HARDENING_PLAN.md`
