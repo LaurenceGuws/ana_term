@@ -4,9 +4,10 @@ Read this file first in Dual Agent Mode.
 
 ## Active Batch
 
-- Execute only `PH1-M19` / sprint `PH1-M19-S1`.
-- Super-gate: `ANA-GATE-210` (report after `ANA-1910` or hard blocker).
-- Ticket source: `docs/todo/PH1_M19_TICKETS.md`.
+- Sprint `PH1-M19-S1` checkpoint submitted; **pause** for Architect review at **`ANA-GATE-210`**.
+- Evidence: `docs/todo/PH1_M19_CHECKPOINT.md`.
+- Do not start the next execution batch until the Architect accepts the gate and updates `docs/todo/implementation.md` / `docs/todo/JIRA_BOARD.md`.
+- Ticket source (completed sprint): `docs/todo/PH1_M19_TICKETS.md`.
 - Board source: `docs/todo/JIRA_BOARD.md`.
 
 ## Required Read Order
@@ -20,8 +21,9 @@ Read this file first in Dual Agent Mode.
 
 ## Execution Contract
 
-- Execute tickets `ANA-1901` through `ANA-1910` in strict order.
-- Keep one ticket per commit.
+- **Paused** at `ANA-GATE-210` pending Architect acceptance of `PH1-M19`.
+- When resumed by Architect: follow the then-current `docs/todo/implementation.md` queue and `docs/todo/JIRA_BOARD.md`.
+- Keep one ticket per commit when executing a batch.
 - Use commit subjects: `[ANA-###] <summary>`.
 - Update `docs/todo/JIRA_BOARD.md` as ticket status changes.
 - Validate locally at ticket boundaries.
