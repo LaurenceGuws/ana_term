@@ -84,8 +84,12 @@ pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
     const rows = run_json.diffResults(allocator, &map_a, &map_b) catch return errors.Category.runtime_failure.exitCode();
     defer run_json.deinitDiffRows(allocator, rows);
 
+    const meta_a = run_json.parseRunMeta(parsed_a.value);
+    const meta_b = run_json.parseRunMeta(parsed_b.value);
+    const meta_diff = run_json.diffRunMeta(meta_a, meta_b);
+
     std.fs.cwd().makePath("artifacts/compare") catch return errors.Category.runtime_failure.exitCode();
-    compare_markdown.writeFile(allocator, "artifacts/compare/compare.md", rows, path_a, path_b) catch return errors.Category.runtime_failure.exitCode();
+    compare_markdown.writeFile(allocator, "artifacts/compare/compare.md", rows, path_a, path_b, &meta_diff) catch return errors.Category.runtime_failure.exitCode();
     compare_json.writeFile(allocator, "artifacts/compare/compare.json", rows, path_a, path_b) catch return errors.Category.runtime_failure.exitCode();
 
     printStdout("compare: wrote artifacts/compare/compare.md and artifacts/compare/compare.json\n", .{}) catch return errors.Category.runtime_failure.exitCode();

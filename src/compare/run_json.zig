@@ -1,5 +1,79 @@
 const std = @import("std");
 
+pub const RunMeta = struct {
+    platform: ?[]const u8 = null,
+    term: ?[]const u8 = null,
+    terminal_name: ?[]const u8 = null,
+    suite: ?[]const u8 = null,
+    comparison_id: ?[]const u8 = null,
+    run_group: ?[]const u8 = null,
+};
+
+pub const MetaDiffRow = struct {
+    field: []const u8,
+    left: ?[]const u8,
+    right: ?[]const u8,
+    delta: []const u8,
+};
+
+/// Reads identity fields from a parsed `run.json` root (slices point into the parsed document).
+pub fn parseRunMeta(root: std.json.Value) RunMeta {
+    const obj = switch (root) {
+        .object => |o| o,
+        else => return .{},
+    };
+    var m = RunMeta{};
+    m.platform = readOptString(obj, "platform");
+    m.term = readOptString(obj, "term");
+    m.suite = readOptStringOrNull(obj, "suite");
+    m.comparison_id = readOptStringOrNull(obj, "comparison_id");
+    m.run_group = readOptStringOrNull(obj, "run_group");
+    if (obj.get("terminal")) |t| switch (t) {
+        .object => |term_o| {
+            m.terminal_name = readOptString(term_o, "name");
+        },
+        else => {},
+    } else {}
+    return m;
+}
+
+fn readOptString(obj: std.json.ObjectMap, key: []const u8) ?[]const u8 {
+    const v = obj.get(key) orelse return null;
+    return switch (v) {
+        .string => |s| s,
+        else => null,
+    };
+}
+
+fn readOptStringOrNull(obj: std.json.ObjectMap, key: []const u8) ?[]const u8 {
+    const v = obj.get(key) orelse return null;
+    return switch (v) {
+        .string => |s| s,
+        .null => null,
+        else => null,
+    };
+}
+
+fn metaDelta(l: ?[]const u8, r: ?[]const u8) []const u8 {
+    if (l == null and r == null) return "unchanged";
+    if (l == null) return "only_right";
+    if (r == null) return "only_left";
+    if (std.mem.eql(u8, l.?, r.?)) return "unchanged";
+    return "changed";
+}
+
+/// Fixed field order for deterministic compare output.
+pub fn diffRunMeta(left: RunMeta, right: RunMeta) [6]MetaDiffRow {
+    return .{
+        .{ .field = "comparison_id", .left = left.comparison_id, .right = right.comparison_id, .delta = metaDelta(left.comparison_id, right.comparison_id) },
+        .{ .field = "platform", .left = left.platform, .right = right.platform, .delta = metaDelta(left.platform, right.platform) },
+        .{ .field = "run_group", .left = left.run_group, .right = right.run_group, .delta = metaDelta(left.run_group, right.run_group) },
+        .{ .field = "suite", .left = left.suite, .right = right.suite, .delta = metaDelta(left.suite, right.suite) },
+        .{ .field = "term", .left = left.term, .right = right.term, .delta = metaDelta(left.term, right.term) },
+        .{ .field = "terminal", .left = left.terminal_name, .right = right.terminal_name, .delta = metaDelta(left.terminal_name, right.terminal_name) },
+    };
+}
+
 pub const Row = struct {
     status: []const u8,
     notes: []const u8,
