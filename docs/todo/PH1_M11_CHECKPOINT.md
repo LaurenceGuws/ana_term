@@ -18,7 +18,7 @@ Status: **Engineering complete** — awaiting Architect review at `ANA-GATE-130`
 | ANA-1107 | `edd8a7e` | `[ANA-1107] test run fingerprint populate determinism` |
 | ANA-1108 | `5f4e0d6` | `[ANA-1108] regression tests for run fingerprint validation and compare` |
 | ANA-1109 | `69eff9b` | `[ANA-1109] document PH1-M11 run fingerprint smoke checks` |
-| ANA-1110 | `05c03ce` | `[ANA-1110] finalize PH1-M11-S1 checkpoint and ticket pack` |
+| ANA-1110 | `21d6960` | `[ANA-1110] finalize PH1-M11-S1 checkpoint and ticket pack` |
 
 ## Engineer validation log
 
