@@ -25,6 +25,10 @@ pub const RunContext = struct {
     pty_experiment_open_ok: ?bool,
     pty_experiment_error: ?[]const u8,
     pty_capability_notes: ?[]const u8,
+    /// PH1-M8: single attempt counter for guarded PTY experiment (`1` when run; `null` in artifacts for scaffold_only).
+    pty_experiment_attempt: ?u32,
+    /// PH1-M8: wall-time nanoseconds for experiment block, clamped to `maxInt(i64)` for JSON.
+    pty_experiment_elapsed_ns: ?u64,
 
     pub fn initDefault() RunContext {
         return .{
@@ -44,6 +48,8 @@ pub const RunContext = struct {
             .pty_experiment_open_ok = null,
             .pty_experiment_error = null,
             .pty_capability_notes = null,
+            .pty_experiment_attempt = null,
+            .pty_experiment_elapsed_ns = null,
         };
     }
 };
