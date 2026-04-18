@@ -31,6 +31,16 @@ Top-level JSON object with at least:
 | `term` | string | Value of `TERM` if known. |
 | `results` | array | One entry per probe/spec executed. |
 
+**PH1-M10+ (root host identity)** — present on every harness `run.json` that writes artifacts (full run, not `--dry-run`):
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `host_identity_machine` | string | Non-empty `uname.machine` snapshot (truncated; JSON-escaped). |
+| `host_identity_release` | string | Non-empty `uname.release` snapshot (truncated; JSON-escaped). |
+| `host_identity_sysname` | string | Non-empty `uname.sysname` snapshot (truncated; JSON-escaped). |
+
+**Serialization order**: after `execution_mode`, before `transport`: `host_identity_machine`, `host_identity_release`, `host_identity_sysname` (lexicographic). See **`docs/HOST_IDENTITY_PLAN.md`**.
+
 Each **result** object includes:
 
 | Field | Type | Description |

@@ -36,6 +36,11 @@ These flags identify **which terminal** is under test and how it would be invoke
 | `--strict` | Boolean flag (no value). Enables stricter validation for the invocation (exact rules evolve by milestone; see `docs/PROTO_EXEC_PLAN.md`). |
 | `--exec-mode <mode>` | `placeholder` (default) or `protocol_stub` (PH1-M4+). Recorded in `run.json` as `execution_mode`. |
 
+**PH1-M10 host identity (`run.json` root)**
+
+- On full runs (artifacts written), the harness records **`host_identity_machine`**, **`host_identity_release`**, and **`host_identity_sysname`** from runtime **`uname`** (see **`docs/HOST_IDENTITY_PLAN.md`** and **`docs/REPORT_FORMAT.md`**).
+- **`--dry-run`** does not write `run.json`; these keys are not applicable.
+
 ## Transport configuration (`run`, `run-suite`, PH1-M5+)
 
 These flags describe the **transport seam** (how the harness would attach to a terminal for I/O). They complement **`--terminal`**, which names the *logical* terminal identity for comparison metadata.
