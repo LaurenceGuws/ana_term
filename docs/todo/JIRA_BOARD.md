@@ -25,6 +25,14 @@ This file is the canonical ticket board for active execution.
 - Commit budget before checkpoint: `20`
 - Super-gate: `ANA-GATE-40`
 
+## Corrective batch (governance — post rejection `101b3d1`)
+
+| Ticket | Purpose |
+|--------|---------|
+| `ANA-221` | Add `docs/todo/PH1_M2_TICKETS.md` to git (ticket authority referenced by `implementation.md`). |
+| `ANA-222` | Refocus `docs/AGENT_HANDOFF.md` and `docs/todo/ENGINEER_ENTRYPOINT.md` to PH1-M2 / `ANA-GATE-40`. |
+| `ANA-223` | Board + checkpoint corrective evidence; gate re-opened for Architect. |
+
 ## Ticket Order (`PH1-M2-S1`)
 
 1. `ANA-201`
@@ -53,7 +61,7 @@ This file is the canonical ticket board for active execution.
 - `in_progress`: none
 - `todo`: none
 - `blocked`: none
-- `review_gate`: none
+- `review_gate`: `ANA-GATE-40` (re-opened after corrective `ANA-221`..`ANA-223`; pending Architect)
 - `done`: `ANA-101`..`ANA-123` (accepted)
 
-Engineer note: sprint `PH1-M2-S1` tickets `ANA-201`..`ANA-220` are committed; checkpoint packet in `docs/todo/PH1_M2_CHECKPOINT.md`. Super-gate: `ANA-GATE-40` (Architect review).
+Engineer note: sprint execution `ANA-201`..`ANA-220` is complete; governance fixes landed in `ANA-221`..`ANA-223`. Checkpoint: `docs/todo/PH1_M2_CHECKPOINT.md`.

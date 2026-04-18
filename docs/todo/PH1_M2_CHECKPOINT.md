@@ -3,7 +3,26 @@
 Sprint: `PH1-M2-S1`
 Gate: `ANA-GATE-40`
 
-Status: **ready for Architect review** (Engineer closure at `ANA-220`).
+Status: **gate re-opened for Architect review** (corrective batch `ANA-221`..`ANA-223` after rejection at `101b3d1`).
+
+## Gate history
+
+- **Rejected** at `101b3d1`: ticket authority file `docs/todo/PH1_M2_TICKETS.md` was not in git; `docs/AGENT_HANDOFF.md` and `docs/todo/ENGINEER_ENTRYPOINT.md` still described PH1-M1 / `ANA-GATE-20` on that commit.
+- **Corrective**: `ANA-221` adds the ticket pack; `ANA-222` refocuses handoff + engineer entrypoint to PH1-M2 / `ANA-GATE-40`; `ANA-223` records evidence and board state.
+
+### Governance verification (post-corrective)
+
+- [x] `git cat-file -e HEAD:docs/todo/PH1_M2_TICKETS.md` succeeds on a clean checkout.
+- [x] `docs/AGENT_HANDOFF.md` and `docs/todo/ENGINEER_ENTRYPOINT.md` reference PH1-M2 and `ANA-GATE-40`.
+
+### Corrective commits (`ANA-221`..`ANA-223`)
+
+| Ticket | SHA | Subject |
+|--------|-----|---------|
+| ANA-221 | `629715b` | add PH1-M2 ticket pack to repo |
+| ANA-222 | `5786189` | refocus handoff and engineer entrypoint to PH1-M2 |
+
+`ANA-223`: resolve SHA with `git log -1 --oneline --grep=ANA-223` (updates board + this checkpoint; re-opens `ANA-GATE-40`).
 
 ## Objective (from sprint)
 
