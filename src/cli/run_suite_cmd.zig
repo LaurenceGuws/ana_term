@@ -1,15 +1,23 @@
 const std = @import("std");
 const errors = @import("../core/errors.zig");
-const discovery = @import("../dsl/discovery.zig");
 const modes = @import("../capture/modes.zig");
+const suite_manifest = @import("suite_manifest.zig");
 const run_pipeline = @import("run_pipeline.zig");
 
 pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
-    var capture_mode: []const u8 = modes.defaultMode();
-    var roots = std.ArrayList([]const u8).empty;
-    defer roots.deinit(allocator);
+    if (argv.len == 0) {
+        printErr("usage: ana_term run-suite <name> [--capture <mode>]\n") catch {};
+        return errors.Category.unknown_command.exitCode();
+    }
 
-    var i: usize = 0;
+    const suite_name = argv[0];
+    if (!std.mem.eql(u8, suite_name, "baseline-linux")) {
+        printErr("unknown suite (only baseline-linux is defined)\n") catch {};
+        return errors.Category.unknown_command.exitCode();
+    }
+
+    var capture_mode: []const u8 = modes.defaultMode();
+    var i: usize = 1;
     while (i < argv.len) {
         if (std.mem.eql(u8, argv[i], "--capture")) {
             if (i + 1 >= argv.len) {
@@ -25,23 +33,21 @@ pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
             continue;
         }
         if (argv[i].len > 0 and argv[i][0] == '-') {
-            printErr("unknown flag\n") catch {};
+            printErr("unknown flag (terminal flags come in later tickets)\n") catch {};
             return errors.Category.unknown_command.exitCode();
         }
-        roots.append(allocator, argv[i]) catch return errors.Category.runtime_failure.exitCode();
-        i += 1;
+        printErr("unexpected positional argument\n") catch {};
+        return errors.Category.unknown_command.exitCode();
     }
 
-    const roots_slice: []const []const u8 = if (roots.items.len == 0) &[_][]const u8{"probes/smoke"} else roots.items;
+    const paths = suite_manifest.loadBaselineLinux(allocator) catch return errors.Category.runtime_failure.exitCode();
+    defer suite_manifest.freePathList(allocator, paths);
 
-    const spec_paths = discovery.discover(allocator, roots_slice) catch return errors.Category.runtime_failure.exitCode();
-    defer discovery.freePaths(allocator, spec_paths);
-
-    return run_pipeline.executeSpecPaths(allocator, spec_paths, capture_mode);
+    return run_pipeline.executeSpecPaths(allocator, paths, capture_mode);
 }
 
 fn printErr(msg: []const u8) !void {
-    var buf: [256]u8 = undefined;
+    var buf: [512]u8 = undefined;
     var w = std.fs.File.stderr().writer(&buf);
     try w.interface.print("{s}", .{msg});
     try w.interface.flush();

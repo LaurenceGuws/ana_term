@@ -3,6 +3,7 @@ const errors = @import("../core/errors.zig");
 const categories = @import("../probes/categories.zig");
 const discovery = @import("../dsl/discovery.zig");
 const run_cmd = @import("run_cmd.zig");
+const run_suite_cmd = @import("run_suite_cmd.zig");
 const report_cmd = @import("report_cmd.zig");
 
 fn printListStub(allocator: std.mem.Allocator, roots: []const []const u8) !void {
@@ -51,11 +52,7 @@ pub fn run(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
         return run_cmd.execute(allocator, argv[1..]);
     }
     if (std.mem.eql(u8, cmd, "run-suite")) {
-        printStdout(
-            "run-suite: placeholder — named suites deferred (extra args: {d})\n",
-            .{argv.len - 1},
-        ) catch return errors.Category.runtime_failure.exitCode();
-        return 0;
+        return run_suite_cmd.execute(allocator, argv[1..]);
     }
     if (std.mem.eql(u8, cmd, "report")) {
         return report_cmd.execute(allocator, argv[1..]);
@@ -81,7 +78,7 @@ fn usageStderr() !void {
         \\commands:
         \\  list        Enumerate probe specs (.toml)
         \\  run         Run specs and write artifacts
-        \\  run-suite   Run a named suite (stub)
+        \\  run-suite   Run a named suite (baseline-linux)
         \\  report      Validate or render report from run.json
         \\  doctor      Environment diagnostics
         \\
