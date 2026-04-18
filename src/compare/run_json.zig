@@ -7,6 +7,7 @@ pub const RunMeta = struct {
     suite: ?[]const u8 = null,
     comparison_id: ?[]const u8 = null,
     run_group: ?[]const u8 = null,
+    execution_mode: ?[]const u8 = null,
 };
 
 pub const MetaDiffRow = struct {
@@ -28,6 +29,7 @@ pub fn parseRunMeta(root: std.json.Value) RunMeta {
     m.suite = readOptStringOrNull(obj, "suite");
     m.comparison_id = readOptStringOrNull(obj, "comparison_id");
     m.run_group = readOptStringOrNull(obj, "run_group");
+    m.execution_mode = readOptString(obj, "execution_mode");
     if (obj.get("terminal")) |t| switch (t) {
         .object => |term_o| {
             m.terminal_name = readOptString(term_o, "name");
@@ -63,9 +65,10 @@ fn metaDelta(l: ?[]const u8, r: ?[]const u8) []const u8 {
 }
 
 /// Fixed field order for deterministic compare output.
-pub fn diffRunMeta(left: RunMeta, right: RunMeta) [6]MetaDiffRow {
+pub fn diffRunMeta(left: RunMeta, right: RunMeta) [7]MetaDiffRow {
     return .{
         .{ .field = "comparison_id", .left = left.comparison_id, .right = right.comparison_id, .delta = metaDelta(left.comparison_id, right.comparison_id) },
+        .{ .field = "execution_mode", .left = left.execution_mode, .right = right.execution_mode, .delta = metaDelta(left.execution_mode, right.execution_mode) },
         .{ .field = "platform", .left = left.platform, .right = right.platform, .delta = metaDelta(left.platform, right.platform) },
         .{ .field = "run_group", .left = left.run_group, .right = right.run_group, .delta = metaDelta(left.run_group, right.run_group) },
         .{ .field = "suite", .left = left.suite, .right = right.suite, .delta = metaDelta(left.suite, right.suite) },

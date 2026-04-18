@@ -23,7 +23,7 @@ pub fn writeRunSummary(
     defer buf.deinit(allocator);
 
     try buf.print(allocator, "# Run {s}\n\n## Environment\n\n", .{run_id});
-    try buf.print(allocator, "- platform: {s}\n- TERM: {s}\n- terminal (logical): {s}\n", .{ ctx.platform, term, ctx.terminal_name });
+    try buf.print(allocator, "- platform: {s}\n- TERM: {s}\n- terminal (logical): {s}\n- execution_mode: {s}\n", .{ ctx.platform, term, ctx.terminal_name, ctx.execution_mode.tag() });
     if (ctx.terminal_cmd.len > 0) {
         try buf.print(allocator, "- terminal-cmd: `{s}`\n", .{ctx.terminal_cmd});
     }
