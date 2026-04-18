@@ -10,6 +10,7 @@ comptime {
     _ = @import("capture/modes.zig");
     _ = @import("report/json_writer.zig");
     _ = @import("report/markdown_writer.zig");
+    _ = @import("report/artifact_paths.zig");
 }
 
 pub fn main() u8 {
