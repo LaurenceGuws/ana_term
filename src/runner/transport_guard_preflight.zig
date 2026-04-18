@@ -39,6 +39,16 @@ test "preflightMessage skips non guarded modes" {
     try std.testing.expect(preflightMessage(.pty_stub, false, false) == null);
 }
 
+test "preflightMessage rejects pty_guarded full run on non-linux host" {
+    if (posix_pty.runtimeHostIsLinux()) return error.SkipZigTest;
+    try std.testing.expect(preflightMessage(.pty_guarded, true, false) != null);
+}
+
+test "preflightMessage allows pty_guarded full run on linux" {
+    if (!posix_pty.runtimeHostIsLinux()) return error.SkipZigTest;
+    try std.testing.expect(preflightMessage(.pty_guarded, true, false) == null);
+}
+
 test "envValueAllowsGuarded" {
     try std.testing.expect(!envValueAllowsGuarded(null));
     try std.testing.expect(envValueAllowsGuarded("1"));

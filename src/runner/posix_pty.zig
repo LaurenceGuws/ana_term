@@ -71,3 +71,12 @@ test "openMinimal Linux closes cleanly" {
     var p = try openMinimal();
     defer p.deinit();
 }
+
+test "openErrorTag maps OpenError to stable strings" {
+    try std.testing.expectEqualStrings("unsupported_host", openErrorTag(error.UnsupportedHost));
+    try std.testing.expectEqualStrings("open_ptmx", openErrorTag(error.OpenPtmx));
+    try std.testing.expectEqualStrings("grantpt", openErrorTag(error.GrantPt));
+    try std.testing.expectEqualStrings("unlockpt", openErrorTag(error.UnlockPt));
+    try std.testing.expectEqualStrings("ptsname_r", openErrorTag(error.PtsName));
+    try std.testing.expectEqualStrings("open_slave", openErrorTag(error.OpenSlave));
+}
