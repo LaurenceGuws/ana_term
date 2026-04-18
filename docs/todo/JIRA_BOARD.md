@@ -20,21 +20,28 @@ This file is the canonical ticket board for active execution.
 
 ## Current Sprint
 
-- Sprint ID: `PH1-M9-S1` (corrective batch)
-- Objective: fix compile regression and close PH1-M9 acceptance (`ANA-911`..`ANA-913`)
-- Commit budget before checkpoint: `3`
-- Super-gate: `ANA-GATE-110`
+- Sprint ID: `PH1-M10-S1`
+- Objective: host identity evidence hardening (`ANA-1001`..`ANA-1010`)
+- Commit budget before checkpoint: `10`
+- Super-gate: `ANA-GATE-120`
 
-## Ticket Order (`PH1-M9 corrective`)
+## Ticket Order (`PH1-M10-S1`)
 
-1. `ANA-911`
-2. `ANA-912`
-3. `ANA-913`
+1. `ANA-1001`
+2. `ANA-1002`
+3. `ANA-1003`
+4. `ANA-1004`
+5. `ANA-1005`
+6. `ANA-1006`
+7. `ANA-1007`
+8. `ANA-1008`
+9. `ANA-1009`
+10. `ANA-1010`
 
 ## Current State
 
-- `in_progress`: none
-- `todo`: none
+- `in_progress`: `ANA-1002`
+- `todo`: `ANA-1003`..`ANA-1010`
 - `blocked`: none
-- `review_gate`: `ANA-GATE-110`
-- `done`: `ANA-101`..`ANA-123`, `ANA-201`..`ANA-223`, `ANA-301`..`ANA-310`, `ANA-401`..`ANA-410`, `ANA-501`..`ANA-510`, `ANA-601`..`ANA-610`, `ANA-701`..`ANA-710`, `ANA-801`..`ANA-810` (accepted)
+- `review_gate`: none
+- `done`: `ANA-101`..`ANA-123`, `ANA-201`..`ANA-223`, `ANA-301`..`ANA-310`, `ANA-401`..`ANA-410`, `ANA-501`..`ANA-510`, `ANA-601`..`ANA-610`, `ANA-701`..`ANA-710`, `ANA-801`..`ANA-810`, `ANA-901`..`ANA-913` (accepted)
