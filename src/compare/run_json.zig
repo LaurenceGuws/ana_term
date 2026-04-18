@@ -298,6 +298,14 @@ fn tdup(a: std.mem.Allocator, s: []const u8) ![]const u8 {
     return try a.dupe(u8, s);
 }
 
+test "diffRunMeta detects execution_mode mismatch" {
+    const left = RunMeta{ .execution_mode = "placeholder" };
+    const right = RunMeta{ .execution_mode = "protocol_stub" };
+    const rows = diffRunMeta(left, right);
+    try std.testing.expectEqualStrings("execution_mode", rows[1].field);
+    try std.testing.expectEqualStrings("changed", rows[1].delta);
+}
+
 test "parseResultsMapCompare rejects duplicate spec_id" {
     const a = std.testing.allocator;
     const text =
