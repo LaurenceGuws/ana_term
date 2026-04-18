@@ -295,6 +295,26 @@ fn tdup(a: std.mem.Allocator, s: []const u8) ![]const u8 {
     return try a.dupe(u8, s);
 }
 
+test "parseResultsMapCompare rejects duplicate spec_id" {
+    const a = std.testing.allocator;
+    const text =
+        \\{"results":[{"spec_id":"x","status":"a"},{"spec_id":"x","status":"b"}]}
+    ;
+    const parsed = try std.json.parseFromSlice(std.json.Value, a, text, .{});
+    defer parsed.deinit();
+    try std.testing.expectError(error.DuplicateSpecId, parseResultsMapCompare(a, parsed.value));
+}
+
+test "parseResultsMapCompare rejects row missing status" {
+    const a = std.testing.allocator;
+    const text =
+        \\{"results":[{"spec_id":"x"}]}
+    ;
+    const parsed = try std.json.parseFromSlice(std.json.Value, a, text, .{});
+    defer parsed.deinit();
+    try std.testing.expectError(error.MissingSpecOrStatus, parseResultsMapCompare(a, parsed.value));
+}
+
 test "diffResults classifies added removed changed unchanged" {
     const a = std.testing.allocator;
     var left = std.StringArrayHashMap(Row).init(a);
