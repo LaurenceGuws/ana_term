@@ -5,6 +5,7 @@ const discovery = @import("../dsl/discovery.zig");
 const run_cmd = @import("run_cmd.zig");
 const run_suite_cmd = @import("run_suite_cmd.zig");
 const report_cmd = @import("report_cmd.zig");
+const compare_cmd = @import("compare_cmd.zig");
 
 fn printListStub(allocator: std.mem.Allocator, roots: []const []const u8) !void {
     const paths = try discovery.discover(allocator, roots);
@@ -57,6 +58,9 @@ pub fn run(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
     if (std.mem.eql(u8, cmd, "report")) {
         return report_cmd.execute(allocator, argv[1..]);
     }
+    if (std.mem.eql(u8, cmd, "compare")) {
+        return compare_cmd.execute(allocator, argv[1..]);
+    }
     if (std.mem.eql(u8, cmd, "doctor")) {
         printStdout(
             "doctor: phase-1 scaffold OK (cwd and env checks expand later)\n",
@@ -80,6 +84,7 @@ fn usageStderr() !void {
         \\  run         Run specs and write artifacts
         \\  run-suite   Run a named suite (baseline-linux)
         \\  report      Validate or render report from run.json
+        \\  compare     Compare two run.json files
         \\  doctor      Environment diagnostics
         \\
     , .{});
