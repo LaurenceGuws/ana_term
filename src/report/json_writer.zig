@@ -98,23 +98,27 @@ pub fn writeRun(
         if (pty_host_null) {
             try buf.appendSlice(allocator, "null");
         } else {
-            var w = buf.writer(allocator);
+            var enc: std.io.Writer.Allocating = .init(allocator);
+            defer enc.deinit();
             try std.json.Stringify.encodeJsonString(
                 ctx.pty_experiment_host_machine[0..ctx.pty_experiment_host_machine_len],
                 .{},
-                &w,
+                &enc.writer,
             );
+            try buf.appendSlice(allocator, enc.written());
         }
         try buf.appendSlice(allocator, ",\n    \"pty_experiment_host_release\": ");
         if (pty_host_null) {
             try buf.appendSlice(allocator, "null");
         } else {
-            var w2 = buf.writer(allocator);
+            var enc2: std.io.Writer.Allocating = .init(allocator);
+            defer enc2.deinit();
             try std.json.Stringify.encodeJsonString(
                 ctx.pty_experiment_host_release[0..ctx.pty_experiment_host_release_len],
                 .{},
-                &w2,
+                &enc2.writer,
             );
+            try buf.appendSlice(allocator, enc2.written());
         }
         try buf.appendSlice(allocator, ",\n    \"pty_experiment_open_ok\": ");
         if (ctx.pty_experiment_open_ok) |b| {

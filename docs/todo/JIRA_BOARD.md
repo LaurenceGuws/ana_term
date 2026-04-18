@@ -20,28 +20,21 @@ This file is the canonical ticket board for active execution.
 
 ## Current Sprint
 
-- Sprint ID: `PH1-M9-S1`
-- Objective: guarded PTY reproducibility and failure-evidence hardening (`ANA-901`..`ANA-910`)
-- Commit budget before checkpoint: `10`
+- Sprint ID: `PH1-M9-S1` (corrective batch)
+- Objective: fix compile regression and close PH1-M9 acceptance (`ANA-911`..`ANA-913`)
+- Commit budget before checkpoint: `3`
 - Super-gate: `ANA-GATE-110`
 
-## Ticket Order (`PH1-M9-S1`)
+## Ticket Order (`PH1-M9 corrective`)
 
-1. `ANA-901`
-2. `ANA-902`
-3. `ANA-903`
-4. `ANA-904`
-5. `ANA-905`
-6. `ANA-906`
-7. `ANA-907`
-8. `ANA-908`
-9. `ANA-909`
-10. `ANA-910`
+1. `ANA-911`
+2. `ANA-912`
+3. `ANA-913`
 
 ## Current State
 
-- `in_progress`: none
-- `todo`: none
+- `in_progress`: `ANA-911`
+- `todo`: `ANA-912`..`ANA-913`
 - `blocked`: none
-- `review_gate`: `ANA-GATE-110`
+- `review_gate`: none (rejected at Architect review due compile break in `ANA-904` serialization path)
 - `done`: `ANA-101`..`ANA-123`, `ANA-201`..`ANA-223`, `ANA-301`..`ANA-310`, `ANA-401`..`ANA-410`, `ANA-501`..`ANA-510`, `ANA-601`..`ANA-610`, `ANA-701`..`ANA-710`, `ANA-801`..`ANA-810` (accepted)
