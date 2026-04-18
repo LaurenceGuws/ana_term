@@ -25,6 +25,12 @@ This file is the canonical ticket board for active execution.
 - Commit budget before checkpoint: `20` commits.
 - Super-gate: `ANA-GATE-20`.
 
+## Corrective follow-up (`PH1-M1-S1`)
+
+21. `ANA-121`
+22. `ANA-122`
+23. `ANA-123`
+
 ## Ticket Order (`PH1-M1-S1`)
 
 1. `ANA-101`
@@ -53,6 +59,6 @@ This file is the canonical ticket board for active execution.
 - `in_progress`: none
 - `todo`: none
 - `blocked`: none
-- `review_gate`: `ANA-GATE-20` (PH1-M1-S1 checkpoint — post `ANA-120`)
+- `review_gate`: `ANA-GATE-20` (PH1-M1-S1 — corrective evidence post `ANA-123`)
 - `done`: none
-- `implementation_complete` (Engineer; Architect promotes to `done` at gate): `ANA-101`..`ANA-120`
+- `implementation_complete` (Engineer; Architect promotes to `done` at gate): `ANA-101`..`ANA-120`, `ANA-121`, `ANA-122`, `ANA-123`

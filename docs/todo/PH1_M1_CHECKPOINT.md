@@ -78,3 +78,32 @@ ok: validated artifacts/2026-04-18/run-001/run.json
 
 - `Blocked by Architect review needed: true`
 - Gate decision: accept `PH1-M1` scaffold as baseline for `PH1-M2`, or request corrective follow-up tickets.
+
+---
+
+## Corrective batch (`ANA-121`..`ANA-123`)
+
+Follow-up work restores the committed workflow authority chain, hardens `report` validation with `std.json`, and re-publishes gate evidence.
+
+### Commits
+
+| Ticket | Commit (short) | Subject |
+|--------|----------------|---------|
+| ANA-121 | `88df937` | `[ANA-121] restore committed workflow authority docs` |
+| ANA-122 | `f6a95a7` | `[ANA-122] enforce JSON parsing in report validation` |
+| ANA-123 | — | `[ANA-123] publish corrective checkpoint evidence` (tip commit for this row; short SHA is `git rev-parse --short HEAD` while this file is at the corrective batch tip) |
+
+### Authority chain (committed)
+
+The following governance and workflow sources are tracked in git and available via `git ls-files`: `AGENTS.md`, `docs/AGENT_HANDOFF.md`, `docs/WORKFLOW.md`, `docs/Vision.md`, `docs/todo/PH1_M1_TICKETS.md`, `docs/todo/ENGINEER_ENTRYPOINT.md`, `docs/todo/README.md` (in addition to existing queue/board/checkpoint docs already on `main`).
+
+### Validations (corrective)
+
+- `zig build` — succeeds (Zig `0.15.2`).
+- Valid artifact: `zig-out/bin/ana_term report <path/to/run.json>` — exit `0` for well-formed JSON object (e.g. harness `run.json` output).
+- Malformed JSON: `printf '%s' '{"x":' > /tmp/bad_run.json` then `zig-out/bin/ana_term report /tmp/bad_run.json` — exit `2`, stderr `invalid run.json (malformed JSON)`.
+- Non-object top-level (e.g. `[1]` or `"s"`) — exit `2`, stderr indicates expected top-level JSON object.
+
+### Architect review (corrective)
+
+- `Blocked by Architect review needed: true` for re-opened `ANA-GATE-20` evidence after `ANA-123`.
