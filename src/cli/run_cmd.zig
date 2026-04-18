@@ -4,6 +4,7 @@ const discovery = @import("../dsl/discovery.zig");
 const modes = @import("../capture/modes.zig");
 const run_pipeline = @import("run_pipeline.zig");
 const RunContext = @import("run_context.zig").RunContext;
+const ExecutionMode = @import("../runner/execution_mode.zig").ExecutionMode;
 
 pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
     var ctx = RunContext.initDefault();
@@ -20,6 +21,19 @@ pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
         if (std.mem.eql(u8, argv[i], "--strict")) {
             ctx.strict = true;
             i += 1;
+            continue;
+        }
+        if (std.mem.eql(u8, argv[i], "--exec-mode")) {
+            if (i + 1 >= argv.len) {
+                printErr("--exec-mode requires a value\n") catch {};
+                return errors.Category.unknown_command.exitCode();
+            }
+            const em = ExecutionMode.parse(argv[i + 1]) orelse {
+                printErr("invalid --exec-mode (use placeholder or protocol_stub)\n") catch {};
+                return errors.Category.invalid_spec.exitCode();
+            };
+            ctx.execution_mode = em;
+            i += 2;
             continue;
         }
         if (std.mem.eql(u8, argv[i], "--capture")) {

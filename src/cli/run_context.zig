@@ -1,4 +1,5 @@
 const modes = @import("../capture/modes.zig");
+const ExecutionMode = @import("../runner/execution_mode.zig").ExecutionMode;
 
 pub const RunContext = struct {
     capture_mode: []const u8,
@@ -13,6 +14,7 @@ pub const RunContext = struct {
     dry_run: bool,
     /// Stricter validation when supported (PH1-M4+).
     strict: bool,
+    execution_mode: ExecutionMode,
 
     pub fn initDefault() RunContext {
         return .{
@@ -25,6 +27,7 @@ pub const RunContext = struct {
             .run_group = null,
             .dry_run = false,
             .strict = false,
+            .execution_mode = .placeholder,
         };
     }
 };

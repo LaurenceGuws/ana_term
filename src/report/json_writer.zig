@@ -46,6 +46,8 @@ pub fn writeRun(
         try buf.appendSlice(allocator, ",\n  \"run_group\": null");
     }
 
+    try buf.print(allocator, ",\n  \"execution_mode\": \"{s}\"", .{ctx.execution_mode.tag()});
+
     try buf.appendSlice(allocator, ",\n  \"started_at\": \"\",\n  \"ended_at\": \"\",\n  \"results\": [\n");
 
     for (records, 0..) |r, i| {

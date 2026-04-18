@@ -34,6 +34,7 @@ These flags identify **which terminal** is under test and how it would be invoke
 |------|---------|
 | `--dry-run` | Boolean flag (no value). Validates specs and runs the planning/execution path in memory, then exits **without** creating a run directory or writing `run.json` / `summary.md` / `env.json`. Exit **0** when planning succeeds. |
 | `--strict` | Boolean flag (no value). Enables stricter validation for the invocation (exact rules evolve by milestone; see `docs/PROTO_EXEC_PLAN.md`). |
+| `--exec-mode <mode>` | `placeholder` (default) or `protocol_stub` (PH1-M4+). Recorded in `run.json` as `execution_mode`. |
 
 ## `list`
 
@@ -65,6 +66,7 @@ These flags identify **which terminal** is under test and how it would be invoke
 | `--capture <mode>` | Optional; one of `manual`, `text_observation`, `timed`. |
 | `--dry-run` | Optional; validate and simulate without writing artifacts (PH1-M4+). |
 | `--strict` | Optional; stricter validation where implemented (PH1-M4+). |
+| `--exec-mode <mode>` | Optional; `placeholder` or `protocol_stub` (PH1-M4+). |
 
 | Output | Description |
 |--------|-------------|
