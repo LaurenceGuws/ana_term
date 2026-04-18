@@ -264,6 +264,49 @@ test "writeRun JSON-encodes guarded PTY host snapshot strings" {
     try std.testing.expect(run_json_validate.validateRunReport(parsed.value) == null);
 }
 
+test "writeRun embeds golden metadata_envelope digest for fixed upstream fingerprints" {
+    const builtin = @import("builtin");
+    if (builtin.target.os.tag != .linux) return error.SkipZigTest;
+
+    var tmp = std.testing.tmpDir(.{});
+    defer tmp.cleanup();
+
+    const run_dir = try std.fmt.allocPrint(std.testing.allocator, ".zig-cache/tmp/{s}", .{tmp.sub_path[0..]});
+    defer std.testing.allocator.free(run_dir);
+
+    var ctx = RunContext.initDefault();
+    ctx.platform = "linux";
+    ctx.terminal_name = "t";
+    ctx.captureHostIdentity();
+
+    const copy64 = struct {
+        fn set(dst: *[64]u8, len: *u8, src: *const [64]u8) void {
+            @memcpy(dst, src);
+            len.* = 64;
+        }
+    }.set;
+    copy64(&ctx.run_fingerprint_digest_hex, &ctx.run_fingerprint_digest_len, &"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".*);
+    copy64(&ctx.specset_fingerprint_digest_hex, &ctx.specset_fingerprint_digest_len, &"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc".*);
+    copy64(&ctx.resultset_fingerprint_digest_hex, &ctx.resultset_fingerprint_digest_len, &"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd".*);
+    copy64(&ctx.transport_fingerprint_digest_hex, &ctx.transport_fingerprint_digest_len, &"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee".*);
+    copy64(&ctx.exec_summary_fingerprint_digest_hex, &ctx.exec_summary_fingerprint_digest_len, &"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff".*);
+    copy64(&ctx.context_summary_fingerprint_digest_hex, &ctx.context_summary_fingerprint_digest_len, &"1111111111111111111111111111111111111111111111111111111111111111".*);
+
+    try metadata_envelope_fingerprint.populate(&ctx, std.testing.allocator);
+    try writeRun(std.testing.allocator, run_dir, "rid-env-golden", &.{}, ctx);
+
+    const json_path = try std.fmt.allocPrint(std.testing.allocator, "{s}/run.json", .{run_dir});
+    defer std.testing.allocator.free(json_path);
+    const json_text = try std.fs.cwd().readFileAlloc(std.testing.allocator, json_path, 1 << 20);
+    defer std.testing.allocator.free(json_text);
+
+    try std.testing.expect(std.mem.indexOf(u8, json_text, "\"metadata_envelope_fingerprint_digest\": \"620d35500e035b198f5a81be6f0a99ba22eb2f86e483fa6abef0ab855f5c5754\"") != null);
+
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, json_text, .{});
+    defer parsed.deinit();
+    try std.testing.expect(run_json_validate.validateRunReport(parsed.value) == null);
+}
+
 test "writeRun escapes quotes in guarded PTY host snapshot strings" {
     const builtin = @import("builtin");
     if (builtin.target.os.tag != .linux) return error.SkipZigTest;
