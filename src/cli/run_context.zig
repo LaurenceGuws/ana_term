@@ -19,6 +19,8 @@ pub const RunContext = struct {
     transport_mode: TransportMode,
     /// Recorded in `run.json` → `transport.timeout_ms`.
     timeout_ms: u32,
+    /// Explicit opt-in for `pty_guarded` (or set `ANA_TERM_ALLOW_GUARDED_TRANSPORT=1`).
+    allow_guarded_transport: bool,
 
     pub fn initDefault() RunContext {
         return .{
@@ -34,6 +36,7 @@ pub const RunContext = struct {
             .execution_mode = .placeholder,
             .transport_mode = .none,
             .timeout_ms = 30_000,
+            .allow_guarded_transport = false,
         };
     }
 };

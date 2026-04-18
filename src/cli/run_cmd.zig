@@ -43,11 +43,16 @@ pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
                 return errors.Category.unknown_command.exitCode();
             }
             const tm = TransportMode.parse(argv[i + 1]) orelse {
-                printErr("invalid --transport (use none or pty_stub)\n") catch {};
+                printErr("invalid --transport (use none, pty_stub, or pty_guarded)\n") catch {};
                 return errors.Category.invalid_spec.exitCode();
             };
             ctx.transport_mode = tm;
             i += 2;
+            continue;
+        }
+        if (std.mem.eql(u8, argv[i], "--allow-guarded-transport")) {
+            ctx.allow_guarded_transport = true;
+            i += 1;
             continue;
         }
         if (std.mem.eql(u8, argv[i], "--timeout-ms")) {

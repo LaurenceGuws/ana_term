@@ -11,10 +11,17 @@ const json_writer = @import("../report/json_writer.zig");
 const markdown_writer = @import("../report/markdown_writer.zig");
 const env_writer = @import("../report/env_writer.zig");
 const RunContext = @import("run_context.zig").RunContext;
+const transport_guard_preflight = @import("../runner/transport_guard_preflight.zig");
 
 pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []const u8, ctx: RunContext) u8 {
     if (spec_paths.len == 0) {
         printErr("no probe specs to run\n") catch {};
+        return errors.Category.invalid_spec.exitCode();
+    }
+
+    if (transport_guard_preflight.preflightMessage(ctx.transport_mode, ctx.allow_guarded_transport)) |msg| {
+        printErr(msg) catch {};
+        printErr("\n") catch {};
         return errors.Category.invalid_spec.exitCode();
     }
 
