@@ -15,50 +15,43 @@ This file is the canonical ticket board for active execution.
 - `todo`: scoped, ready, not started.
 - `in_progress`: active execution ticket (max 1).
 - `blocked`: waiting on architecture/product decision.
-- `review_gate`: engineer hit checkpoint boundary; waiting on Architect review.
-- `done`: Architect accepted the ticket outcome.
+- `review_gate`: checkpoint reached; awaiting Architect review.
+- `done`: Architect accepted ticket outcome.
 
-## Active Sprint
+## Current Sprint
 
-- Sprint ID: `PH1-M1-S1`
-- Objective: phase-1 harness scaffolding with strict text-first boundaries.
-- Commit budget before checkpoint: `20` commits.
-- Super-gate: `ANA-GATE-20`.
+- Sprint ID: `PH1-M2-S1`
+- Objective: first real comparison lane (`ANA-201`..`ANA-220`)
+- Commit budget before checkpoint: `20`
+- Super-gate: `ANA-GATE-40`
 
-## Corrective follow-up (`PH1-M1-S1`)
+## Ticket Order (`PH1-M2-S1`)
 
-21. `ANA-121`
-22. `ANA-122`
-23. `ANA-123`
-
-## Ticket Order (`PH1-M1-S1`)
-
-1. `ANA-101`
-2. `ANA-102`
-3. `ANA-103`
-4. `ANA-104`
-5. `ANA-105`
-6. `ANA-106`
-7. `ANA-107`
-8. `ANA-108`
-9. `ANA-109`
-10. `ANA-110`
-11. `ANA-111`
-12. `ANA-112`
-13. `ANA-113`
-14. `ANA-114`
-15. `ANA-115`
-16. `ANA-116`
-17. `ANA-117`
-18. `ANA-118`
-19. `ANA-119`
-20. `ANA-120`
+1. `ANA-201`
+2. `ANA-202`
+3. `ANA-203`
+4. `ANA-204`
+5. `ANA-205`
+6. `ANA-206`
+7. `ANA-207`
+8. `ANA-208`
+9. `ANA-209`
+10. `ANA-210`
+11. `ANA-211`
+12. `ANA-212`
+13. `ANA-213`
+14. `ANA-214`
+15. `ANA-215`
+16. `ANA-216`
+17. `ANA-217`
+18. `ANA-218`
+19. `ANA-219`
+20. `ANA-220`
 
 ## Current State
 
-- `in_progress`: none
-- `todo`: none
+- `in_progress`: `ANA-202`
+- `todo`: `ANA-203`..`ANA-220`
 - `blocked`: none
-- `review_gate`: `ANA-GATE-20` (PH1-M1-S1 — corrective evidence post `ANA-123`)
-- `done`: none
-- `implementation_complete` (Engineer; Architect promotes to `done` at gate): `ANA-101`..`ANA-120`, `ANA-121`, `ANA-122`, `ANA-123`
+- `review_gate`: none
+- `done`: `ANA-101`..`ANA-123` (accepted)
