@@ -320,3 +320,43 @@ Queue lines (exact):
 - [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
 - [x] Stop only at `ANA-GATE-130` (post `ANA-1110`) unless truly blocked.
 - [x] Submit checkpoint packet in `docs/todo/PH1_M11_CHECKPOINT.md`.
+
+### `PH1-M12` (`review_gate`)
+
+Purpose:
+
+- Strengthen run provenance by adding deterministic spec-set fingerprint fields and compare visibility for suite integrity checks.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M12_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- define PH1-M12 spec-set fingerprint plan and boundaries
+- emit root spec-set fingerprint fields in `run.json`
+- add report schema invariants and compare metadata coverage for spec-set fingerprint fields
+- expand regression tests and smoke coverage
+- PH1-M12 checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-1201` through `ANA-1210` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-140` reached and reported.
+
+Non-goals:
+
+- Windows ConPTY implementation
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [x] Execute `ANA-1201` through `ANA-1210` in order from `docs/todo/PH1_M12_TICKETS.md`.
+- [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [x] Stop only at `ANA-GATE-140` (post `ANA-1210`) unless truly blocked.
+- [x] Submit checkpoint packet in `docs/todo/PH1_M12_CHECKPOINT.md`.
