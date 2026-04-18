@@ -32,3 +32,39 @@ pub fn populate(ctx: *RunContext, allocator: std.mem.Allocator) !void {
     writeHexLower(&ctx.report_envelope_fingerprint_digest_hex, &digest);
     ctx.report_envelope_fingerprint_digest_len = 64;
 }
+
+fn fillDigest(dst: *[64]u8, len: *u8, hex_lower_64: *const [64]u8) void {
+    @memcpy(dst, hex_lower_64);
+    len.* = 64;
+}
+
+fn testCtxWithArtifactBundle(ab: *const [64]u8) RunContext {
+    var ctx = RunContext.initDefault();
+    fillDigest(&ctx.artifact_bundle_fingerprint_digest_hex, &ctx.artifact_bundle_fingerprint_digest_len, ab);
+    return ctx;
+}
+
+test "report envelope fingerprint is deterministic for fixed artifact-bundle digest" {
+    var a = testCtxWithArtifactBundle(&"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".*);
+    var b = testCtxWithArtifactBundle(&"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".*);
+    try populate(&a, std.testing.allocator);
+    try populate(&b, std.testing.allocator);
+    try std.testing.expectEqual(a.report_envelope_fingerprint_digest_len, b.report_envelope_fingerprint_digest_len);
+    try std.testing.expectEqualSlices(
+        u8,
+        a.report_envelope_fingerprint_digest_hex[0..a.report_envelope_fingerprint_digest_len],
+        b.report_envelope_fingerprint_digest_hex[0..b.report_envelope_fingerprint_digest_len],
+    );
+}
+
+test "report envelope fingerprint changes when artifact-bundle digest changes" {
+    var a = testCtxWithArtifactBundle(&"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".*);
+    var b = testCtxWithArtifactBundle(&"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb".*);
+    try populate(&a, std.testing.allocator);
+    try populate(&b, std.testing.allocator);
+    try std.testing.expect(!std.mem.eql(
+        u8,
+        a.report_envelope_fingerprint_digest_hex[0..a.report_envelope_fingerprint_digest_len],
+        b.report_envelope_fingerprint_digest_hex[0..b.report_envelope_fingerprint_digest_len],
+    ));
+}

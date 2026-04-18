@@ -10,6 +10,7 @@ test {
     _ = @import("report/context_summary_fingerprint.zig");
     _ = @import("report/metadata_envelope_fingerprint.zig");
     _ = @import("report/artifact_bundle_fingerprint.zig");
+    _ = @import("report/report_envelope_fingerprint.zig");
     _ = @import("report/run_json_validate.zig");
     _ = @import("compare/run_json.zig");
     _ = @import("compare/compare_json.zig");
