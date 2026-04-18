@@ -20,28 +20,28 @@ This file is the canonical ticket board for active execution.
 
 ## Current Sprint
 
-- Sprint ID: `PH1-M10-S1`
-- Objective: host identity evidence hardening (`ANA-1001`..`ANA-1010`)
+- Sprint ID: `PH1-M11-S1`
+- Objective: run-fingerprint auditability hardening (`ANA-1101`..`ANA-1110`)
 - Commit budget before checkpoint: `10`
-- Super-gate: `ANA-GATE-120`
+- Super-gate: `ANA-GATE-130`
 
-## Ticket Order (`PH1-M10-S1`)
+## Ticket Order (`PH1-M11-S1`)
 
-1. `ANA-1001`
-2. `ANA-1002`
-3. `ANA-1003`
-4. `ANA-1004`
-5. `ANA-1005`
-6. `ANA-1006`
-7. `ANA-1007`
-8. `ANA-1008`
-9. `ANA-1009`
-10. `ANA-1010`
+1. `ANA-1101`
+2. `ANA-1102`
+3. `ANA-1103`
+4. `ANA-1104`
+5. `ANA-1105`
+6. `ANA-1106`
+7. `ANA-1107`
+8. `ANA-1108`
+9. `ANA-1109`
+10. `ANA-1110`
 
 ## Current State
 
-- `in_progress`: none
-- `todo`: none
+- `in_progress`: `ANA-1102`
+- `todo`: `ANA-1103`..`ANA-1110`
 - `blocked`: none
-- `review_gate`: `ANA-GATE-120`
-- `done`: `ANA-101`..`ANA-123`, `ANA-201`..`ANA-223`, `ANA-301`..`ANA-310`, `ANA-401`..`ANA-410`, `ANA-501`..`ANA-510`, `ANA-601`..`ANA-610`, `ANA-701`..`ANA-710`, `ANA-801`..`ANA-810`, `ANA-901`..`ANA-913` (accepted)
+- `review_gate`: none
+- `done`: `ANA-101`..`ANA-123`, `ANA-201`..`ANA-223`, `ANA-301`..`ANA-310`, `ANA-401`..`ANA-410`, `ANA-501`..`ANA-510`, `ANA-601`..`ANA-610`, `ANA-701`..`ANA-710`, `ANA-801`..`ANA-810`, `ANA-901`..`ANA-913`, `ANA-1001`..`ANA-1010` (accepted)
