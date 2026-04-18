@@ -541,7 +541,7 @@ Outcome:
 
 - Accepted at `ANA-GATE-180`.
 
-### `PH1-M17` (`review_gate`)
+### `PH1-M17` (`completed`)
 
 Purpose:
 
@@ -583,4 +583,44 @@ Queue lines (exact):
 
 Outcome:
 
-- Super-gate `ANA-GATE-190` reached; Architect acceptance pending.
+- Accepted at `ANA-GATE-190`.
+
+### `PH1-M18` (`in_progress`)
+
+Purpose:
+
+- Improve artifact integrity auditing with a deterministic artifact-bundle fingerprint that composes root metadata fingerprints into one replay handle.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M18_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- define PH1-M18 artifact-bundle fingerprint plan and boundaries
+- emit root artifact-bundle fingerprint fields in `run.json`
+- add report schema invariants and compare metadata coverage for artifact-bundle fingerprint fields
+- expand regression tests and smoke coverage
+- PH1-M18 checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-1801` through `ANA-1810` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-200` reached and reported.
+
+Non-goals:
+
+- Windows ConPTY implementation
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [ ] Execute `ANA-1801` through `ANA-1810` in order from `docs/todo/PH1_M18_TICKETS.md`.
+- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [ ] Stop only at `ANA-GATE-200` (post `ANA-1810`) unless truly blocked.
+- [ ] Submit checkpoint packet in `docs/todo/PH1_M18_CHECKPOINT.md`.
