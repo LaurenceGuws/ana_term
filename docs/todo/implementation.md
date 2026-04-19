@@ -717,7 +717,7 @@ Outcome:
 
 - Accepted at `ANA-GATE-220`.
 
-### `PH1-M21` (`in_progress`)
+### `PH1-M21` (`review_gate`)
 
 Purpose:
 
@@ -752,7 +752,11 @@ Non-goals:
 
 Queue lines (exact):
 
-- [ ] Execute `ANA-2101` through `ANA-2110` in order from `docs/todo/PH1_M21_TICKETS.md`.
-- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
-- [ ] Stop only at `ANA-GATE-230` (post `ANA-2110`) unless truly blocked.
-- [ ] Submit checkpoint packet in `docs/todo/PH1_M21_CHECKPOINT.md`.
+- [x] Execute `ANA-2101` through `ANA-2110` in order from `docs/todo/PH1_M21_TICKETS.md`.
+- [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [x] Stop only at `ANA-GATE-230` (post `ANA-2110`) unless truly blocked.
+- [x] Submit checkpoint packet in `docs/todo/PH1_M21_CHECKPOINT.md`.
+
+Outcome:
+
+- Pending Architect review at `ANA-GATE-230`.
