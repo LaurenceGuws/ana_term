@@ -75,7 +75,7 @@ Top-level JSON object with at least:
 | `transport_fingerprint_digest` | string | **64**-character lowercase hex SHA-256 of the canonical payload (`docs/TRANSPORT_FINGERPRINT_PLAN.md`). |
 | `transport_fingerprint_version` | string | Fingerprint schema revision; phase-1 value **`1`**. |
 
-**Serialization order**: after `resultset_fingerprint_version`, before root **`exec_summary_fingerprint_*`**, root **`context_summary_fingerprint_*`**, root **`metadata_envelope_fingerprint_*`**, root **`artifact_bundle_fingerprint_*`**, root **`report_envelope_fingerprint_*`**, root **`compare_envelope_fingerprint_*`**, root **`run_envelope_fingerprint_*`**, root **`session_envelope_fingerprint_*`**, root **`environment_envelope_fingerprint_*`**, root **`artifact_manifest_fingerprint_*`**, root **`provenance_envelope_fingerprint_*`**, root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, and the nested `transport` object: `transport_fingerprint_digest`, `transport_fingerprint_version` (lexicographic).
+**Serialization order**: after `resultset_fingerprint_version`, before root **`exec_summary_fingerprint_*`**, root **`context_summary_fingerprint_*`**, root **`metadata_envelope_fingerprint_*`**, root **`artifact_bundle_fingerprint_*`**, root **`report_envelope_fingerprint_*`**, root **`compare_envelope_fingerprint_*`**, root **`run_envelope_fingerprint_*`**, root **`session_envelope_fingerprint_*`**, root **`environment_envelope_fingerprint_*`**, root **`artifact_manifest_fingerprint_*`**, root **`provenance_envelope_fingerprint_*`**, root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, root **`state_envelope_fingerprint_*`**, and the nested `transport` object: `transport_fingerprint_digest`, `transport_fingerprint_version` (lexicographic).
 
 **PH1-M15+ (execution-summary fingerprint)** — present on every harness `run.json` that writes artifacts:
 
@@ -84,7 +84,7 @@ Top-level JSON object with at least:
 | `exec_summary_fingerprint_digest` | string | **64**-character lowercase hex SHA-256 of the canonical payload (`docs/EXEC_SUMMARY_FINGERPRINT_PLAN.md`). |
 | `exec_summary_fingerprint_version` | string | Fingerprint schema revision; phase-1 value **`1`**. |
 
-**Serialization order**: after `transport_fingerprint_version`, before root **`context_summary_fingerprint_*`**, root **`metadata_envelope_fingerprint_*`**, root **`artifact_bundle_fingerprint_*`**, root **`report_envelope_fingerprint_*`**, root **`compare_envelope_fingerprint_*`**, root **`run_envelope_fingerprint_*`**, root **`session_envelope_fingerprint_*`**, root **`environment_envelope_fingerprint_*`**, root **`artifact_manifest_fingerprint_*`**, root **`provenance_envelope_fingerprint_*`**, root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, and the nested `transport` object: `exec_summary_fingerprint_digest`, `exec_summary_fingerprint_version` (lexicographic).
+**Serialization order**: after `transport_fingerprint_version`, before root **`context_summary_fingerprint_*`**, root **`metadata_envelope_fingerprint_*`**, root **`artifact_bundle_fingerprint_*`**, root **`report_envelope_fingerprint_*`**, root **`compare_envelope_fingerprint_*`**, root **`run_envelope_fingerprint_*`**, root **`session_envelope_fingerprint_*`**, root **`environment_envelope_fingerprint_*`**, root **`artifact_manifest_fingerprint_*`**, root **`provenance_envelope_fingerprint_*`**, root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, root **`state_envelope_fingerprint_*`**, and the nested `transport` object: `exec_summary_fingerprint_digest`, `exec_summary_fingerprint_version` (lexicographic).
 
 **PH1-M16+ (context-summary fingerprint)** — present on every harness `run.json` that writes artifacts:
 
@@ -93,7 +93,7 @@ Top-level JSON object with at least:
 | `context_summary_fingerprint_digest` | string | **64**-character lowercase hex SHA-256 of the canonical payload (`docs/CONTEXT_SUMMARY_FINGERPRINT_PLAN.md`). |
 | `context_summary_fingerprint_version` | string | Fingerprint schema revision; phase-1 value **`1`**. |
 
-**Serialization order**: after `exec_summary_fingerprint_version`, before root **`metadata_envelope_fingerprint_*`**, root **`artifact_bundle_fingerprint_*`**, root **`report_envelope_fingerprint_*`**, root **`compare_envelope_fingerprint_*`**, root **`run_envelope_fingerprint_*`**, root **`session_envelope_fingerprint_*`**, root **`environment_envelope_fingerprint_*`**, root **`artifact_manifest_fingerprint_*`**, root **`provenance_envelope_fingerprint_*`**, root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, and the nested `transport` object: `context_summary_fingerprint_digest`, `context_summary_fingerprint_version` (lexicographic).
+**Serialization order**: after `exec_summary_fingerprint_version`, before root **`metadata_envelope_fingerprint_*`**, root **`artifact_bundle_fingerprint_*`**, root **`report_envelope_fingerprint_*`**, root **`compare_envelope_fingerprint_*`**, root **`run_envelope_fingerprint_*`**, root **`session_envelope_fingerprint_*`**, root **`environment_envelope_fingerprint_*`**, root **`artifact_manifest_fingerprint_*`**, root **`provenance_envelope_fingerprint_*`**, root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, root **`state_envelope_fingerprint_*`**, and the nested `transport` object: `context_summary_fingerprint_digest`, `context_summary_fingerprint_version` (lexicographic).
 
 **PH1-M17+ (metadata-envelope fingerprint)** — present on every harness `run.json` that writes artifacts:
 
@@ -102,7 +102,7 @@ Top-level JSON object with at least:
 | `metadata_envelope_fingerprint_digest` | string | **64**-character lowercase hex SHA-256 of the canonical payload (`docs/METADATA_ENVELOPE_FINGERPRINT_PLAN.md`). |
 | `metadata_envelope_fingerprint_version` | string | Fingerprint schema revision; phase-1 value **`1`**. |
 
-**Serialization order**: after `context_summary_fingerprint_version`, before root **`artifact_bundle_fingerprint_*`**, root **`report_envelope_fingerprint_*`**, root **`compare_envelope_fingerprint_*`**, root **`run_envelope_fingerprint_*`**, root **`session_envelope_fingerprint_*`**, root **`environment_envelope_fingerprint_*`**, root **`artifact_manifest_fingerprint_*`**, root **`provenance_envelope_fingerprint_*`**, root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, and the nested `transport` object: `metadata_envelope_fingerprint_digest`, `metadata_envelope_fingerprint_version` (lexicographic).
+**Serialization order**: after `context_summary_fingerprint_version`, before root **`artifact_bundle_fingerprint_*`**, root **`report_envelope_fingerprint_*`**, root **`compare_envelope_fingerprint_*`**, root **`run_envelope_fingerprint_*`**, root **`session_envelope_fingerprint_*`**, root **`environment_envelope_fingerprint_*`**, root **`artifact_manifest_fingerprint_*`**, root **`provenance_envelope_fingerprint_*`**, root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, root **`state_envelope_fingerprint_*`**, and the nested `transport` object: `metadata_envelope_fingerprint_digest`, `metadata_envelope_fingerprint_version` (lexicographic).
 
 **PH1-M18+ (artifact-bundle fingerprint)** — present on every harness `run.json` that writes artifacts:
 
@@ -111,7 +111,7 @@ Top-level JSON object with at least:
 | `artifact_bundle_fingerprint_digest` | string | **64**-character lowercase hex SHA-256 of the canonical payload (`docs/ARTIFACT_BUNDLE_FINGERPRINT_PLAN.md`). |
 | `artifact_bundle_fingerprint_version` | string | Fingerprint schema revision; phase-1 value **`1`**. |
 
-**Serialization order**: after `metadata_envelope_fingerprint_version`, before root **`report_envelope_fingerprint_*`**, root **`compare_envelope_fingerprint_*`**, root **`run_envelope_fingerprint_*`**, root **`session_envelope_fingerprint_*`**, root **`environment_envelope_fingerprint_*`**, root **`artifact_manifest_fingerprint_*`**, root **`provenance_envelope_fingerprint_*`**, root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, and the nested `transport` object: `artifact_bundle_fingerprint_digest`, `artifact_bundle_fingerprint_version` (lexicographic).
+**Serialization order**: after `metadata_envelope_fingerprint_version`, before root **`report_envelope_fingerprint_*`**, root **`compare_envelope_fingerprint_*`**, root **`run_envelope_fingerprint_*`**, root **`session_envelope_fingerprint_*`**, root **`environment_envelope_fingerprint_*`**, root **`artifact_manifest_fingerprint_*`**, root **`provenance_envelope_fingerprint_*`**, root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, root **`state_envelope_fingerprint_*`**, and the nested `transport` object: `artifact_bundle_fingerprint_digest`, `artifact_bundle_fingerprint_version` (lexicographic).
 
 **PH1-M19+ (report-envelope fingerprint)** — present on every harness `run.json` that writes artifacts:
 
@@ -120,7 +120,7 @@ Top-level JSON object with at least:
 | `report_envelope_fingerprint_digest` | string | **64**-character lowercase hex SHA-256 of the canonical payload (`docs/REPORT_ENVELOPE_FINGERPRINT_PLAN.md`). |
 | `report_envelope_fingerprint_version` | string | Fingerprint schema revision; phase-1 value **`1`**. |
 
-**Serialization order**: after `artifact_bundle_fingerprint_version`, before root **`compare_envelope_fingerprint_*`**, root **`run_envelope_fingerprint_*`**, root **`session_envelope_fingerprint_*`**, root **`environment_envelope_fingerprint_*`**, root **`artifact_manifest_fingerprint_*`**, root **`provenance_envelope_fingerprint_*`**, root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, and the nested `transport` object: `report_envelope_fingerprint_digest`, `report_envelope_fingerprint_version` (lexicographic).
+**Serialization order**: after `artifact_bundle_fingerprint_version`, before root **`compare_envelope_fingerprint_*`**, root **`run_envelope_fingerprint_*`**, root **`session_envelope_fingerprint_*`**, root **`environment_envelope_fingerprint_*`**, root **`artifact_manifest_fingerprint_*`**, root **`provenance_envelope_fingerprint_*`**, root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, root **`state_envelope_fingerprint_*`**, and the nested `transport` object: `report_envelope_fingerprint_digest`, `report_envelope_fingerprint_version` (lexicographic).
 
 **PH1-M20+ (compare-envelope fingerprint)** — present on every harness `run.json` that writes artifacts:
 
@@ -129,7 +129,7 @@ Top-level JSON object with at least:
 | `compare_envelope_fingerprint_digest` | string | **64**-character lowercase hex SHA-256 of the canonical payload (`docs/COMPARE_ENVELOPE_FINGERPRINT_PLAN.md`). |
 | `compare_envelope_fingerprint_version` | string | Fingerprint schema revision; phase-1 value **`1`**. |
 
-**Serialization order**: after `report_envelope_fingerprint_version`, before root **`run_envelope_fingerprint_*`**, root **`session_envelope_fingerprint_*`**, root **`environment_envelope_fingerprint_*`**, root **`artifact_manifest_fingerprint_*`**, root **`provenance_envelope_fingerprint_*`**, root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, and the nested `transport` object: `compare_envelope_fingerprint_digest`, `compare_envelope_fingerprint_version` (lexicographic).
+**Serialization order**: after `report_envelope_fingerprint_version`, before root **`run_envelope_fingerprint_*`**, root **`session_envelope_fingerprint_*`**, root **`environment_envelope_fingerprint_*`**, root **`artifact_manifest_fingerprint_*`**, root **`provenance_envelope_fingerprint_*`**, root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, root **`state_envelope_fingerprint_*`**, and the nested `transport` object: `compare_envelope_fingerprint_digest`, `compare_envelope_fingerprint_version` (lexicographic).
 
 **PH1-M21+ (run-envelope fingerprint)** — present on every harness `run.json` that writes artifacts:
 
@@ -138,7 +138,7 @@ Top-level JSON object with at least:
 | `run_envelope_fingerprint_digest` | string | **64**-character lowercase hex SHA-256 of the canonical payload (`docs/RUN_ENVELOPE_FINGERPRINT_PLAN.md`). |
 | `run_envelope_fingerprint_version` | string | Fingerprint schema revision; phase-1 value **`1`**. |
 
-**Serialization order**: after `compare_envelope_fingerprint_version`, before root **`session_envelope_fingerprint_*`**, root **`environment_envelope_fingerprint_*`**, root **`artifact_manifest_fingerprint_*`**, root **`provenance_envelope_fingerprint_*`**, root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, and the nested `transport` object: `run_envelope_fingerprint_digest`, `run_envelope_fingerprint_version` (lexicographic).
+**Serialization order**: after `compare_envelope_fingerprint_version`, before root **`session_envelope_fingerprint_*`**, root **`environment_envelope_fingerprint_*`**, root **`artifact_manifest_fingerprint_*`**, root **`provenance_envelope_fingerprint_*`**, root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, root **`state_envelope_fingerprint_*`**, and the nested `transport` object: `run_envelope_fingerprint_digest`, `run_envelope_fingerprint_version` (lexicographic).
 
 **PH1-M22+ (session-envelope fingerprint)** — present on every harness `run.json` that writes artifacts:
 
@@ -147,7 +147,7 @@ Top-level JSON object with at least:
 | `session_envelope_fingerprint_digest` | string | **64**-character lowercase hex SHA-256 of the canonical payload (`docs/SESSION_ENVELOPE_FINGERPRINT_PLAN.md`). |
 | `session_envelope_fingerprint_version` | string | Fingerprint schema revision; phase-1 value **`1`**. |
 
-**Serialization order**: after `run_envelope_fingerprint_version`, before root **`environment_envelope_fingerprint_*`**, root **`artifact_manifest_fingerprint_*`**, root **`provenance_envelope_fingerprint_*`**, root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, and the nested `transport` object: `session_envelope_fingerprint_digest`, `session_envelope_fingerprint_version` (lexicographic).
+**Serialization order**: after `run_envelope_fingerprint_version`, before root **`environment_envelope_fingerprint_*`**, root **`artifact_manifest_fingerprint_*`**, root **`provenance_envelope_fingerprint_*`**, root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, root **`state_envelope_fingerprint_*`**, and the nested `transport` object: `session_envelope_fingerprint_digest`, `session_envelope_fingerprint_version` (lexicographic).
 
 **PH1-M23+ (environment-envelope fingerprint)** — present on every harness `run.json` that writes artifacts:
 
@@ -156,7 +156,7 @@ Top-level JSON object with at least:
 | `environment_envelope_fingerprint_digest` | string | **64**-character lowercase hex SHA-256 of the canonical payload (`docs/ENVIRONMENT_ENVELOPE_FINGERPRINT_PLAN.md`). |
 | `environment_envelope_fingerprint_version` | string | Fingerprint schema revision; phase-1 value **`1`**. |
 
-**Serialization order**: after `session_envelope_fingerprint_version`, before root **`artifact_manifest_fingerprint_*`**, root **`provenance_envelope_fingerprint_*`**, root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, and the nested `transport` object: `environment_envelope_fingerprint_digest`, `environment_envelope_fingerprint_version` (lexicographic).
+**Serialization order**: after `session_envelope_fingerprint_version`, before root **`artifact_manifest_fingerprint_*`**, root **`provenance_envelope_fingerprint_*`**, root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, root **`state_envelope_fingerprint_*`**, and the nested `transport` object: `environment_envelope_fingerprint_digest`, `environment_envelope_fingerprint_version` (lexicographic).
 
 **PH1-M24+ (artifact-manifest fingerprint)** — present on every harness `run.json` that writes artifacts:
 
@@ -165,7 +165,7 @@ Top-level JSON object with at least:
 | `artifact_manifest_fingerprint_digest` | string | **64**-character lowercase hex SHA-256 of the canonical payload (`docs/ARTIFACT_MANIFEST_FINGERPRINT_PLAN.md`). |
 | `artifact_manifest_fingerprint_version` | string | Fingerprint schema revision; phase-1 value **`1`**. |
 
-**Serialization order**: after `environment_envelope_fingerprint_version`, before root **`provenance_envelope_fingerprint_*`**, root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, and the nested `transport` object: `artifact_manifest_fingerprint_digest`, `artifact_manifest_fingerprint_version` (lexicographic).
+**Serialization order**: after `environment_envelope_fingerprint_version`, before root **`provenance_envelope_fingerprint_*`**, root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, root **`state_envelope_fingerprint_*`**, and the nested `transport` object: `artifact_manifest_fingerprint_digest`, `artifact_manifest_fingerprint_version` (lexicographic).
 
 **PH1-M25+ (provenance-envelope fingerprint)** — present on every harness `run.json` that writes artifacts:
 
@@ -174,7 +174,7 @@ Top-level JSON object with at least:
 | `provenance_envelope_fingerprint_digest` | string | **64**-character lowercase hex SHA-256 of the canonical payload (`docs/PROVENANCE_ENVELOPE_FINGERPRINT_PLAN.md`). |
 | `provenance_envelope_fingerprint_version` | string | Fingerprint schema revision; phase-1 value **`1`**. |
 
-**Serialization order**: after `artifact_manifest_fingerprint_version`, before root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, and the nested `transport` object: `provenance_envelope_fingerprint_digest`, `provenance_envelope_fingerprint_version` (lexicographic).
+**Serialization order**: after `artifact_manifest_fingerprint_version`, before root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, root **`state_envelope_fingerprint_*`**, and the nested `transport` object: `provenance_envelope_fingerprint_digest`, `provenance_envelope_fingerprint_version` (lexicographic).
 
 **PH1-M26+ (integrity-envelope fingerprint)** — present on every harness `run.json` that writes artifacts:
 
@@ -183,7 +183,7 @@ Top-level JSON object with at least:
 | `integrity_envelope_fingerprint_digest` | string | **64**-character lowercase hex SHA-256 of the canonical payload (`docs/INTEGRITY_ENVELOPE_FINGERPRINT_PLAN.md`). |
 | `integrity_envelope_fingerprint_version` | string | Fingerprint schema revision; phase-1 value **`1`**. |
 
-**Serialization order**: after `provenance_envelope_fingerprint_version`, before root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, and the nested `transport` object: `integrity_envelope_fingerprint_digest`, `integrity_envelope_fingerprint_version` (lexicographic).
+**Serialization order**: after `provenance_envelope_fingerprint_version`, before root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, root **`state_envelope_fingerprint_*`**, and the nested `transport` object: `integrity_envelope_fingerprint_digest`, `integrity_envelope_fingerprint_version` (lexicographic).
 
 **PH1-M27+ (consistency-envelope fingerprint)** — present on every harness `run.json` that writes artifacts:
 
@@ -201,7 +201,7 @@ Top-level JSON object with at least:
 | `trace_envelope_fingerprint_digest` | string | **64**-character lowercase hex SHA-256 of the canonical payload (`docs/TRACE_ENVELOPE_FINGERPRINT_PLAN.md`). |
 | `trace_envelope_fingerprint_version` | string | Fingerprint schema revision; phase-1 value **`1`**. |
 
-**Serialization order**: after `consistency_envelope_fingerprint_version`, before root **`lineage_envelope_fingerprint_*`** and the nested `transport` object: `trace_envelope_fingerprint_digest`, `trace_envelope_fingerprint_version` (lexicographic).
+**Serialization order**: after `consistency_envelope_fingerprint_version`, before root **`lineage_envelope_fingerprint_*`**, root **`state_envelope_fingerprint_*`** and the nested `transport` object: `trace_envelope_fingerprint_digest`, `trace_envelope_fingerprint_version` (lexicographic).
 
 **PH1-M29+ (lineage-envelope fingerprint)** — present on every harness `run.json` that writes artifacts:
 
@@ -210,7 +210,16 @@ Top-level JSON object with at least:
 | `lineage_envelope_fingerprint_digest` | string | **64**-character lowercase hex SHA-256 of the canonical payload (`docs/LINEAGE_ENVELOPE_FINGERPRINT_PLAN.md`). |
 | `lineage_envelope_fingerprint_version` | string | Fingerprint schema revision; phase-1 value **`1`**. |
 
-**Serialization order**: after `trace_envelope_fingerprint_version`, before the nested `transport` object: `lineage_envelope_fingerprint_digest`, `lineage_envelope_fingerprint_version` (lexicographic).
+**Serialization order**: after `trace_envelope_fingerprint_version`, before root **`state_envelope_fingerprint_*`** and the nested `transport` object: `lineage_envelope_fingerprint_digest`, `lineage_envelope_fingerprint_version` (lexicographic).
+
+**PH1-M30+ (state-envelope fingerprint)** — present on every harness `run.json` that writes artifacts:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `state_envelope_fingerprint_digest` | string | **64**-character lowercase hex SHA-256 of the canonical payload (`docs/STATE_ENVELOPE_FINGERPRINT_PLAN.md`). |
+| `state_envelope_fingerprint_version` | string | Fingerprint schema revision; phase-1 value **`1`**. |
+
+**Serialization order**: after `lineage_envelope_fingerprint_version`, before the nested `transport` object: `state_envelope_fingerprint_digest`, `state_envelope_fingerprint_version` (lexicographic).
 
 Each **result** object includes:
 
