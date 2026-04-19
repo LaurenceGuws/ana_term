@@ -46,6 +46,7 @@ pub fn runBoundedShellCommand(allocator: std.mem.Allocator, cmd: []const u8, tim
             .exit_code = null,
             .ok = false,
             .err = err_spawn_failed,
+            .outcome = outcome_spawn_failed,
         };
     };
 
@@ -56,6 +57,7 @@ pub fn runBoundedShellCommand(allocator: std.mem.Allocator, cmd: []const u8, tim
             .exit_code = null,
             .ok = false,
             .err = err_spawn_failed,
+            .outcome = outcome_spawn_failed,
         };
     };
 
@@ -70,6 +72,7 @@ pub fn runBoundedShellCommand(allocator: std.mem.Allocator, cmd: []const u8, tim
             .exit_code = null,
             .ok = false,
             .err = err_spawn_failed,
+            .outcome = outcome_spawn_failed,
         };
     };
 
@@ -89,6 +92,7 @@ pub fn runBoundedShellCommand(allocator: std.mem.Allocator, cmd: []const u8, tim
                     .exit_code = null,
                     .ok = false,
                     .err = err_spawn_failed,
+                    .outcome = outcome_spawn_failed,
                 };
             };
             const elapsed_raw = now.since(t_start);
@@ -103,6 +107,7 @@ pub fn runBoundedShellCommand(allocator: std.mem.Allocator, cmd: []const u8, tim
                     .exit_code = null,
                     .ok = false,
                     .err = err_timeout,
+                    .outcome = outcome_timeout,
                 };
             }
             std.Thread.sleep(1 * std.time.ns_per_ms);
@@ -119,6 +124,7 @@ pub fn runBoundedShellCommand(allocator: std.mem.Allocator, cmd: []const u8, tim
                             .exit_code = null,
                             .ok = false,
                             .err = err_spawn_failed,
+                            .outcome = outcome_spawn_failed,
                         };
                     };
                     return .{
@@ -127,6 +133,7 @@ pub fn runBoundedShellCommand(allocator: std.mem.Allocator, cmd: []const u8, tim
                         .exit_code = null,
                         .ok = false,
                         .err = err_spawn_failed,
+                        .outcome = outcome_spawn_failed,
                     };
                 },
             }
@@ -139,6 +146,7 @@ pub fn runBoundedShellCommand(allocator: std.mem.Allocator, cmd: []const u8, tim
                     .exit_code = null,
                     .ok = false,
                     .err = err_spawn_failed,
+                    .outcome = outcome_spawn_failed,
                 };
             };
             return .{
@@ -147,6 +155,7 @@ pub fn runBoundedShellCommand(allocator: std.mem.Allocator, cmd: []const u8, tim
                 .exit_code = null,
                 .ok = false,
                 .err = err_spawn_failed,
+                .outcome = outcome_spawn_failed,
             };
         }
 
@@ -155,12 +164,33 @@ pub fn runBoundedShellCommand(allocator: std.mem.Allocator, cmd: []const u8, tim
         const ustatus: u32 = @bitCast(status);
         if (posix.W.IFEXITED(ustatus)) {
             const ec = posix.W.EXITSTATUS(ustatus);
+            if (ec == 0) {
+                return .{
+                    .attempt = 1,
+                    .elapsed_ns = elapsed_final,
+                    .exit_code = 0,
+                    .ok = true,
+                    .err = null,
+                    .outcome = outcome_ok,
+                };
+            }
             return .{
                 .attempt = 1,
                 .elapsed_ns = elapsed_final,
                 .exit_code = ec,
-                .ok = ec == 0,
+                .ok = false,
                 .err = null,
+                .outcome = outcome_nonzero_exit,
+            };
+        }
+        if (posix.W.IFSIGNALED(ustatus)) {
+            return .{
+                .attempt = 1,
+                .elapsed_ns = elapsed_final,
+                .exit_code = null,
+                .ok = false,
+                .err = null,
+                .outcome = outcome_signaled,
             };
         }
         return .{
@@ -168,7 +198,8 @@ pub fn runBoundedShellCommand(allocator: std.mem.Allocator, cmd: []const u8, tim
             .elapsed_ns = elapsed_final,
             .exit_code = null,
             .ok = false,
-            .err = null,
+            .err = err_spawn_failed,
+            .outcome = outcome_spawn_failed,
         };
     }
 }
@@ -183,6 +214,7 @@ test "runBoundedShellCommand true exits 0 on Linux" {
     try std.testing.expectEqual(@as(?u32, 0), t.exit_code);
     try std.testing.expectEqual(@as(?bool, true), t.ok);
     try std.testing.expectEqual(@as(?[]const u8, null), t.err);
+    try std.testing.expectEqualStrings(outcome_ok, t.outcome.?);
 }
 
 test "runBoundedShellCommand false exits 1 on Linux" {
@@ -193,6 +225,7 @@ test "runBoundedShellCommand false exits 1 on Linux" {
     try std.testing.expectEqual(@as(?u32, 1), t.attempt);
     try std.testing.expectEqual(@as(?u32, 1), t.exit_code);
     try std.testing.expectEqual(@as(?bool, false), t.ok);
+    try std.testing.expectEqualStrings(outcome_nonzero_exit, t.outcome.?);
 }
 
 test "runBoundedShellCommand times out sleep on Linux" {
@@ -204,4 +237,17 @@ test "runBoundedShellCommand times out sleep on Linux" {
     try std.testing.expectEqual(@as(?u32, null), t.exit_code);
     try std.testing.expectEqual(@as(?bool, false), t.ok);
     try std.testing.expectEqual(err_timeout, t.err.?);
+    try std.testing.expectEqualStrings(outcome_timeout, t.outcome.?);
+}
+
+test "runBoundedShellCommand signaled when child dies by signal on Linux" {
+    const builtin = @import("builtin");
+    if (builtin.target.os.tag != .linux) return error.SkipZigTest;
+
+    const t = runBoundedShellCommand(std.testing.allocator, "kill -9 $$", 5_000);
+    try std.testing.expectEqual(@as(?u32, 1), t.attempt);
+    try std.testing.expectEqual(@as(?u32, null), t.exit_code);
+    try std.testing.expectEqual(@as(?bool, false), t.ok);
+    try std.testing.expectEqual(@as(?[]const u8, null), t.err);
+    try std.testing.expectEqualStrings(outcome_signaled, t.outcome.?);
 }
