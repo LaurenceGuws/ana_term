@@ -191,7 +191,7 @@ test "runBoundedShellCommand times out sleep on Linux" {
     const builtin = @import("builtin");
     if (builtin.target.os.tag != .linux) return error.SkipZigTest;
 
-    const t = runBoundedShellCommand(std.testing.allocator, "sleep 30", 80);
+    const t = runBoundedShellCommand(std.testing.allocator, "sleep 30", 250);
     try std.testing.expectEqual(@as(?u32, 1), t.attempt);
     try std.testing.expectEqual(@as(?u32, null), t.exit_code);
     try std.testing.expectEqual(@as(?bool, false), t.ok);
