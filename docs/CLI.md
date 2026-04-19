@@ -176,6 +176,12 @@ On **non-Linux** hosts, `pty_guarded` (non-dry-run) fails with exit **2** before
 
 - **`pty_experiment_host_machine`**, **`pty_experiment_host_release`**: `null` for `scaffold_only`; on `experiment_linux_pty`, non-empty snapshots from `uname` (truncated to harness buffers). See **`docs/PTY_REPRODUCIBILITY_PLAN.md`**.
 
+**PH1-M31 real terminal launch (`transport` in `run.json`)**
+
+- **When**: `pty_guarded`, not **`--dry-run`**, Linux host, **`guarded_state == experiment_linux_pty`**, and **`--terminal-cmd`** is non-empty (after the minimal PTY experiment block). The harness runs **`/bin/sh -c <terminal_cmd>`** with wall-clock budget **`transport.timeout_ms`** (poll **`waitpid`**, **`SIGKILL`** on timeout); see **`docs/REAL_TERMINAL_LAUNCH_PLAN.md`**.
+- **Fail-closed**: a guarded **full** run on Linux **requires** a non-empty **`--terminal-cmd`**; otherwise the run exits before writing artifacts with a clear stderr message.
+- **Telemetry**: **`terminal_launch_*`** fields under **`transport`** (attempt, elapsed ns, exit code, ok flag, short error tag). Full contract: **`docs/REPORT_FORMAT.md`**.
+
 ## `list`
 
 **Purpose**: Enumerate discovered `.toml` probe specs.
@@ -201,7 +207,7 @@ On **non-Linux** hosts, `pty_guarded` (non-dry-run) fails with exit **2** before
 |-------|-------------|
 | Path | Directory (e.g. `probes/smoke`) or single `.toml` file. |
 | `--terminal <name>` | Optional; logical terminal id (see **Terminal target model**). |
-| `--terminal-cmd <string>` | Optional; launch command string for future automation. |
+| `--terminal-cmd <string>` | Optional in general; **required** on **Linux** for **`pty_guarded`** full runs (non-**`--dry-run`**) so the harness can execute the bounded real-launch lane (PH1-M31; see **Transport configuration** below). |
 | `--platform <name>` | Optional; OS tag recorded in artifacts. |
 | `--capture <mode>` | Optional; one of `manual`, `text_observation`, `timed`. |
 | `--dry-run` | Optional; validate and simulate without writing artifacts (PH1-M4+). |

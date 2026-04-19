@@ -236,7 +236,7 @@ Phase-1 placeholder runs may use minimal values but must preserve these keys for
 
 The harness emits a **`transport`** object alongside core run fields. Keys are stable for `report` / `compare`.
 
-**Serialization order (PH1-M9+)**: when `mode` is `pty_guarded`, the harness writes transport keys in lexicographic order: `guarded_opt_in`, `guarded_state`, `handshake`, `handshake_latency_ns`, `mode`, `pty_capability_notes`, `pty_experiment_attempt`, `pty_experiment_elapsed_ns`, `pty_experiment_error`, `pty_experiment_host_machine`, `pty_experiment_host_release`, `pty_experiment_open_ok`, `timeout_ms`.
+**Serialization order (PH1-M9+)**: when `mode` is `pty_guarded`, the harness writes transport keys in lexicographic order: `guarded_opt_in`, `guarded_state`, `handshake`, `handshake_latency_ns`, `mode`, `pty_capability_notes`, `pty_experiment_attempt`, `pty_experiment_elapsed_ns`, `pty_experiment_error`, `pty_experiment_host_machine`, `pty_experiment_host_release`, `pty_experiment_open_ok`, `terminal_launch_attempt`, `terminal_launch_elapsed_ns`, `terminal_launch_error`, `terminal_launch_exit_code`, `terminal_launch_ok`, `timeout_ms`.
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -260,6 +260,16 @@ The harness emits a **`transport`** object alongside core run fields. Keys are s
 | `pty_experiment_open_ok` | boolean or `null` | `null` when `guarded_state` is `scaffold_only`; otherwise whether the minimal PTY pair opened. |
 
 See **`docs/PTY_EXPERIMENT_HARDENING_PLAN.md`** (PH1-M8) and **`docs/PTY_REPRODUCIBILITY_PLAN.md`** (PH1-M9).
+
+**PH1-M31 (guarded Linux real terminal launch)** — present when `mode` is `pty_guarded` and the harness records process-level launch evidence (see **`docs/REAL_TERMINAL_LAUNCH_PLAN.md`**):
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `terminal_launch_attempt` | integer or `null` | **`1`** when a launch was attempted; **`null`** when not applicable (e.g. scaffold, non-Linux, non-guarded, empty `--terminal-cmd`). |
+| `terminal_launch_elapsed_ns` | integer or `null` | Wall time for the launch attempt (nanoseconds), clamped to signed JSON range; **`null`** when no attempt. |
+| `terminal_launch_error` | string or `null` | Short static reason (`timeout`, `spawn_failed`, …) or **`null`**. |
+| `terminal_launch_exit_code` | integer or `null` | Child exit code when reaped normally; **`null`** on spawn failure or timeout before status. |
+| `terminal_launch_ok` | boolean or `null` | **`true`** / **`false`** when a launch ran to completion; **`null`** when no attempt. |
 
 ## `summary.md` (required)
 
