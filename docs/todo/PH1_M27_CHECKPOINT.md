@@ -3,7 +3,7 @@
 Sprint: `PH1-M27-S1`  
 Super-gate: `ANA-GATE-290`
 
-Status: **Engineering complete** — awaiting Architect review at `ANA-GATE-290`.
+Status: **Accepted by Architect** at `ANA-GATE-290`.
 
 ## Ticket commits (strict order, one commit per ticket)
 

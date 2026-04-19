@@ -981,7 +981,7 @@ Outcome:
 
 - Accepted at `ANA-GATE-280`.
 
-### `PH1-M27` (`review_gate`)
+### `PH1-M27` (`completed`)
 
 Purpose:
 
@@ -1023,4 +1023,44 @@ Queue lines (exact):
 
 Outcome:
 
-- Reported at `ANA-GATE-290` (awaiting Architect acceptance).
+- Accepted at `ANA-GATE-290`.
+
+### `PH1-M28` (`in_progress`)
+
+Purpose:
+
+- Improve trace-level audit coverage with a deterministic trace-envelope fingerprint that composes canonical trace-facing metadata into one replay handle.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M28_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- define PH1-M28 trace-envelope fingerprint plan and boundaries
+- emit root trace-envelope fingerprint fields in `run.json`
+- add report schema invariants and compare metadata coverage for trace-envelope fingerprint fields
+- expand regression tests and smoke coverage
+- PH1-M28 checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-2801` through `ANA-2810` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-300` reached and reported.
+
+Non-goals:
+
+- Windows ConPTY implementation
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [ ] Execute `ANA-2801` through `ANA-2810` in order from `docs/todo/PH1_M28_TICKETS.md`.
+- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [ ] Stop only at `ANA-GATE-300` (post `ANA-2810`) unless truly blocked.
+- [ ] Submit checkpoint packet in `docs/todo/PH1_M28_CHECKPOINT.md`.

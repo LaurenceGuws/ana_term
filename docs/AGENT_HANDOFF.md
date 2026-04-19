@@ -5,8 +5,8 @@ Session entrypoint only. Keep this file short and current.
 ## Active Focus
 
 - Product lane: text-first terminal harness
-- Active macro batch (`review_gate`): `PH1-M27` (`PH1-M27-S1`) — consistency-envelope fingerprint hardening (`ANA-2701`..`ANA-2710`)
-- Super-gate (Architect review): `ANA-GATE-290` (checkpoint: `docs/todo/PH1_M27_CHECKPOINT.md`)
+- Active macro batch (`in_progress`): `PH1-M28` (`PH1-M28-S1`) — trace-envelope fingerprint hardening (`ANA-2801`..`ANA-2810`)
+- Super-gate (Architect review): `ANA-GATE-300`
 - Active queue authority: `docs/todo/implementation.md`
 - Ticket board authority: `docs/todo/JIRA_BOARD.md`
 - Engineer entrypoint: `docs/todo/ENGINEER_ENTRYPOINT.md`
@@ -16,12 +16,12 @@ Session entrypoint only. Keep this file short and current.
 1. `docs/todo/ENGINEER_ENTRYPOINT.md`
 2. `docs/todo/implementation.md`
 3. `docs/todo/JIRA_BOARD.md`
-4. `docs/todo/PH1_M27_TICKETS.md`
+4. `docs/todo/PH1_M28_TICKETS.md`
 5. `docs/Vision.md`
 6. `docs/WORKFLOW.md`
 
 ## Execution Contract
 
-- Execute only `ANA-2701`..`ANA-2710` in order.
+- Execute only `ANA-2801`..`ANA-2810` in order.
 - One ticket per commit with `[ANA-###]` prefix.
-- Stop at `ANA-GATE-290` or hard blocker.
+- Stop at `ANA-GATE-300` or hard blocker.
