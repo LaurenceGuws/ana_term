@@ -5,8 +5,8 @@ Session entrypoint only. Keep this file short and current.
 ## Active Focus
 
 - Product lane: text-first terminal harness
-- Active macro batch (`in_progress`): `PH1-M31` (`PH1-M31-S1`) — real terminal launch lane v1 (`ANA-3101`..`ANA-3110`)
-- Super-gate (Architect review): `ANA-GATE-330`
+- Latest engineer batch: `PH1-M31` (`PH1-M31-S1`) — real terminal launch lane v1 (`ANA-3101`..`ANA-3110`) — **checkpoint submitted**
+- Super-gate (Architect review): `ANA-GATE-330` — **pending Architect acceptance**
 - Active queue authority: `docs/todo/implementation.md`
 - Ticket board authority: `docs/todo/JIRA_BOARD.md`
 - Engineer entrypoint: `docs/todo/ENGINEER_ENTRYPOINT.md`

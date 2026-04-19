@@ -1157,7 +1157,7 @@ Outcome:
 
 - Accepted at `ANA-GATE-320`.
 
-### `PH1-M31` (`in_progress`)
+### `PH1-M31` (`awaiting_gate`)
 
 Purpose:
 
@@ -1191,9 +1191,13 @@ Non-goals:
 - screenshot/OCR systems
 - rich TUI frontend
 
+Outcome:
+
+- Engineer batch complete; checkpoint packet in `docs/todo/PH1_M31_CHECKPOINT.md`. **Architect acceptance** at `ANA-GATE-330` pending.
+
 Queue lines (exact):
 
-- [ ] Execute `ANA-3101` through `ANA-3110` in order from `docs/todo/PH1_M31_TICKETS.md`.
-- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
-- [ ] Stop only at `ANA-GATE-330` (post `ANA-3110`) unless truly blocked.
-- [ ] Submit checkpoint packet in `docs/todo/PH1_M31_CHECKPOINT.md`.
+- [x] Execute `ANA-3101` through `ANA-3110` in order from `docs/todo/PH1_M31_TICKETS.md`.
+- [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [x] Stop only at `ANA-GATE-330` (post `ANA-3110`) unless truly blocked.
+- [x] Submit checkpoint packet in `docs/todo/PH1_M31_CHECKPOINT.md`.
