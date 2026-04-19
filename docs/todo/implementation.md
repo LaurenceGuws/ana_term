@@ -1113,7 +1113,7 @@ Outcome:
 
 - Accepted at `ANA-GATE-310`.
 
-### `PH1-M30` (`in_progress`)
+### `PH1-M30` (`review_gate`)
 
 Purpose:
 
@@ -1148,7 +1148,7 @@ Non-goals:
 
 Queue lines (exact):
 
-- [ ] Execute `ANA-3001` through `ANA-3010` in order from `docs/todo/PH1_M30_TICKETS.md`.
-- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
-- [ ] Stop only at `ANA-GATE-320` (post `ANA-3010`) unless truly blocked.
-- [ ] Submit checkpoint packet in `docs/todo/PH1_M30_CHECKPOINT.md`.
+- [x] Execute `ANA-3001` through `ANA-3010` in order from `docs/todo/PH1_M30_TICKETS.md`.
+- [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [x] Stop only at `ANA-GATE-320` (post `ANA-3010`) unless truly blocked.
+- [x] Submit checkpoint packet in `docs/todo/PH1_M30_CHECKPOINT.md`.
