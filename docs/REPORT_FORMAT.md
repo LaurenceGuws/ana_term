@@ -63,7 +63,13 @@ Top-level JSON object with at least:
 | `terminal_launch_preflight_ok` | boolean or `null` | **`true`** / **`false`** when a Linux preflight probe ran for the bounded argv launch; **`null`** when not applicable. |
 | `terminal_launch_preflight_reason` | string or `null` | Static tag: **`na`**, **`ok`**, **`missing_executable`**, **`not_executable`** (see **`docs/LAUNCH_PREFLIGHT_PLAN.md`**); **`null`** when not applicable. |
 
-**Serialization order**: after `execution_mode`, before `host_identity_machine`: `terminal_profile_id`, `terminal_cmd_source`, `resolved_terminal_cmd`, **`resolved_terminal_argv`**, **`terminal_exec_template_id`**, **`terminal_exec_template_version`**, **`terminal_exec_resolved_path`**, **`terminal_launch_preflight_ok`**, **`terminal_launch_preflight_reason`**, then `host_identity_machine`, `host_identity_release`, `host_identity_sysname` (lexicographic among the host triple). See **`docs/HOST_IDENTITY_PLAN.md`**, **`docs/TERMINAL_PROFILE_ADAPTER_PLAN.md`**, **`docs/TERMINAL_PROFILE_EXEC_TEMPLATE_PLAN.md`**, and **`docs/LAUNCH_PREFLIGHT_PLAN.md`**.
+**PH1-M36 (preflight strictness)** — present on every harness `run.json` that writes artifacts:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `terminal_exec_resolved_path_normalization` | string or `null` | **`canonical`** (**`realpath`** succeeded), **`literal`** (probe path retained), or **`null`** when **`terminal_exec_resolved_path`** is **`null`**. See **`docs/LAUNCH_PREFLIGHT_STRICTNESS_PLAN.md`**. |
+
+**Serialization order**: after `execution_mode`, before `host_identity_machine`: `terminal_profile_id`, `terminal_cmd_source`, `resolved_terminal_cmd`, **`resolved_terminal_argv`**, **`terminal_exec_template_id`**, **`terminal_exec_template_version`**, **`terminal_exec_resolved_path`**, **`terminal_exec_resolved_path_normalization`**, **`terminal_launch_preflight_ok`**, **`terminal_launch_preflight_reason`**, then `host_identity_machine`, `host_identity_release`, `host_identity_sysname` (lexicographic among the host triple). See **`docs/HOST_IDENTITY_PLAN.md`**, **`docs/TERMINAL_PROFILE_ADAPTER_PLAN.md`**, **`docs/TERMINAL_PROFILE_EXEC_TEMPLATE_PLAN.md`**, **`docs/LAUNCH_PREFLIGHT_PLAN.md`**, and **`docs/LAUNCH_PREFLIGHT_STRICTNESS_PLAN.md`**.
 
 **PH1-M11+ (run fingerprint)** — present on every harness `run.json` that writes artifacts:
 
@@ -97,7 +103,7 @@ Top-level JSON object with at least:
 | Field | Type | Description |
 |-------|------|-------------|
 | `transport_fingerprint_digest` | string | **64**-character lowercase hex SHA-256 of the canonical payload (`docs/TRANSPORT_FINGERPRINT_PLAN.md`). |
-| `transport_fingerprint_version` | string | Fingerprint schema revision; **`2`** after **PH1-M35** (preflight canonical lines when **`pty_guarded`**); legacy **`1`** only in older fixtures. |
+| `transport_fingerprint_version` | string | Fingerprint schema revision; **`3`** after **PH1-M36** (preflight path normalization line); **`2`** after **PH1-M35** (preflight lines without normalization); legacy **`1`** only in older fixtures. |
 
 **Serialization order**: after `resultset_fingerprint_version`, before root **`exec_summary_fingerprint_*`**, root **`context_summary_fingerprint_*`**, root **`metadata_envelope_fingerprint_*`**, root **`artifact_bundle_fingerprint_*`**, root **`report_envelope_fingerprint_*`**, root **`compare_envelope_fingerprint_*`**, root **`run_envelope_fingerprint_*`**, root **`session_envelope_fingerprint_*`**, root **`environment_envelope_fingerprint_*`**, root **`artifact_manifest_fingerprint_*`**, root **`provenance_envelope_fingerprint_*`**, root **`integrity_envelope_fingerprint_*`**, root **`consistency_envelope_fingerprint_*`**, root **`trace_envelope_fingerprint_*`**, root **`lineage_envelope_fingerprint_*`**, root **`state_envelope_fingerprint_*`**, and the nested `transport` object: `transport_fingerprint_digest`, `transport_fingerprint_version` (lexicographic).
 
