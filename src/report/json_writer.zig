@@ -21,6 +21,7 @@ const provenance_envelope_fingerprint = @import("provenance_envelope_fingerprint
 const integrity_envelope_fingerprint = @import("integrity_envelope_fingerprint.zig");
 const consistency_envelope_fingerprint = @import("consistency_envelope_fingerprint.zig");
 const trace_envelope_fingerprint = @import("trace_envelope_fingerprint.zig");
+const lineage_envelope_fingerprint = @import("lineage_envelope_fingerprint.zig");
 
 fn appendJsonEncodedString(allocator: std.mem.Allocator, buf: *std.ArrayList(u8), bytes: []const u8) !void {
     var enc: std.io.Writer.Allocating = .init(allocator);
@@ -52,6 +53,7 @@ pub fn writePlaceholder(allocator: std.mem.Allocator, run_dir: []const u8, run_i
     try integrity_envelope_fingerprint.populate(&ctx, allocator);
     try consistency_envelope_fingerprint.populate(&ctx, allocator);
     try trace_envelope_fingerprint.populate(&ctx, allocator);
+    try lineage_envelope_fingerprint.populate(&ctx, allocator);
     try writeRun(allocator, run_dir, run_id, &.{}, ctx);
 }
 
@@ -157,6 +159,9 @@ pub fn writeRun(
     try buf.appendSlice(allocator, ",\n  \"trace_envelope_fingerprint_digest\": ");
     try appendJsonEncodedString(allocator, &buf, ctx.trace_envelope_fingerprint_digest_hex[0..ctx.trace_envelope_fingerprint_digest_len]);
     try buf.appendSlice(allocator, ",\n  \"trace_envelope_fingerprint_version\": \"1\"");
+    try buf.appendSlice(allocator, ",\n  \"lineage_envelope_fingerprint_digest\": ");
+    try appendJsonEncodedString(allocator, &buf, ctx.lineage_envelope_fingerprint_digest_hex[0..ctx.lineage_envelope_fingerprint_digest_len]);
+    try buf.appendSlice(allocator, ",\n  \"lineage_envelope_fingerprint_version\": \"1\"");
 
     const guarded_opt_in = ctx.transport_mode == .pty_guarded;
     const guarded_state: []const u8 = blk: {
@@ -293,6 +298,7 @@ test "writeRun JSON-encodes guarded PTY host snapshot strings" {
     try integrity_envelope_fingerprint.populate(&ctx, std.testing.allocator);
     try consistency_envelope_fingerprint.populate(&ctx, std.testing.allocator);
     try trace_envelope_fingerprint.populate(&ctx, std.testing.allocator);
+    try lineage_envelope_fingerprint.populate(&ctx, std.testing.allocator);
 
     const mach = "x86_64";
     const rel = "6.1.0-test";
@@ -346,6 +352,8 @@ test "writeRun JSON-encodes guarded PTY host snapshot strings" {
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"consistency_envelope_fingerprint_digest\": \"") != null);
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"trace_envelope_fingerprint_version\": \"1\"") != null);
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"trace_envelope_fingerprint_digest\": \"") != null);
+    try std.testing.expect(std.mem.indexOf(u8, json_text, "\"lineage_envelope_fingerprint_version\": \"1\"") != null);
+    try std.testing.expect(std.mem.indexOf(u8, json_text, "\"lineage_envelope_fingerprint_digest\": \"") != null);
 
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, json_text, .{});
     defer parsed.deinit();
@@ -392,6 +400,7 @@ test "writeRun embeds golden metadata_envelope digest for fixed upstream fingerp
     try integrity_envelope_fingerprint.populate(&ctx, std.testing.allocator);
     try consistency_envelope_fingerprint.populate(&ctx, std.testing.allocator);
     try trace_envelope_fingerprint.populate(&ctx, std.testing.allocator);
+    try lineage_envelope_fingerprint.populate(&ctx, std.testing.allocator);
     try writeRun(std.testing.allocator, run_dir, "rid-env-golden", &.{}, ctx);
 
     const json_path = try std.fmt.allocPrint(std.testing.allocator, "{s}/run.json", .{run_dir});
@@ -411,6 +420,7 @@ test "writeRun embeds golden metadata_envelope digest for fixed upstream fingerp
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"integrity_envelope_fingerprint_digest\": \"85006478d27f84d40319d5107072b420417a8bf12a81c966bf04e0d15dd01fa0\"") != null);
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"consistency_envelope_fingerprint_digest\": \"40b1a4678654405c7d0d72dcc6cc992d8038d983fb28455b34ccba3a2132207a\"") != null);
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"trace_envelope_fingerprint_digest\": \"c6c42cdc0e94231e4ae5d1105e5add411bfe274c1a360153993dafb0ad7f31e1\"") != null);
+    try std.testing.expect(std.mem.indexOf(u8, json_text, "\"lineage_envelope_fingerprint_digest\": \"ab0d29132d75a50c33523822984a11df745fa6cd934d2ee9d638b240a84c8659\"") != null);
 
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, json_text, .{});
     defer parsed.deinit();
@@ -457,6 +467,7 @@ test "writeRun escapes quotes in guarded PTY host snapshot strings" {
     try integrity_envelope_fingerprint.populate(&ctx, std.testing.allocator);
     try consistency_envelope_fingerprint.populate(&ctx, std.testing.allocator);
     try trace_envelope_fingerprint.populate(&ctx, std.testing.allocator);
+    try lineage_envelope_fingerprint.populate(&ctx, std.testing.allocator);
 
     const mach: []const u8 = &.{ 'a', 'b', '"', 'c' };
     @memcpy(ctx.pty_experiment_host_machine[0..mach.len], mach);
