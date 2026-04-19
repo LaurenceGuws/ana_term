@@ -245,6 +245,36 @@ pub fn writeRun(
         } else {
             try buf.appendSlice(allocator, "null");
         }
+        try buf.appendSlice(allocator, ",\n    \"terminal_launch_attempt\": ");
+        if (ctx.terminal_launch_attempt) |a| {
+            try buf.print(allocator, "{d}", .{a});
+        } else {
+            try buf.appendSlice(allocator, "null");
+        }
+        try buf.appendSlice(allocator, ",\n    \"terminal_launch_elapsed_ns\": ");
+        if (ctx.terminal_launch_elapsed_ns) |e| {
+            try buf.print(allocator, "{d}", .{e});
+        } else {
+            try buf.appendSlice(allocator, "null");
+        }
+        try buf.appendSlice(allocator, ",\n    \"terminal_launch_error\": ");
+        if (ctx.terminal_launch_error) |e| {
+            try buf.print(allocator, "\"{s}\"", .{e});
+        } else {
+            try buf.appendSlice(allocator, "null");
+        }
+        try buf.appendSlice(allocator, ",\n    \"terminal_launch_exit_code\": ");
+        if (ctx.terminal_launch_exit_code) |c| {
+            try buf.print(allocator, "{d}", .{c});
+        } else {
+            try buf.appendSlice(allocator, "null");
+        }
+        try buf.appendSlice(allocator, ",\n    \"terminal_launch_ok\": ");
+        if (ctx.terminal_launch_ok) |b| {
+            try buf.print(allocator, "{}", .{b});
+        } else {
+            try buf.appendSlice(allocator, "null");
+        }
     }
 
     try buf.print(allocator, ",\n    \"timeout_ms\": {d}\n  }}", .{ctx.timeout_ms});

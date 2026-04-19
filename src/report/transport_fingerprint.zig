@@ -75,6 +75,31 @@ pub fn populate(ctx: *RunContext, allocator: std.mem.Allocator, run_id: []const 
         } else {
             try canon.appendSlice(allocator, "null\n");
         }
+        if (ctx.terminal_launch_attempt) |a| {
+            try canon.print(allocator, "{d}\n", .{a});
+        } else {
+            try canon.appendSlice(allocator, "null\n");
+        }
+        if (ctx.terminal_launch_elapsed_ns) |e| {
+            try canon.print(allocator, "{d}\n", .{e});
+        } else {
+            try canon.appendSlice(allocator, "null\n");
+        }
+        if (ctx.terminal_launch_error) |e| {
+            try canon.print(allocator, "{s}\n", .{e});
+        } else {
+            try canon.appendSlice(allocator, "null\n");
+        }
+        if (ctx.terminal_launch_exit_code) |code| {
+            try canon.print(allocator, "{d}\n", .{code});
+        } else {
+            try canon.appendSlice(allocator, "null\n");
+        }
+        if (ctx.terminal_launch_ok) |b| {
+            try canon.print(allocator, "{s}\n", .{if (b) "true" else "false"});
+        } else {
+            try canon.appendSlice(allocator, "null\n");
+        }
     }
 
     var digest: [32]u8 = undefined;
