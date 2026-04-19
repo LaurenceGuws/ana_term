@@ -28,4 +28,5 @@ test {
     _ = @import("runner/transport_guard_preflight.zig");
     _ = @import("runner/posix_pty.zig");
     _ = @import("runner/real_terminal_launch.zig");
+    _ = @import("runner/terminal_profile.zig");
 }

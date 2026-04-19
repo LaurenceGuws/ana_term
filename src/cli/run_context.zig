@@ -15,10 +15,24 @@ pub const host_identity_release_cap: usize = 256;
 /// Root `run.json` host identity: `uname.sysname` (PH1-M10).
 pub const host_identity_sysname_cap: usize = 64;
 
+/// Max bytes stored for PH1-M33 resolved terminal command (bounded copy).
+pub const terminal_cmd_storage_cap: usize = 1024;
+/// Max bytes for canonical `terminal_profile_id` in artifacts.
+pub const terminal_profile_id_cap: usize = 64;
+
 pub const RunContext = struct {
     capture_mode: []const u8,
     terminal_name: []const u8,
+    /// Raw `--terminal-cmd` argv slice when provided; empty otherwise (PH1-M33).
+    terminal_cmd_cli: []const u8,
+    /// Effective command after profile resolution (PH1-M33); used for launch + fingerprints.
     terminal_cmd: []const u8,
+    terminal_cmd_effective_buf: [terminal_cmd_storage_cap]u8,
+    terminal_cmd_effective_len: u16,
+    terminal_profile_id_buf: [terminal_profile_id_cap]u8,
+    terminal_profile_id_len: u8,
+    /// `terminal_profile.source_*` (PH1-M33).
+    terminal_cmd_source: []const u8,
     platform: []const u8,
     suite_name: ?[]const u8,
     comparison_id: ?[]const u8,
@@ -131,7 +145,13 @@ pub const RunContext = struct {
         return .{
             .capture_mode = modes.defaultMode(),
             .terminal_name = "unknown",
+            .terminal_cmd_cli = "",
             .terminal_cmd = "",
+            .terminal_cmd_effective_buf = std.mem.zeroes([terminal_cmd_storage_cap]u8),
+            .terminal_cmd_effective_len = 0,
+            .terminal_profile_id_buf = std.mem.zeroes([terminal_profile_id_cap]u8),
+            .terminal_profile_id_len = 0,
+            .terminal_cmd_source = "",
             .platform = defaultPlatformTag(),
             .suite_name = null,
             .comparison_id = null,
