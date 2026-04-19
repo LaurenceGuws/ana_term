@@ -32,3 +32,47 @@ pub fn populate(ctx: *RunContext, allocator: std.mem.Allocator) !void {
     writeHexLower(&ctx.session_envelope_fingerprint_digest_hex, &digest);
     ctx.session_envelope_fingerprint_digest_len = 64;
 }
+
+fn fillDigest(dst: *[64]u8, len: *u8, hex_lower_64: *const [64]u8) void {
+    @memcpy(dst, hex_lower_64);
+    len.* = 64;
+}
+
+fn testCtxWithRunEnvelope(re: *const [64]u8) RunContext {
+    var ctx = RunContext.initDefault();
+    fillDigest(&ctx.run_envelope_fingerprint_digest_hex, &ctx.run_envelope_fingerprint_digest_len, re);
+    return ctx;
+}
+
+test "session envelope fingerprint is deterministic for fixed run-envelope digest" {
+    var a = testCtxWithRunEnvelope(&"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".*);
+    var b = testCtxWithRunEnvelope(&"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".*);
+    try populate(&a, std.testing.allocator);
+    try populate(&b, std.testing.allocator);
+    try std.testing.expectEqual(a.session_envelope_fingerprint_digest_len, b.session_envelope_fingerprint_digest_len);
+    try std.testing.expectEqualSlices(
+        u8,
+        a.session_envelope_fingerprint_digest_hex[0..a.session_envelope_fingerprint_digest_len],
+        b.session_envelope_fingerprint_digest_hex[0..b.session_envelope_fingerprint_digest_len],
+    );
+}
+
+test "session envelope fingerprint changes when run-envelope digest changes" {
+    var a = testCtxWithRunEnvelope(&"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".*);
+    var b = testCtxWithRunEnvelope(&"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb".*);
+    try populate(&a, std.testing.allocator);
+    try populate(&b, std.testing.allocator);
+    try std.testing.expect(!std.mem.eql(
+        u8,
+        a.session_envelope_fingerprint_digest_hex[0..a.session_envelope_fingerprint_digest_len],
+        b.session_envelope_fingerprint_digest_hex[0..b.session_envelope_fingerprint_digest_len],
+    ));
+}
+
+test "session envelope fingerprint matches golden for M21 run-envelope digest chain" {
+    const golden_session_envelope = "d9ac103387a17fd9217799a54fd1f2ba121ade49f8a171a0ce00bb7e6e79e0b3";
+    var ctx = testCtxWithRunEnvelope(&"6eb18d774c8c3625e082076218508331bef799ed368ead1dcde5de6ac5e91a90".*);
+    try populate(&ctx, std.testing.allocator);
+    try std.testing.expectEqual(@as(u8, 64), ctx.session_envelope_fingerprint_digest_len);
+    try std.testing.expectEqualStrings(golden_session_envelope, ctx.session_envelope_fingerprint_digest_hex[0..ctx.session_envelope_fingerprint_digest_len]);
+}
