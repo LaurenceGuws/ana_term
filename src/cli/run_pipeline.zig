@@ -33,6 +33,7 @@ const env_writer = @import("../report/env_writer.zig");
 const RunContext = @import("run_context.zig").RunContext;
 const transport_guard_preflight = @import("../runner/transport_guard_preflight.zig");
 const posix_pty = @import("../runner/posix_pty.zig");
+const real_terminal_launch = @import("../runner/real_terminal_launch.zig");
 
 pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []const u8, ctx_in: RunContext) u8 {
     var ctx = ctx_in;
@@ -44,6 +45,11 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
     if (transport_guard_preflight.preflightMessage(ctx.transport_mode, ctx.allow_guarded_transport, ctx.dry_run)) |msg| {
         printErr(msg) catch {};
         printErr("\n") catch {};
+        return errors.Category.invalid_spec.exitCode();
+    }
+
+    if (ctx.transport_mode == .pty_guarded and !ctx.dry_run and posix_pty.runtimeHostIsLinux() and ctx.terminal_cmd.len == 0) {
+        printErr("pty_guarded full run on Linux requires --terminal-cmd (see docs/CLI.md)\n") catch {};
         return errors.Category.invalid_spec.exitCode();
     }
 
@@ -94,6 +100,15 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
         } else null;
         const cap: u64 = @intCast(std.math.maxInt(i64));
         ctx.pty_experiment_elapsed_ns = @min(elapsed_raw orelse 0, cap);
+
+        if (posix_pty.runtimeHostIsLinux() and ctx.terminal_cmd.len > 0) {
+            const telem = real_terminal_launch.runBoundedShellCommand(allocator, ctx.terminal_cmd, ctx.timeout_ms);
+            ctx.terminal_launch_attempt = telem.attempt;
+            ctx.terminal_launch_elapsed_ns = telem.elapsed_ns;
+            ctx.terminal_launch_exit_code = telem.exit_code;
+            ctx.terminal_launch_ok = telem.ok;
+            ctx.terminal_launch_error = telem.err;
+        }
     }
 
     if (ctx.dry_run) {
