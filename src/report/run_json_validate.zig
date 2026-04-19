@@ -100,6 +100,46 @@ pub fn validateRunReport(root: std.json.Value) ?[]const u8 {
         else => return "terminal_launch_preflight_reason must be a string or null",
     }
 
+    // PH1-M36: root preflight reason ↔ ok mutual constraints
+    switch (tlpok_o) {
+        .bool => |b| {
+            if (b) {
+                const rs = switch (tlpr_o) {
+                    .string => |s| s,
+                    else => return "terminal_launch_preflight_reason must be ok when terminal_launch_preflight_ok is true",
+                };
+                if (!std.mem.eql(u8, rs, launch_preflight.reason_ok)) return "terminal_launch_preflight_reason must be ok when terminal_launch_preflight_ok is true";
+            } else {
+                const rs = switch (tlpr_o) {
+                    .string => |s| s,
+                    else => return "terminal_launch_preflight_reason must be a string when terminal_launch_preflight_ok is false",
+                };
+                if (!(std.mem.eql(u8, rs, launch_preflight.reason_missing_executable) or
+                    std.mem.eql(u8, rs, launch_preflight.reason_not_executable)))
+                    return "terminal_launch_preflight_reason must be missing_executable or not_executable when terminal_launch_preflight_ok is false";
+            }
+        },
+        .null => {
+            switch (tlpr_o) {
+                .null => {},
+                .string => |s| {
+                    if (!std.mem.eql(u8, s, launch_preflight.reason_na)) return "terminal_launch_preflight_reason must be null or na when terminal_launch_preflight_ok is null";
+                },
+                else => return "terminal_launch_preflight_reason must be null or na when terminal_launch_preflight_ok is null",
+            }
+        },
+        else => unreachable,
+    }
+    switch (terp_o) {
+        .null => {
+            if (ternorm_o != .null) return "terminal_exec_resolved_path_normalization must be null when terminal_exec_resolved_path is null";
+        },
+        .string => {
+            if (ternorm_o == .null) return "terminal_exec_resolved_path_normalization must be set when terminal_exec_resolved_path is set";
+        },
+        else => unreachable,
+    }
+
     const term_o = obj.get("terminal") orelse return "missing terminal object";
     const term_obj = switch (term_o) {
         .object => |t| t,
@@ -649,6 +689,15 @@ test "validateRunReport rejects terminal_exec_template_version when id is null" 
 test "validateRunReport rejects invalid terminal_launch_preflight_reason tag" {
     const text =
         \\{"schema_version":"0.2","run_id":"run-001","started_at":"","ended_at":"","platform":"linux","term":"xterm","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","terminal_profile_id":null,"terminal_cmd_source":"fallback","resolved_terminal_cmd":"","resolved_terminal_argv":[],"terminal_exec_template_id":null,"terminal_exec_template_version":null,"terminal_exec_resolved_path":null,"terminal_exec_resolved_path_normalization":null,"terminal_launch_preflight_ok":true,"terminal_launch_preflight_reason":"bogus","host_identity_machine":"x86_64","host_identity_release":"6.0.0","host_identity_sysname":"Linux","run_fingerprint_digest":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","run_fingerprint_version":"1","specset_fingerprint_digest":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc","specset_fingerprint_version":"1","resultset_fingerprint_digest":"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd","resultset_fingerprint_version":"1","transport_fingerprint_digest":"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee","transport_fingerprint_version":"2","exec_summary_fingerprint_digest":"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff","exec_summary_fingerprint_version":"1","context_summary_fingerprint_digest":"1111111111111111111111111111111111111111111111111111111111111111","context_summary_fingerprint_version":"1","metadata_envelope_fingerprint_digest":"2222222222222222222222222222222222222222222222222222222222222222","metadata_envelope_fingerprint_version":"1","artifact_bundle_fingerprint_digest":"3333333333333333333333333333333333333333333333333333333333333333","artifact_bundle_fingerprint_version":"1","report_envelope_fingerprint_digest":"4444444444444444444444444444444444444444444444444444444444444444","report_envelope_fingerprint_version":"1","compare_envelope_fingerprint_digest":"5555555555555555555555555555555555555555555555555555555555555555","compare_envelope_fingerprint_version":"1","run_envelope_fingerprint_digest":"6666666666666666666666666666666666666666666666666666666666666666","run_envelope_fingerprint_version":"1","session_envelope_fingerprint_digest":"7777777777777777777777777777777777777777777777777777777777777777","session_envelope_fingerprint_version":"1","environment_envelope_fingerprint_digest":"8888888888888888888888888888888888888888888888888888888888888888","environment_envelope_fingerprint_version":"1","artifact_manifest_fingerprint_digest":"9999999999999999999999999999999999999999999999999999999999999999","artifact_manifest_fingerprint_version":"1","provenance_envelope_fingerprint_digest":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","provenance_envelope_fingerprint_version":"1","integrity_envelope_fingerprint_digest":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","integrity_envelope_fingerprint_version":"1","consistency_envelope_fingerprint_digest":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc","consistency_envelope_fingerprint_version":"1","trace_envelope_fingerprint_digest":"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","trace_envelope_fingerprint_version":"1","lineage_envelope_fingerprint_digest":"00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff","lineage_envelope_fingerprint_version":"1","state_envelope_fingerprint_digest":"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee","state_envelope_fingerprint_version":"1","transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":30000},"results":[{"spec_id":"p","status":"manual","notes":"","capture_mode":"manual","observations":{}}]}
+    ;
+    const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
+    defer parsed.deinit();
+    try std.testing.expect(validateRunReport(parsed.value) != null);
+}
+
+test "validateRunReport rejects preflight ok true with non-ok reason" {
+    const text =
+        \\{"schema_version":"0.2","run_id":"run-001","started_at":"","ended_at":"","platform":"linux","term":"xterm","terminal":{"name":"t","version":""},"suite":null,"comparison_id":null,"run_group":null,"execution_mode":"placeholder","terminal_profile_id":null,"terminal_cmd_source":"fallback","resolved_terminal_cmd":"","resolved_terminal_argv":[],"terminal_exec_template_id":null,"terminal_exec_template_version":null,"terminal_exec_resolved_path":null,"terminal_exec_resolved_path_normalization":null,"terminal_launch_preflight_ok":true,"terminal_launch_preflight_reason":"missing_executable","host_identity_machine":"x86_64","host_identity_release":"6.0.0","host_identity_sysname":"Linux","run_fingerprint_digest":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","run_fingerprint_version":"1","specset_fingerprint_digest":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc","specset_fingerprint_version":"1","resultset_fingerprint_digest":"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd","resultset_fingerprint_version":"1","transport_fingerprint_digest":"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee","transport_fingerprint_version":"2","exec_summary_fingerprint_digest":"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff","exec_summary_fingerprint_version":"1","context_summary_fingerprint_digest":"1111111111111111111111111111111111111111111111111111111111111111","context_summary_fingerprint_version":"1","metadata_envelope_fingerprint_digest":"2222222222222222222222222222222222222222222222222222222222222222","metadata_envelope_fingerprint_version":"1","artifact_bundle_fingerprint_digest":"3333333333333333333333333333333333333333333333333333333333333333","artifact_bundle_fingerprint_version":"1","report_envelope_fingerprint_digest":"4444444444444444444444444444444444444444444444444444444444444444","report_envelope_fingerprint_version":"1","compare_envelope_fingerprint_digest":"5555555555555555555555555555555555555555555555555555555555555555","compare_envelope_fingerprint_version":"1","run_envelope_fingerprint_digest":"6666666666666666666666666666666666666666666666666666666666666666","run_envelope_fingerprint_version":"1","session_envelope_fingerprint_digest":"7777777777777777777777777777777777777777777777777777777777777777","session_envelope_fingerprint_version":"1","environment_envelope_fingerprint_digest":"8888888888888888888888888888888888888888888888888888888888888888","environment_envelope_fingerprint_version":"1","artifact_manifest_fingerprint_digest":"9999999999999999999999999999999999999999999999999999999999999999","artifact_manifest_fingerprint_version":"1","provenance_envelope_fingerprint_digest":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","provenance_envelope_fingerprint_version":"1","integrity_envelope_fingerprint_digest":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","integrity_envelope_fingerprint_version":"1","consistency_envelope_fingerprint_digest":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc","consistency_envelope_fingerprint_version":"1","trace_envelope_fingerprint_digest":"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","trace_envelope_fingerprint_version":"1","lineage_envelope_fingerprint_digest":"00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff","lineage_envelope_fingerprint_version":"1","state_envelope_fingerprint_digest":"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee","state_envelope_fingerprint_version":"1","transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":30000},"results":[{"spec_id":"p","status":"manual","notes":"","capture_mode":"manual","observations":{}}]}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
