@@ -231,6 +231,72 @@ test "writeFile includes terminal_exec_template_version in metadata_deltas" {
     try std.testing.expect(std.mem.indexOf(u8, text, "\"delta\": \"changed\"") != null);
 }
 
+test "writeFile includes terminal_exec_resolved_path in metadata_deltas" {
+    var tmp = std.testing.tmpDir(.{});
+    defer tmp.cleanup();
+
+    const path = try std.fmt.allocPrint(std.testing.allocator, ".zig-cache/tmp/{s}/compare-exec-resolved.json", .{tmp.sub_path[0..]});
+    defer std.testing.allocator.free(path);
+
+    const rows: []const run_json.DiffRow = &.{};
+    const meta = run_json.diffRunMeta(
+        .{ .terminal_exec_resolved_path = "/bin/foo" },
+        .{ .terminal_exec_resolved_path = "/bin/bar" },
+    );
+
+    try writeFile(std.testing.allocator, path, rows, "a/run.json", "b/run.json", &meta);
+
+    const text = try std.fs.cwd().readFileAlloc(std.testing.allocator, path, 1 << 20);
+    defer std.testing.allocator.free(text);
+
+    try std.testing.expect(std.mem.indexOf(u8, text, "\"field\": \"terminal_exec_resolved_path\"") != null);
+    try std.testing.expect(std.mem.indexOf(u8, text, "\"delta\": \"changed\"") != null);
+}
+
+test "writeFile includes terminal_launch_preflight_ok in metadata_deltas" {
+    var tmp = std.testing.tmpDir(.{});
+    defer tmp.cleanup();
+
+    const path = try std.fmt.allocPrint(std.testing.allocator, ".zig-cache/tmp/{s}/compare-preflight-ok.json", .{tmp.sub_path[0..]});
+    defer std.testing.allocator.free(path);
+
+    const rows: []const run_json.DiffRow = &.{};
+    const meta = run_json.diffRunMeta(
+        .{ .terminal_launch_preflight_ok = "true" },
+        .{ .terminal_launch_preflight_ok = "false" },
+    );
+
+    try writeFile(std.testing.allocator, path, rows, "a/run.json", "b/run.json", &meta);
+
+    const text = try std.fs.cwd().readFileAlloc(std.testing.allocator, path, 1 << 20);
+    defer std.testing.allocator.free(text);
+
+    try std.testing.expect(std.mem.indexOf(u8, text, "\"field\": \"terminal_launch_preflight_ok\"") != null);
+    try std.testing.expect(std.mem.indexOf(u8, text, "\"delta\": \"changed\"") != null);
+}
+
+test "writeFile includes terminal_launch_preflight_reason in metadata_deltas" {
+    var tmp = std.testing.tmpDir(.{});
+    defer tmp.cleanup();
+
+    const path = try std.fmt.allocPrint(std.testing.allocator, ".zig-cache/tmp/{s}/compare-preflight-reason.json", .{tmp.sub_path[0..]});
+    defer std.testing.allocator.free(path);
+
+    const rows: []const run_json.DiffRow = &.{};
+    const meta = run_json.diffRunMeta(
+        .{ .terminal_launch_preflight_reason = "ok" },
+        .{ .terminal_launch_preflight_reason = "missing_executable" },
+    );
+
+    try writeFile(std.testing.allocator, path, rows, "a/run.json", "b/run.json", &meta);
+
+    const text = try std.fs.cwd().readFileAlloc(std.testing.allocator, path, 1 << 20);
+    defer std.testing.allocator.free(text);
+
+    try std.testing.expect(std.mem.indexOf(u8, text, "\"field\": \"terminal_launch_preflight_reason\"") != null);
+    try std.testing.expect(std.mem.indexOf(u8, text, "\"delta\": \"changed\"") != null);
+}
+
 test "writeFile includes resultset_fingerprint_digest in metadata_deltas" {
     var tmp = std.testing.tmpDir(.{});
     defer tmp.cleanup();
