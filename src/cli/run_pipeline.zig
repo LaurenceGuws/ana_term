@@ -19,6 +19,7 @@ const artifact_bundle_fingerprint = @import("../report/artifact_bundle_fingerpri
 const report_envelope_fingerprint = @import("../report/report_envelope_fingerprint.zig");
 const compare_envelope_fingerprint = @import("../report/compare_envelope_fingerprint.zig");
 const run_envelope_fingerprint = @import("../report/run_envelope_fingerprint.zig");
+const session_envelope_fingerprint = @import("../report/session_envelope_fingerprint.zig");
 const markdown_writer = @import("../report/markdown_writer.zig");
 const env_writer = @import("../report/env_writer.zig");
 const RunContext = @import("run_context.zig").RunContext;
@@ -116,6 +117,7 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
     report_envelope_fingerprint.populate(&ctx, allocator) catch return errors.Category.runtime_failure.exitCode();
     compare_envelope_fingerprint.populate(&ctx, allocator) catch return errors.Category.runtime_failure.exitCode();
     run_envelope_fingerprint.populate(&ctx, allocator) catch return errors.Category.runtime_failure.exitCode();
+    session_envelope_fingerprint.populate(&ctx, allocator) catch return errors.Category.runtime_failure.exitCode();
     json_writer.writeRun(allocator, run_dir, run_id, records.items, ctx) catch return errors.Category.runtime_failure.exitCode();
     markdown_writer.writeRunSummary(allocator, run_dir, run_id, records.items, ctx) catch return errors.Category.runtime_failure.exitCode();
     env_writer.writeEnvJson(allocator, run_dir, ctx) catch return errors.Category.runtime_failure.exitCode();
