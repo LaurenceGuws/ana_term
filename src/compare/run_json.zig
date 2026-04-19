@@ -549,6 +549,14 @@ test "diffRunMeta detects pty_experiment_open_ok mismatch" {
     try std.testing.expectEqualStrings("changed", rows[14].delta);
 }
 
+test "diffRunMeta detects terminal_launch_ok mismatch" {
+    const left = RunMeta{ .terminal_launch_ok = "true" };
+    const right = RunMeta{ .terminal_launch_ok = "false" };
+    const rows = diffRunMeta(left, right);
+    try std.testing.expectEqualStrings("terminal_launch_ok", rows[19].field);
+    try std.testing.expectEqualStrings("changed", rows[19].delta);
+}
+
 test "diffRunMeta detects guarded_state mismatch" {
     const left = RunMeta{ .guarded_state = "na" };
     const right = RunMeta{ .guarded_state = "scaffold_only" };
