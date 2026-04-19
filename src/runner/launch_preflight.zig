@@ -1,6 +1,7 @@
 //! PH1-M35: deterministic argv[0] availability before bounded terminal launch (see `docs/LAUNCH_PREFLIGHT_PLAN.md`).
 
 const std = @import("std");
+const posix = std.posix;
 
 /// Preflight not applicable (wrong OS, empty probe, or harness path that skips preflight).
 pub const reason_na = "na";
@@ -23,3 +24,110 @@ pub const Probe = struct {
         return self.resolved_path_buf[0..self.resolved_path_len];
     }
 };
+
+fn copyResolvedPath(p: *Probe, path: []const u8) void {
+    const n = @min(path.len, p.resolved_path_buf.len);
+    @memcpy(p.resolved_path_buf[0..n], path[0..n]);
+    p.resolved_path_len = @intCast(n);
+}
+
+fn finishFromOpenedFile(file: std.fs.File, path: []const u8) Probe {
+    defer file.close();
+    const st = file.stat() catch {
+        return .{ .ok = false, .reason = reason_missing_executable };
+    };
+    if (st.kind != .file) {
+        return .{ .ok = false, .reason = reason_not_executable };
+    }
+    posix.access(path, posix.X_OK) catch {
+        return .{ .ok = false, .reason = reason_not_executable };
+    };
+    var p = Probe{ .ok = true, .reason = reason_ok };
+    copyResolvedPath(&p, path);
+    return p;
+}
+
+/// Linux: resolve **`argv[0]`** against **`PATH`** (bare name) or treat **`/`** paths as explicit. Other OS: **`reason_na`**.
+pub fn probeArgv0ExecutableLinux(argv0: []const u8) Probe {
+    const builtin = @import("builtin");
+    if (builtin.target.os.tag != .linux) {
+        return .{ .ok = false, .reason = reason_na };
+    }
+    if (argv0.len == 0) {
+        return .{ .ok = false, .reason = reason_missing_executable };
+    }
+
+    if (std.mem.indexOfScalar(u8, argv0, '/')) |_| {
+        const file = std.fs.cwd().openFile(argv0, .{}) catch {
+            return .{ .ok = false, .reason = reason_missing_executable };
+        };
+        return finishFromOpenedFile(file, argv0);
+    }
+
+    const path_env = posix.getenv("PATH") orelse "";
+    var it = std.mem.tokenizeScalar(u8, path_env, ':');
+    var cand_buf: [4096]u8 = undefined;
+    while (it.next()) |dir| {
+        if (dir.len == 0) continue;
+        const written = std.fmt.bufPrint(&cand_buf, "{s}/{s}", .{ dir, argv0 }) catch continue;
+        const file = std.fs.cwd().openFile(written, .{}) catch {
+            continue;
+        };
+        const r = finishFromOpenedFile(file, written);
+        if (r.ok) return r;
+        if (std.mem.eql(u8, r.reason, reason_not_executable)) return r;
+    }
+
+    return .{ .ok = false, .reason = reason_missing_executable };
+}
+
+test "probeArgv0ExecutableLinux finds /bin/true" {
+    const builtin = @import("builtin");
+    if (builtin.target.os.tag != .linux) return error.SkipZigTest;
+
+    const p = probeArgv0ExecutableLinux("/bin/true");
+    try std.testing.expect(p.ok);
+    try std.testing.expectEqualStrings(reason_ok, p.reason);
+    try std.testing.expectEqualStrings("/bin/true", p.resolvedPathSlice().?);
+}
+
+test "probeArgv0ExecutableLinux bare true uses PATH" {
+    const builtin = @import("builtin");
+    if (builtin.target.os.tag != .linux) return error.SkipZigTest;
+
+    const p = probeArgv0ExecutableLinux("true");
+    try std.testing.expect(p.ok);
+    try std.testing.expectEqualStrings(reason_ok, p.reason);
+    try std.testing.expect(std.mem.endsWith(u8, p.resolvedPathSlice().?, "/true"));
+}
+
+test "probeArgv0ExecutableLinux missing basename" {
+    const builtin = @import("builtin");
+    if (builtin.target.os.tag != .linux) return error.SkipZigTest;
+
+    const p = probeArgv0ExecutableLinux("no_such_binary_ana_term_m35_xyz");
+    try std.testing.expect(!p.ok);
+    try std.testing.expectEqualStrings(reason_missing_executable, p.reason);
+}
+
+test "probeArgv0ExecutableLinux non-executable regular file" {
+    const builtin = @import("builtin");
+    if (builtin.target.os.tag != .linux) return error.SkipZigTest;
+
+    var tmp = std.testing.tmpDir(.{});
+    defer tmp.cleanup();
+
+    {
+        var f = try tmp.dir.createFile("not-exec.sh", .{ .truncate = true });
+        defer f.close();
+        try f.writeAll("#!/bin/sh\necho hi\n");
+        try f.chmod(@as(std.fs.File.Mode, 0o644));
+    }
+
+    const path = try std.fmt.allocPrint(std.testing.allocator, ".zig-cache/tmp/{s}/not-exec.sh", .{tmp.sub_path[0..]});
+    defer std.testing.allocator.free(path);
+
+    const p = probeArgv0ExecutableLinux(path);
+    try std.testing.expect(!p.ok);
+    try std.testing.expectEqualStrings(reason_not_executable, p.reason);
+}
