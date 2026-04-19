@@ -16,6 +16,7 @@ test {
     _ = @import("report/session_envelope_fingerprint.zig");
     _ = @import("report/environment_envelope_fingerprint.zig");
     _ = @import("report/artifact_manifest_fingerprint.zig");
+    _ = @import("report/provenance_envelope_fingerprint.zig");
     _ = @import("report/run_json_validate.zig");
     _ = @import("compare/run_json.zig");
     _ = @import("compare/compare_json.zig");
