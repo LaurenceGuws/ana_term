@@ -112,9 +112,8 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
             }
             const probe = launch_preflight.probeArgv0ExecutableLinux(launch_argv[0]);
             launch_preflight.applyProbeToContext(&ctx, &probe);
-            const block_launch = !probe.ok and
-                (std.mem.eql(u8, probe.reason, launch_preflight.reason_missing_executable) or
-                std.mem.eql(u8, probe.reason, launch_preflight.reason_not_executable));
+            // PH1-M36: fail-closed for any unsuccessful probe on the guarded argv path (reason fidelity).
+            const block_launch = !probe.ok;
             if (block_launch) {
                 launch_preflight_failed = true;
             } else if (probe.ok) {
