@@ -114,6 +114,29 @@ pub fn writeRun(
     try buf.appendSlice(allocator, ",\n  \"resolved_terminal_cmd\": ");
     try appendJsonEncodedString(allocator, &buf, ctx.terminal_cmd);
 
+    try buf.appendSlice(allocator, ",\n  \"resolved_terminal_argv\": [");
+    {
+        var i: usize = 0;
+        while (i < @as(usize, ctx.terminal_exec_argc)) : (i += 1) {
+            if (i > 0) try buf.appendSlice(allocator, ", ");
+            try appendJsonEncodedString(allocator, &buf, ctx.terminal_exec_argv_flat[i][0..ctx.terminal_exec_argv_lens[i]]);
+        }
+    }
+    try buf.appendSlice(allocator, "]");
+
+    if (ctx.terminal_exec_template_id_len == 0) {
+        try buf.appendSlice(allocator, ",\n  \"terminal_exec_template_id\": null");
+    } else {
+        try buf.appendSlice(allocator, ",\n  \"terminal_exec_template_id\": ");
+        try appendJsonEncodedString(allocator, &buf, ctx.terminal_exec_template_id_buf[0..ctx.terminal_exec_template_id_len]);
+    }
+    if (ctx.terminal_exec_template_id_len == 0) {
+        try buf.appendSlice(allocator, ",\n  \"terminal_exec_template_version\": null");
+    } else {
+        try buf.appendSlice(allocator, ",\n  \"terminal_exec_template_version\": ");
+        try appendJsonEncodedString(allocator, &buf, ctx.terminal_exec_template_version_buf[0..ctx.terminal_exec_template_version_len]);
+    }
+
     try buf.appendSlice(allocator, ",\n  \"host_identity_machine\": ");
     try appendJsonEncodedString(allocator, &buf, ctx.host_identity_machine[0..ctx.host_identity_machine_len]);
     try buf.appendSlice(allocator, ",\n  \"host_identity_release\": ");

@@ -41,6 +41,20 @@ pub fn writeRunSummary(
     if (ctx.terminal_cmd.len > 0) {
         try buf.print(allocator, "- resolved_terminal_cmd: `{s}`\n", .{ctx.terminal_cmd});
     }
+    if (ctx.terminal_exec_argc > 0) {
+        try buf.appendSlice(allocator, "- resolved_terminal_argv:");
+        var i: usize = 0;
+        while (i < @as(usize, ctx.terminal_exec_argc)) : (i += 1) {
+            try buf.appendSlice(allocator, " `");
+            try buf.appendSlice(allocator, ctx.terminal_exec_argv_flat[i][0..ctx.terminal_exec_argv_lens[i]]);
+            try buf.appendSlice(allocator, "`");
+        }
+        try buf.appendSlice(allocator, "\n");
+    }
+    if (ctx.terminal_exec_template_id_len > 0) {
+        try buf.print(allocator, "- terminal_exec_template_id: {s}\n", .{ctx.terminal_exec_template_id_buf[0..ctx.terminal_exec_template_id_len]});
+        try buf.print(allocator, "- terminal_exec_template_version: {s}\n", .{ctx.terminal_exec_template_version_buf[0..ctx.terminal_exec_template_version_len]});
+    }
     if (ctx.suite_name) |s| {
         try buf.print(allocator, "- suite: {s}\n", .{s});
     } else {
