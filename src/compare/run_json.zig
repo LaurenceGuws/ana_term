@@ -60,6 +60,11 @@ pub const RunMeta = struct {
     pty_experiment_host_machine: ?[]const u8 = null,
     pty_experiment_host_release: ?[]const u8 = null,
     pty_experiment_open_ok: ?[]const u8 = null,
+    terminal_launch_attempt: ?[]const u8 = null,
+    terminal_launch_elapsed_ns: ?[]const u8 = null,
+    terminal_launch_error: ?[]const u8 = null,
+    terminal_launch_exit_code: ?[]const u8 = null,
+    terminal_launch_ok: ?[]const u8 = null,
     transport_handshake: ?[]const u8 = null,
     transport_handshake_latency_ns: ?[]const u8 = null,
     transport_mode: ?[]const u8 = null,
@@ -148,6 +153,11 @@ pub fn parseRunMeta(allocator: std.mem.Allocator, root: std.json.Value) !RunMeta
             m.pty_experiment_host_machine = readOptStringOrNull(tr, "pty_experiment_host_machine");
             m.pty_experiment_host_release = readOptStringOrNull(tr, "pty_experiment_host_release");
             m.pty_experiment_open_ok = try readOptBoolString(allocator, tr, "pty_experiment_open_ok");
+            m.terminal_launch_attempt = try readOptNumberStringOrNull(allocator, tr, "terminal_launch_attempt");
+            m.terminal_launch_elapsed_ns = try readOptNumberStringOrNull(allocator, tr, "terminal_launch_elapsed_ns");
+            m.terminal_launch_error = readOptStringOrNull(tr, "terminal_launch_error");
+            m.terminal_launch_exit_code = try readOptNumberStringOrNull(allocator, tr, "terminal_launch_exit_code");
+            m.terminal_launch_ok = try readOptBoolString(allocator, tr, "terminal_launch_ok");
             m.transport_handshake = readHandshakeField(tr);
             m.transport_timeout_ms = try readOptNumberString(allocator, tr, "timeout_ms");
             m.transport_handshake_latency_ns = try readOptNumberString(allocator, tr, "handshake_latency_ns");
@@ -221,7 +231,7 @@ fn metaDelta(l: ?[]const u8, r: ?[]const u8) []const u8 {
 }
 
 /// Fixed field order for deterministic compare output.
-pub fn diffRunMeta(left: RunMeta, right: RunMeta) [63]MetaDiffRow {
+pub fn diffRunMeta(left: RunMeta, right: RunMeta) [68]MetaDiffRow {
     return .{
         .{ .field = "comparison_id", .left = left.comparison_id, .right = right.comparison_id, .delta = metaDelta(left.comparison_id, right.comparison_id) },
         .{ .field = "execution_mode", .left = left.execution_mode, .right = right.execution_mode, .delta = metaDelta(left.execution_mode, right.execution_mode) },
@@ -238,6 +248,11 @@ pub fn diffRunMeta(left: RunMeta, right: RunMeta) [63]MetaDiffRow {
         .{ .field = "pty_experiment_host_machine", .left = left.pty_experiment_host_machine, .right = right.pty_experiment_host_machine, .delta = metaDelta(left.pty_experiment_host_machine, right.pty_experiment_host_machine) },
         .{ .field = "pty_experiment_host_release", .left = left.pty_experiment_host_release, .right = right.pty_experiment_host_release, .delta = metaDelta(left.pty_experiment_host_release, right.pty_experiment_host_release) },
         .{ .field = "pty_experiment_open_ok", .left = left.pty_experiment_open_ok, .right = right.pty_experiment_open_ok, .delta = metaDelta(left.pty_experiment_open_ok, right.pty_experiment_open_ok) },
+        .{ .field = "terminal_launch_attempt", .left = left.terminal_launch_attempt, .right = right.terminal_launch_attempt, .delta = metaDelta(left.terminal_launch_attempt, right.terminal_launch_attempt) },
+        .{ .field = "terminal_launch_elapsed_ns", .left = left.terminal_launch_elapsed_ns, .right = right.terminal_launch_elapsed_ns, .delta = metaDelta(left.terminal_launch_elapsed_ns, right.terminal_launch_elapsed_ns) },
+        .{ .field = "terminal_launch_error", .left = left.terminal_launch_error, .right = right.terminal_launch_error, .delta = metaDelta(left.terminal_launch_error, right.terminal_launch_error) },
+        .{ .field = "terminal_launch_exit_code", .left = left.terminal_launch_exit_code, .right = right.terminal_launch_exit_code, .delta = metaDelta(left.terminal_launch_exit_code, right.terminal_launch_exit_code) },
+        .{ .field = "terminal_launch_ok", .left = left.terminal_launch_ok, .right = right.terminal_launch_ok, .delta = metaDelta(left.terminal_launch_ok, right.terminal_launch_ok) },
         .{ .field = "run_fingerprint_digest", .left = left.run_fingerprint_digest, .right = right.run_fingerprint_digest, .delta = metaDelta(left.run_fingerprint_digest, right.run_fingerprint_digest) },
         .{ .field = "run_fingerprint_version", .left = left.run_fingerprint_version, .right = right.run_fingerprint_version, .delta = metaDelta(left.run_fingerprint_version, right.run_fingerprint_version) },
         .{ .field = "specset_fingerprint_digest", .left = left.specset_fingerprint_digest, .right = right.specset_fingerprint_digest, .delta = metaDelta(left.specset_fingerprint_digest, right.specset_fingerprint_digest) },
@@ -522,8 +537,8 @@ test "diffRunMeta detects transport_mode mismatch" {
     const left = RunMeta{ .transport_mode = "none" };
     const right = RunMeta{ .transport_mode = "pty_stub" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("transport_mode", rows[61].field);
-    try std.testing.expectEqualStrings("changed", rows[61].delta);
+    try std.testing.expectEqualStrings("transport_mode", rows[66].field);
+    try std.testing.expectEqualStrings("changed", rows[66].delta);
 }
 
 test "diffRunMeta detects pty_experiment_open_ok mismatch" {
@@ -562,160 +577,160 @@ test "diffRunMeta detects run_fingerprint_digest mismatch" {
     const left = RunMeta{ .run_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
     const right = RunMeta{ .run_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("run_fingerprint_digest", rows[15].field);
-    try std.testing.expectEqualStrings("changed", rows[15].delta);
+    try std.testing.expectEqualStrings("run_fingerprint_digest", rows[20].field);
+    try std.testing.expectEqualStrings("changed", rows[20].delta);
 }
 
 test "diffRunMeta detects specset_fingerprint_digest mismatch" {
     const left = RunMeta{ .specset_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
     const right = RunMeta{ .specset_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("specset_fingerprint_digest", rows[17].field);
-    try std.testing.expectEqualStrings("changed", rows[17].delta);
+    try std.testing.expectEqualStrings("specset_fingerprint_digest", rows[22].field);
+    try std.testing.expectEqualStrings("changed", rows[22].delta);
 }
 
 test "diffRunMeta detects resultset_fingerprint_digest mismatch" {
     const left = RunMeta{ .resultset_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
     const right = RunMeta{ .resultset_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("resultset_fingerprint_digest", rows[19].field);
-    try std.testing.expectEqualStrings("changed", rows[19].delta);
+    try std.testing.expectEqualStrings("resultset_fingerprint_digest", rows[24].field);
+    try std.testing.expectEqualStrings("changed", rows[24].delta);
 }
 
 test "diffRunMeta detects transport_fingerprint_digest mismatch" {
     const left = RunMeta{ .transport_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
     const right = RunMeta{ .transport_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("transport_fingerprint_digest", rows[21].field);
-    try std.testing.expectEqualStrings("changed", rows[21].delta);
+    try std.testing.expectEqualStrings("transport_fingerprint_digest", rows[26].field);
+    try std.testing.expectEqualStrings("changed", rows[26].delta);
 }
 
 test "diffRunMeta detects exec_summary_fingerprint_digest mismatch" {
     const left = RunMeta{ .exec_summary_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
     const right = RunMeta{ .exec_summary_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("exec_summary_fingerprint_digest", rows[23].field);
-    try std.testing.expectEqualStrings("changed", rows[23].delta);
+    try std.testing.expectEqualStrings("exec_summary_fingerprint_digest", rows[28].field);
+    try std.testing.expectEqualStrings("changed", rows[28].delta);
 }
 
 test "diffRunMeta detects context_summary_fingerprint_digest mismatch" {
     const left = RunMeta{ .context_summary_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
     const right = RunMeta{ .context_summary_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("context_summary_fingerprint_digest", rows[25].field);
-    try std.testing.expectEqualStrings("changed", rows[25].delta);
+    try std.testing.expectEqualStrings("context_summary_fingerprint_digest", rows[30].field);
+    try std.testing.expectEqualStrings("changed", rows[30].delta);
 }
 
 test "diffRunMeta detects metadata_envelope_fingerprint_digest mismatch" {
     const left = RunMeta{ .metadata_envelope_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
     const right = RunMeta{ .metadata_envelope_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("metadata_envelope_fingerprint_digest", rows[27].field);
-    try std.testing.expectEqualStrings("changed", rows[27].delta);
+    try std.testing.expectEqualStrings("metadata_envelope_fingerprint_digest", rows[32].field);
+    try std.testing.expectEqualStrings("changed", rows[32].delta);
 }
 
 test "diffRunMeta detects artifact_bundle_fingerprint_digest mismatch" {
     const left = RunMeta{ .artifact_bundle_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
     const right = RunMeta{ .artifact_bundle_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("artifact_bundle_fingerprint_digest", rows[29].field);
-    try std.testing.expectEqualStrings("changed", rows[29].delta);
+    try std.testing.expectEqualStrings("artifact_bundle_fingerprint_digest", rows[34].field);
+    try std.testing.expectEqualStrings("changed", rows[34].delta);
 }
 
 test "diffRunMeta detects report_envelope_fingerprint_digest mismatch" {
     const left = RunMeta{ .report_envelope_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
     const right = RunMeta{ .report_envelope_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("report_envelope_fingerprint_digest", rows[31].field);
-    try std.testing.expectEqualStrings("changed", rows[31].delta);
+    try std.testing.expectEqualStrings("report_envelope_fingerprint_digest", rows[36].field);
+    try std.testing.expectEqualStrings("changed", rows[36].delta);
 }
 
 test "diffRunMeta detects compare_envelope_fingerprint_digest mismatch" {
     const left = RunMeta{ .compare_envelope_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
     const right = RunMeta{ .compare_envelope_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("compare_envelope_fingerprint_digest", rows[33].field);
-    try std.testing.expectEqualStrings("changed", rows[33].delta);
+    try std.testing.expectEqualStrings("compare_envelope_fingerprint_digest", rows[38].field);
+    try std.testing.expectEqualStrings("changed", rows[38].delta);
 }
 
 test "diffRunMeta detects run_envelope_fingerprint_digest mismatch" {
     const left = RunMeta{ .run_envelope_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
     const right = RunMeta{ .run_envelope_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("run_envelope_fingerprint_digest", rows[35].field);
-    try std.testing.expectEqualStrings("changed", rows[35].delta);
+    try std.testing.expectEqualStrings("run_envelope_fingerprint_digest", rows[40].field);
+    try std.testing.expectEqualStrings("changed", rows[40].delta);
 }
 
 test "diffRunMeta detects session_envelope_fingerprint_digest mismatch" {
     const left = RunMeta{ .session_envelope_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
     const right = RunMeta{ .session_envelope_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("session_envelope_fingerprint_digest", rows[37].field);
-    try std.testing.expectEqualStrings("changed", rows[37].delta);
+    try std.testing.expectEqualStrings("session_envelope_fingerprint_digest", rows[42].field);
+    try std.testing.expectEqualStrings("changed", rows[42].delta);
 }
 
 test "diffRunMeta detects environment_envelope_fingerprint_digest mismatch" {
     const left = RunMeta{ .environment_envelope_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
     const right = RunMeta{ .environment_envelope_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("environment_envelope_fingerprint_digest", rows[39].field);
-    try std.testing.expectEqualStrings("changed", rows[39].delta);
+    try std.testing.expectEqualStrings("environment_envelope_fingerprint_digest", rows[44].field);
+    try std.testing.expectEqualStrings("changed", rows[44].delta);
 }
 
 test "diffRunMeta detects artifact_manifest_fingerprint_digest mismatch" {
     const left = RunMeta{ .artifact_manifest_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
     const right = RunMeta{ .artifact_manifest_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("artifact_manifest_fingerprint_digest", rows[41].field);
-    try std.testing.expectEqualStrings("changed", rows[41].delta);
+    try std.testing.expectEqualStrings("artifact_manifest_fingerprint_digest", rows[46].field);
+    try std.testing.expectEqualStrings("changed", rows[46].delta);
 }
 
 test "diffRunMeta detects provenance_envelope_fingerprint_digest mismatch" {
     const left = RunMeta{ .provenance_envelope_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
     const right = RunMeta{ .provenance_envelope_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("provenance_envelope_fingerprint_digest", rows[43].field);
-    try std.testing.expectEqualStrings("changed", rows[43].delta);
+    try std.testing.expectEqualStrings("provenance_envelope_fingerprint_digest", rows[48].field);
+    try std.testing.expectEqualStrings("changed", rows[48].delta);
 }
 
 test "diffRunMeta detects integrity_envelope_fingerprint_digest mismatch" {
     const left = RunMeta{ .integrity_envelope_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
     const right = RunMeta{ .integrity_envelope_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("integrity_envelope_fingerprint_digest", rows[45].field);
-    try std.testing.expectEqualStrings("changed", rows[45].delta);
+    try std.testing.expectEqualStrings("integrity_envelope_fingerprint_digest", rows[50].field);
+    try std.testing.expectEqualStrings("changed", rows[50].delta);
 }
 
 test "diffRunMeta detects consistency_envelope_fingerprint_digest mismatch" {
     const left = RunMeta{ .consistency_envelope_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
     const right = RunMeta{ .consistency_envelope_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("consistency_envelope_fingerprint_digest", rows[47].field);
-    try std.testing.expectEqualStrings("changed", rows[47].delta);
+    try std.testing.expectEqualStrings("consistency_envelope_fingerprint_digest", rows[52].field);
+    try std.testing.expectEqualStrings("changed", rows[52].delta);
 }
 
 test "diffRunMeta detects trace_envelope_fingerprint_digest mismatch" {
     const left = RunMeta{ .trace_envelope_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
     const right = RunMeta{ .trace_envelope_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("trace_envelope_fingerprint_digest", rows[49].field);
-    try std.testing.expectEqualStrings("changed", rows[49].delta);
+    try std.testing.expectEqualStrings("trace_envelope_fingerprint_digest", rows[54].field);
+    try std.testing.expectEqualStrings("changed", rows[54].delta);
 }
 
 test "diffRunMeta detects lineage_envelope_fingerprint_digest mismatch" {
     const left = RunMeta{ .lineage_envelope_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
     const right = RunMeta{ .lineage_envelope_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("lineage_envelope_fingerprint_digest", rows[51].field);
-    try std.testing.expectEqualStrings("changed", rows[51].delta);
+    try std.testing.expectEqualStrings("lineage_envelope_fingerprint_digest", rows[56].field);
+    try std.testing.expectEqualStrings("changed", rows[56].delta);
 }
 
 test "diffRunMeta detects state_envelope_fingerprint_digest mismatch" {
     const left = RunMeta{ .state_envelope_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
     const right = RunMeta{ .state_envelope_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("state_envelope_fingerprint_digest", rows[53].field);
-    try std.testing.expectEqualStrings("changed", rows[53].delta);
+    try std.testing.expectEqualStrings("state_envelope_fingerprint_digest", rows[58].field);
+    try std.testing.expectEqualStrings("changed", rows[58].delta);
 }
 
 test "parseRunMeta reads root host identity fields" {
@@ -778,7 +793,7 @@ test "parseRunMeta reads PTY experiment telemetry numbers" {
     defer arena.deinit();
     const a = arena.allocator();
     const text =
-        \\{"transport":{"guarded_opt_in":true,"guarded_state":"experiment_linux_pty","handshake":"x","handshake_latency_ns":1,"mode":"pty_guarded","pty_capability_notes":"n","pty_experiment_attempt":1,"pty_experiment_elapsed_ns":99,"pty_experiment_error":null,"pty_experiment_host_machine":"x86_64","pty_experiment_host_release":"6.1.0","pty_experiment_open_ok":true,"timeout_ms":1}}
+        \\{"transport":{"guarded_opt_in":true,"guarded_state":"experiment_linux_pty","handshake":"x","handshake_latency_ns":1,"mode":"pty_guarded","pty_capability_notes":"n","pty_experiment_attempt":1,"pty_experiment_elapsed_ns":99,"pty_experiment_error":null,"pty_experiment_host_machine":"x86_64","pty_experiment_host_release":"6.1.0","pty_experiment_open_ok":true,"terminal_launch_attempt":1,"terminal_launch_elapsed_ns":5,"terminal_launch_error":null,"terminal_launch_exit_code":0,"terminal_launch_ok":true,"timeout_ms":1}}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
@@ -787,6 +802,10 @@ test "parseRunMeta reads PTY experiment telemetry numbers" {
     try std.testing.expectEqualStrings("99", m.pty_experiment_elapsed_ns.?);
     try std.testing.expectEqualStrings("x86_64", m.pty_experiment_host_machine.?);
     try std.testing.expectEqualStrings("6.1.0", m.pty_experiment_host_release.?);
+    try std.testing.expectEqualStrings("1", m.terminal_launch_attempt.?);
+    try std.testing.expectEqualStrings("5", m.terminal_launch_elapsed_ns.?);
+    try std.testing.expectEqualStrings("0", m.terminal_launch_exit_code.?);
+    try std.testing.expectEqualStrings("true", m.terminal_launch_ok.?);
 }
 
 test "parseRunMeta reads null PTY host fields for scaffold_only" {
@@ -794,7 +813,7 @@ test "parseRunMeta reads null PTY host fields for scaffold_only" {
     defer arena.deinit();
     const a = arena.allocator();
     const text =
-        \\{"transport":{"guarded_opt_in":true,"guarded_state":"scaffold_only","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":null,"pty_experiment_attempt":null,"pty_experiment_elapsed_ns":null,"pty_experiment_error":null,"pty_experiment_host_machine":null,"pty_experiment_host_release":null,"pty_experiment_open_ok":null,"timeout_ms":30000}}
+        \\{"transport":{"guarded_opt_in":true,"guarded_state":"scaffold_only","handshake":"guarded-handshake-v1","handshake_latency_ns":99,"mode":"pty_guarded","pty_capability_notes":null,"pty_experiment_attempt":null,"pty_experiment_elapsed_ns":null,"pty_experiment_error":null,"pty_experiment_host_machine":null,"pty_experiment_host_release":null,"pty_experiment_open_ok":null,"terminal_launch_attempt":null,"terminal_launch_elapsed_ns":null,"terminal_launch_error":null,"terminal_launch_exit_code":null,"terminal_launch_ok":null,"timeout_ms":30000}}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
