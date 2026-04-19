@@ -3,7 +3,7 @@
 Sprint: `PH1-M21-S1`  
 Super-gate: `ANA-GATE-230`
 
-Status: **Checkpoint submitted**; pending Architect acceptance at `ANA-GATE-230`.
+Status: **Accepted by Architect** at `ANA-GATE-230`.
 
 ## Ticket commits (strict order, one commit per ticket)
 

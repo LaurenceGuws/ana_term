@@ -717,7 +717,7 @@ Outcome:
 
 - Accepted at `ANA-GATE-220`.
 
-### `PH1-M21` (`review_gate`)
+### `PH1-M21` (`completed`)
 
 Purpose:
 
@@ -759,4 +759,44 @@ Queue lines (exact):
 
 Outcome:
 
-- Pending Architect review at `ANA-GATE-230`.
+- Accepted at `ANA-GATE-230`.
+
+### `PH1-M22` (`in_progress`)
+
+Purpose:
+
+- Improve session-level audit integrity with a deterministic session-envelope fingerprint that composes canonical session-facing metadata into one replay handle.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M22_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- define PH1-M22 session-envelope fingerprint plan and boundaries
+- emit root session-envelope fingerprint fields in `run.json`
+- add report schema invariants and compare metadata coverage for session-envelope fingerprint fields
+- expand regression tests and smoke coverage
+- PH1-M22 checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-2201` through `ANA-2210` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-240` reached and reported.
+
+Non-goals:
+
+- Windows ConPTY implementation
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [ ] Execute `ANA-2201` through `ANA-2210` in order from `docs/todo/PH1_M22_TICKETS.md`.
+- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [ ] Stop only at `ANA-GATE-240` (post `ANA-2210`) unless truly blocked.
+- [ ] Submit checkpoint packet in `docs/todo/PH1_M22_CHECKPOINT.md`.
