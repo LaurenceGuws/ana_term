@@ -27,4 +27,5 @@ test {
     _ = @import("compare/compare_json.zig");
     _ = @import("runner/transport_guard_preflight.zig");
     _ = @import("runner/posix_pty.zig");
+    _ = @import("runner/real_terminal_launch.zig");
 }
