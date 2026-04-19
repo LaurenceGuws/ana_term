@@ -19,6 +19,12 @@ pub const host_identity_sysname_cap: usize = 64;
 pub const terminal_cmd_storage_cap: usize = 1024;
 /// Max bytes for canonical `terminal_profile_id` in artifacts.
 pub const terminal_profile_id_cap: usize = 64;
+/// PH1-M34: max argv slots for bounded terminal launch.
+pub const terminal_exec_argc_max: usize = 16;
+/// PH1-M34: max bytes per argv slot (including NUL not stored).
+pub const terminal_exec_arg_max: usize = 256;
+/// PH1-M34: max bytes for `terminal_exec_template_id` in artifacts.
+pub const terminal_exec_template_id_cap: usize = 64;
 
 pub const RunContext = struct {
     capture_mode: []const u8,
@@ -33,6 +39,14 @@ pub const RunContext = struct {
     terminal_profile_id_len: u8,
     /// `terminal_profile.source_*` (PH1-M33).
     terminal_cmd_source: []const u8,
+    /// PH1-M34: resolved launch argv (direct exec); `terminal_exec_argc` zero until resolution runs.
+    terminal_exec_argv_flat: [terminal_exec_argc_max][terminal_exec_arg_max]u8,
+    terminal_exec_argv_lens: [terminal_exec_argc_max]u16,
+    terminal_exec_argc: u8,
+    terminal_exec_template_id_buf: [terminal_exec_template_id_cap]u8,
+    terminal_exec_template_id_len: u8,
+    terminal_exec_template_version_buf: [8]u8,
+    terminal_exec_template_version_len: u8,
     platform: []const u8,
     suite_name: ?[]const u8,
     comparison_id: ?[]const u8,
@@ -152,6 +166,13 @@ pub const RunContext = struct {
             .terminal_profile_id_buf = std.mem.zeroes([terminal_profile_id_cap]u8),
             .terminal_profile_id_len = 0,
             .terminal_cmd_source = "",
+            .terminal_exec_argv_flat = std.mem.zeroes([terminal_exec_argc_max][terminal_exec_arg_max]u8),
+            .terminal_exec_argv_lens = std.mem.zeroes([terminal_exec_argc_max]u16),
+            .terminal_exec_argc = 0,
+            .terminal_exec_template_id_buf = std.mem.zeroes([terminal_exec_template_id_cap]u8),
+            .terminal_exec_template_id_len = 0,
+            .terminal_exec_template_version_buf = std.mem.zeroes([8]u8),
+            .terminal_exec_template_version_len = 0,
             .platform = defaultPlatformTag(),
             .suite_name = null,
             .comparison_id = null,

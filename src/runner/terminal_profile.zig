@@ -6,6 +6,27 @@ pub const source_cli_override = "cli_override";
 pub const source_profile = "profile";
 pub const source_fallback = "fallback";
 
+/// Recorded in `run.json` when a built-in executable template applies (PH1-M34).
+pub const exec_template_version = "1";
+
+pub const template_id_kitty_v1 = "kitty_exec_v1";
+pub const template_id_ghostty_v1 = "ghostty_exec_v1";
+pub const template_id_konsole_v1 = "konsole_exec_v1";
+pub const template_id_zide_terminal_v1 = "zide_terminal_exec_v1";
+
+/// Deterministic argv for direct exec (PH1-M34). `kitty --detach` returns quickly after forking the UI.
+const argv_kitty = [_][]const u8{ "kitty", "--detach" };
+const argv_ghostty = [_][]const u8{"ghostty"};
+const argv_konsole = [_][]const u8{"konsole"};
+const argv_zide = [_][]const u8{"zide-terminal"};
+
+/// Built-in profile + executable template contract (PH1-M34).
+pub const ProfileExecSpec = struct {
+    profile_id: []const u8,
+    template_id: []const u8,
+    argv: []const []const u8,
+};
+
 const Profile = struct {
     id: []const u8,
     cmd: []const u8,
@@ -17,6 +38,24 @@ fn profileMatch(terminal_name: []const u8) ?Profile {
     if (std.ascii.eqlIgnoreCase(terminal_name, "ghostty")) return .{ .id = "ghostty", .cmd = "ghostty" };
     if (std.ascii.eqlIgnoreCase(terminal_name, "konsole")) return .{ .id = "konsole", .cmd = "konsole" };
     if (std.ascii.eqlIgnoreCase(terminal_name, "zide-terminal")) return .{ .id = "zide-terminal", .cmd = "zide-terminal" };
+    return null;
+}
+
+/// Returns the PH1-M34 executable template for a known `--terminal` profile, if any.
+pub fn profileExecSpec(terminal_name: []const u8) ?ProfileExecSpec {
+    if (terminal_name.len == 0) return null;
+    if (std.ascii.eqlIgnoreCase(terminal_name, "kitty")) {
+        return .{ .profile_id = "kitty", .template_id = template_id_kitty_v1, .argv = &argv_kitty };
+    }
+    if (std.ascii.eqlIgnoreCase(terminal_name, "ghostty")) {
+        return .{ .profile_id = "ghostty", .template_id = template_id_ghostty_v1, .argv = &argv_ghostty };
+    }
+    if (std.ascii.eqlIgnoreCase(terminal_name, "konsole")) {
+        return .{ .profile_id = "konsole", .template_id = template_id_konsole_v1, .argv = &argv_konsole };
+    }
+    if (std.ascii.eqlIgnoreCase(terminal_name, "zide-terminal")) {
+        return .{ .profile_id = "zide-terminal", .template_id = template_id_zide_terminal_v1, .argv = &argv_zide };
+    }
     return null;
 }
 
@@ -126,4 +165,17 @@ test "resolve fallback uses terminal name" {
     try std.testing.expectEqualStrings("alacritty", ctx.terminal_cmd);
     try std.testing.expectEqualStrings(source_fallback, ctx.terminal_cmd_source);
     try std.testing.expectEqual(@as(u8, 0), ctx.terminal_profile_id_len);
+}
+
+test "profileExecSpec kitty uses detach argv" {
+    const s = profileExecSpec("KiTTY").?;
+    try std.testing.expectEqualStrings("kitty", s.profile_id);
+    try std.testing.expectEqualStrings(template_id_kitty_v1, s.template_id);
+    try std.testing.expectEqual(@as(usize, 2), s.argv.len);
+    try std.testing.expectEqualStrings("kitty", s.argv[0]);
+    try std.testing.expectEqualStrings("--detach", s.argv[1]);
+}
+
+test "profileExecSpec unknown is null" {
+    try std.testing.expectEqual(@as(?ProfileExecSpec, null), profileExecSpec("foot"));
 }
