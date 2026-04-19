@@ -25,7 +25,7 @@ These flags identify **which terminal** is under test and how it would be invoke
 **Rules**
 
 - `--terminal` is the primary key for comparison: two runs with different `--terminal` values are expected to differ in metadata even if specs match.
-- `--terminal-cmd` is optional metadata for reproducibility; it does not override `--terminal` identity.
+- **PH1-M33 profile resolution**: when **`--terminal-cmd`** is omitted, the harness resolves a **default launch command** from **`--terminal`** using built-in profile adapters (see **`docs/TERMINAL_PROFILE_ADAPTER_PLAN.md`**). When **`--terminal-cmd`** is set, it **wins** for the effective launch string; `run.json` records source **`cli_override`** vs **`profile`** vs **`fallback`**.
 - Unknown or missing `--terminal` is recorded as `unknown` in artifacts unless a default is documented per command.
 
 ## Execution control flags (`run`, `run-suite`, PH1-M4+)
@@ -178,8 +178,8 @@ On **non-Linux** hosts, `pty_guarded` (non-dry-run) fails with exit **2** before
 
 **PH1-M31 real terminal launch (`transport` in `run.json`)**
 
-- **When**: `pty_guarded`, not **`--dry-run`**, Linux host, **`guarded_state == experiment_linux_pty`**, and **`--terminal-cmd`** is non-empty (after the minimal PTY experiment block). The harness runs **`/bin/sh -c <terminal_cmd>`** with wall-clock budget **`transport.timeout_ms`** (poll **`waitpid`**, **`SIGKILL`** on timeout); see **`docs/REAL_TERMINAL_LAUNCH_PLAN.md`**.
-- **Fail-closed**: a guarded **full** run on Linux **requires** a non-empty **`--terminal-cmd`**; otherwise the run exits before writing artifacts with a clear stderr message.
+- **When**: `pty_guarded`, not **`--dry-run`**, Linux host, **`guarded_state == experiment_linux_pty`**, and the **resolved** launch command is non-empty (after **PH1-M33** profile resolution; **`--terminal-cmd`** overrides profile/fallback). The harness runs **`/bin/sh -c <resolved_terminal_cmd>`** with wall-clock budget **`transport.timeout_ms`** (poll **`waitpid`**, **`SIGKILL`** on timeout); see **`docs/REAL_TERMINAL_LAUNCH_PLAN.md`** and **`docs/TERMINAL_PROFILE_ADAPTER_PLAN.md`**.
+- **Fail-closed**: a guarded **full** run on Linux **requires** a non-empty **resolved** command (from **`--terminal-cmd`**, a built-in profile, or **`--terminal`** fallback); otherwise the run exits before writing artifacts with a clear stderr message.
 - **Telemetry**: **`terminal_launch_*`** fields under **`transport`** (attempt, elapsed ns, exit code, ok flag, short error tag, **PH1-M32** outcome class). Full contract: **`docs/REPORT_FORMAT.md`**.
 - **PH1-M32 outcome class**: **`terminal_launch_outcome`** is one of **`ok`**, **`nonzero_exit`**, **`signaled`**, **`timeout`**, **`spawn_failed`** when a launch was attempted; it must agree with **`terminal_launch_ok`**, **`terminal_launch_error`**, and **`terminal_launch_exit_code`** per **`docs/TERMINAL_LAUNCH_SEMANTICS_PLAN.md`**.
 
@@ -208,7 +208,7 @@ On **non-Linux** hosts, `pty_guarded` (non-dry-run) fails with exit **2** before
 |-------|-------------|
 | Path | Directory (e.g. `probes/smoke`) or single `.toml` file. |
 | `--terminal <name>` | Optional; logical terminal id (see **Terminal target model**). |
-| `--terminal-cmd <string>` | Optional in general; **required** on **Linux** for **`pty_guarded`** full runs (non-**`--dry-run`**) so the harness can execute the bounded real-launch lane (PH1-M31; see **Transport configuration** below). |
+| `--terminal-cmd <string>` | Optional in general; on **Linux** **`pty_guarded`** full runs, either this flag **or** a **PH1-M33** profile / fallback must yield a non-empty resolved command (see **Terminal target model**). |
 | `--platform <name>` | Optional; OS tag recorded in artifacts. |
 | `--capture <mode>` | Optional; one of `manual`, `text_observation`, `timed`. |
 | `--dry-run` | Optional; validate and simulate without writing artifacts (PH1-M4+). |

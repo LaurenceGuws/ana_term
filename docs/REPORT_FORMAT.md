@@ -39,7 +39,15 @@ Top-level JSON object with at least:
 | `host_identity_release` | string | Non-empty `uname.release` snapshot (truncated; JSON-escaped). |
 | `host_identity_sysname` | string | Non-empty `uname.sysname` snapshot (truncated; JSON-escaped). |
 
-**Serialization order**: after `execution_mode`, before `transport`: `host_identity_machine`, `host_identity_release`, `host_identity_sysname` (lexicographic). See **`docs/HOST_IDENTITY_PLAN.md`**.
+**PH1-M33 (terminal profile metadata)** — present on every harness `run.json` that writes artifacts:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `terminal_profile_id` | string or `null` | Canonical adapter id when **`--terminal`** matches a built-in profile (e.g. `kitty`); **`null`** when unknown or not applicable. |
+| `terminal_cmd_source` | string | One of: **`cli_override`** (non-empty **`--terminal-cmd`**), **`profile`** (adapter template), **`fallback`** (effective command is the **`--terminal`** string). |
+| `resolved_terminal_cmd` | string | Effective shell command string passed to the bounded launch lane / context fingerprint (JSON-escaped). |
+
+**Serialization order**: after `execution_mode`, before `host_identity_machine`: `terminal_profile_id`, `terminal_cmd_source`, `resolved_terminal_cmd`, then `host_identity_machine`, `host_identity_release`, `host_identity_sysname` (lexicographic among the host triple). See **`docs/HOST_IDENTITY_PLAN.md`** and **`docs/TERMINAL_PROFILE_ADAPTER_PLAN.md`**.
 
 **PH1-M11+ (run fingerprint)** — present on every harness `run.json` that writes artifacts:
 
