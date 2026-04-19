@@ -30,7 +30,8 @@ const lineage_envelope_fingerprint = @import("../report/lineage_envelope_fingerp
 const state_envelope_fingerprint = @import("../report/state_envelope_fingerprint.zig");
 const markdown_writer = @import("../report/markdown_writer.zig");
 const env_writer = @import("../report/env_writer.zig");
-const RunContext = @import("run_context.zig").RunContext;
+const run_context_mod = @import("run_context.zig");
+const RunContext = run_context_mod.RunContext;
 const transport_guard_preflight = @import("../runner/transport_guard_preflight.zig");
 const posix_pty = @import("../runner/posix_pty.zig");
 const real_terminal_launch = @import("../runner/real_terminal_launch.zig");
@@ -48,8 +49,8 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
         return errors.Category.invalid_spec.exitCode();
     }
 
-    if (ctx.transport_mode == .pty_guarded and !ctx.dry_run and posix_pty.runtimeHostIsLinux() and ctx.terminal_cmd.len == 0) {
-        printErr("pty_guarded full run on Linux requires a non-empty resolved terminal command (--terminal-cmd and/or a PH1-M33 profile; see docs/CLI.md)\n") catch {};
+    if (ctx.transport_mode == .pty_guarded and !ctx.dry_run and posix_pty.runtimeHostIsLinux() and ctx.terminal_exec_argc == 0) {
+        printErr("pty_guarded full run on Linux requires a non-empty resolved terminal argv (--terminal-cmd and/or a PH1-M33/PH1-M34 profile; see docs/CLI.md)\n") catch {};
         return errors.Category.invalid_spec.exitCode();
     }
 
@@ -101,8 +102,13 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
         const cap: u64 = @intCast(std.math.maxInt(i64));
         ctx.pty_experiment_elapsed_ns = @min(elapsed_raw orelse 0, cap);
 
-        if (posix_pty.runtimeHostIsLinux() and ctx.terminal_cmd.len > 0) {
-            const telem = real_terminal_launch.runBoundedShellCommand(allocator, ctx.terminal_cmd, ctx.timeout_ms);
+        if (posix_pty.runtimeHostIsLinux() and ctx.terminal_exec_argc > 0) {
+            var launch_argv: [run_context_mod.terminal_exec_argc_max][]const u8 = undefined;
+            const na = @as(usize, ctx.terminal_exec_argc);
+            for (0..na) |k| {
+                launch_argv[k] = ctx.terminal_exec_argv_flat[k][0..ctx.terminal_exec_argv_lens[k]];
+            }
+            const telem = real_terminal_launch.runBoundedArgvCommand(allocator, launch_argv[0..na], ctx.timeout_ms);
             ctx.terminal_launch_attempt = telem.attempt;
             ctx.terminal_launch_elapsed_ns = telem.elapsed_ns;
             ctx.terminal_launch_exit_code = telem.exit_code;

@@ -26,6 +26,183 @@ fn clampJsonNs(raw: u64) u64 {
     return @min(raw, @as(u64, @intCast(std.math.maxInt(i64))));
 }
 
+/// Runs `argv[0]` with remaining args with stdio discarded; polls `waitpid(WNOHANG)` until exit or `timeout_ms` elapses (then `SIGKILL`).
+/// Non-Linux: returns all-null fields. Empty `argv`: returns all-null fields.
+pub fn runBoundedArgvCommand(allocator: std.mem.Allocator, argv: []const []const u8, timeout_ms: u32) LaunchTelemetry {
+    const builtin = @import("builtin");
+    if (builtin.target.os.tag != .linux) return .{};
+    if (argv.len == 0) return .{};
+
+    var child = std.process.Child.init(argv, allocator);
+    child.stdin_behavior = .Ignore;
+    child.stdout_behavior = .Ignore;
+    child.stderr_behavior = .Ignore;
+
+    child.spawn() catch {
+        return .{
+            .attempt = 1,
+            .elapsed_ns = 0,
+            .exit_code = null,
+            .ok = false,
+            .err = err_spawn_failed,
+            .outcome = outcome_spawn_failed,
+        };
+    };
+
+    child.waitForSpawn() catch {
+        return .{
+            .attempt = 1,
+            .elapsed_ns = 0,
+            .exit_code = null,
+            .ok = false,
+            .err = err_spawn_failed,
+            .outcome = outcome_spawn_failed,
+        };
+    };
+
+    const pid = child.id;
+    const t_start = std.time.Instant.now() catch {
+        posix.kill(pid, posix.SIG.KILL) catch {};
+        var st_kill: c_int = undefined;
+        _ = c.waitpid(pid, &st_kill, 0);
+        return .{
+            .attempt = 1,
+            .elapsed_ns = 0,
+            .exit_code = null,
+            .ok = false,
+            .err = err_spawn_failed,
+            .outcome = outcome_spawn_failed,
+        };
+    };
+
+    const budget_ns = @as(u64, timeout_ms) * std.time.ns_per_ms;
+
+    while (true) {
+        var status: c_int = undefined;
+        const wr = c.waitpid(pid, &status, 1); // WNOHANG
+        if (wr == 0) {
+            const now = std.time.Instant.now() catch {
+                posix.kill(pid, posix.SIG.KILL) catch {};
+                var st_clock: c_int = undefined;
+                _ = c.waitpid(pid, &st_clock, 0);
+                return .{
+                    .attempt = 1,
+                    .elapsed_ns = 0,
+                    .exit_code = null,
+                    .ok = false,
+                    .err = err_spawn_failed,
+                    .outcome = outcome_spawn_failed,
+                };
+            };
+            const elapsed_raw = now.since(t_start);
+            if (elapsed_raw > budget_ns) {
+                posix.kill(pid, posix.SIG.KILL) catch {};
+                var st_to: c_int = undefined;
+                _ = c.waitpid(pid, &st_to, 0);
+                const el = clampJsonNs(now.since(t_start));
+                return .{
+                    .attempt = 1,
+                    .elapsed_ns = el,
+                    .exit_code = null,
+                    .ok = false,
+                    .err = err_timeout,
+                    .outcome = outcome_timeout,
+                };
+            }
+            std.Thread.sleep(1 * std.time.ns_per_ms);
+            continue;
+        }
+        if (wr == -1) {
+            switch (posix.errno(wr)) {
+                .INTR => continue,
+                else => {
+                    const now_e = std.time.Instant.now() catch {
+                        return .{
+                            .attempt = 1,
+                            .elapsed_ns = 0,
+                            .exit_code = null,
+                            .ok = false,
+                            .err = err_spawn_failed,
+                            .outcome = outcome_spawn_failed,
+                        };
+                    };
+                    return .{
+                        .attempt = 1,
+                        .elapsed_ns = clampJsonNs(now_e.since(t_start)),
+                        .exit_code = null,
+                        .ok = false,
+                        .err = err_spawn_failed,
+                        .outcome = outcome_spawn_failed,
+                    };
+                },
+            }
+        }
+        if (wr != pid) {
+            const now_u = std.time.Instant.now() catch {
+                return .{
+                    .attempt = 1,
+                    .elapsed_ns = 0,
+                    .exit_code = null,
+                    .ok = false,
+                    .err = err_spawn_failed,
+                    .outcome = outcome_spawn_failed,
+                };
+            };
+            return .{
+                .attempt = 1,
+                .elapsed_ns = clampJsonNs(now_u.since(t_start)),
+                .exit_code = null,
+                .ok = false,
+                .err = err_spawn_failed,
+                .outcome = outcome_spawn_failed,
+            };
+        }
+
+        const now_done = std.time.Instant.now() catch unreachable;
+        const elapsed_final = clampJsonNs(now_done.since(t_start));
+        const ustatus: u32 = @bitCast(status);
+        if (posix.W.IFEXITED(ustatus)) {
+            const ec = posix.W.EXITSTATUS(ustatus);
+            if (ec == 0) {
+                return .{
+                    .attempt = 1,
+                    .elapsed_ns = elapsed_final,
+                    .exit_code = 0,
+                    .ok = true,
+                    .err = null,
+                    .outcome = outcome_ok,
+                };
+            }
+            return .{
+                .attempt = 1,
+                .elapsed_ns = elapsed_final,
+                .exit_code = ec,
+                .ok = false,
+                .err = null,
+                .outcome = outcome_nonzero_exit,
+            };
+        }
+        if (posix.W.IFSIGNALED(ustatus)) {
+            return .{
+                .attempt = 1,
+                .elapsed_ns = elapsed_final,
+                .exit_code = null,
+                .ok = false,
+                .err = null,
+                .outcome = outcome_signaled,
+            };
+        }
+        return .{
+            .attempt = 1,
+            .elapsed_ns = elapsed_final,
+            .exit_code = null,
+            .ok = false,
+            .err = err_spawn_failed,
+            .outcome = outcome_spawn_failed,
+        };
+    }
+}
+
 /// Runs `/bin/sh -c <cmd>` with stdio discarded; polls `waitpid(WNOHANG)` until exit or `timeout_ms` elapses (then `SIGKILL`).
 /// Non-Linux: returns all-null fields. Empty `cmd`: returns all-null fields.
 pub fn runBoundedShellCommand(allocator: std.mem.Allocator, cmd: []const u8, timeout_ms: u32) LaunchTelemetry {
@@ -214,6 +391,18 @@ test "runBoundedShellCommand true exits 0 on Linux" {
     try std.testing.expectEqual(@as(?u32, 0), t.exit_code);
     try std.testing.expectEqual(@as(?bool, true), t.ok);
     try std.testing.expectEqual(@as(?[]const u8, null), t.err);
+    try std.testing.expectEqualStrings(outcome_ok, t.outcome.?);
+}
+
+test "runBoundedArgvCommand bin true exits 0 on Linux" {
+    const builtin = @import("builtin");
+    if (builtin.target.os.tag != .linux) return error.SkipZigTest;
+
+    const t = runBoundedArgvCommand(std.testing.allocator, &.{ "/bin/true" }, 5_000);
+    try std.testing.expectEqual(@as(?u32, 1), t.attempt);
+    try std.testing.expect(t.elapsed_ns != null);
+    try std.testing.expectEqual(@as(?u32, 0), t.exit_code);
+    try std.testing.expectEqual(@as(?bool, true), t.ok);
     try std.testing.expectEqualStrings(outcome_ok, t.outcome.?);
 }
 
