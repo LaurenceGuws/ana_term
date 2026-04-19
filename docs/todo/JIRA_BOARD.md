@@ -20,28 +20,28 @@ This file is the canonical ticket board for active execution.
 
 ## Current Sprint
 
-- Sprint ID: `PH1-M35-S1`
-- Objective: launch preflight + availability evidence (`ANA-3501`..`ANA-3510`)
+- Sprint ID: `PH1-M36-S1`
+- Objective: launch preflight strictness + reason fidelity (`ANA-3601`..`ANA-3610`)
 - Commit budget before checkpoint: `10`
-- Super-gate: `ANA-GATE-370`
+- Super-gate: `ANA-GATE-380`
 
-## Ticket Order (`PH1-M35-S1`)
+## Ticket Order (`PH1-M36-S1`)
 
-1. `ANA-3501`
-2. `ANA-3502`
-3. `ANA-3503`
-4. `ANA-3504`
-5. `ANA-3505`
-6. `ANA-3506`
-7. `ANA-3507`
-8. `ANA-3508`
-9. `ANA-3509`
-10. `ANA-3510`
+1. `ANA-3601`
+2. `ANA-3602`
+3. `ANA-3603`
+4. `ANA-3604`
+5. `ANA-3605`
+6. `ANA-3606`
+7. `ANA-3607`
+8. `ANA-3608`
+9. `ANA-3609`
+10. `ANA-3610`
 
 ## Current State
 
-- `in_progress`: none
-- `todo`: none
+- `in_progress`: `ANA-3601`
+- `todo`: `ANA-3602`, `ANA-3603`, `ANA-3604`, `ANA-3605`, `ANA-3606`, `ANA-3607`, `ANA-3608`, `ANA-3609`, `ANA-3610`
 - `blocked`: none
-- `review_gate`: `ANA-GATE-370` (PH1-M35-S1 checkpoint — Architect review)
+- `review_gate`: none
 - `done`: `ANA-101`..`ANA-123`, `ANA-201`..`ANA-223`, `ANA-301`..`ANA-310`, `ANA-401`..`ANA-410`, `ANA-501`..`ANA-510`, `ANA-601`..`ANA-610`, `ANA-701`..`ANA-710`, `ANA-801`..`ANA-810`, `ANA-901`..`ANA-913`, `ANA-1001`..`ANA-1010`, `ANA-1101`..`ANA-1110`, `ANA-1201`..`ANA-1210`, `ANA-1301`..`ANA-1310`, `ANA-1401`..`ANA-1410`, `ANA-1501`..`ANA-1510`, `ANA-1601`..`ANA-1610`, `ANA-1701`..`ANA-1710`, `ANA-1801`..`ANA-1810`, `ANA-1901`..`ANA-1910`, `ANA-2001`..`ANA-2010`, `ANA-2101`..`ANA-2110`, `ANA-2201`..`ANA-2210`, `ANA-2301`..`ANA-2310`, `ANA-2401`..`ANA-2410`, `ANA-2501`..`ANA-2510`, `ANA-2601`..`ANA-2610`, `ANA-2701`..`ANA-2710`, `ANA-2801`..`ANA-2810`, `ANA-2901`..`ANA-2910`, `ANA-3001`..`ANA-3010`, `ANA-3101`..`ANA-3110`, `ANA-3201`..`ANA-3210`, `ANA-3301`..`ANA-3310`, `ANA-3401`..`ANA-3410` (accepted), `ANA-3501`..`ANA-3510`

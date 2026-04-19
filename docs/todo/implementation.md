@@ -1372,7 +1372,7 @@ Non-goals:
 
 Outcome:
 
-- Engineer batch complete; **Architect review** at `ANA-GATE-370`.
+- Accepted at `ANA-GATE-370`.
 
 Queue lines (exact):
 
@@ -1380,3 +1380,44 @@ Queue lines (exact):
 - [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
 - [x] Stop only at `ANA-GATE-370` (post `ANA-3510`) unless truly blocked.
 - [x] Submit checkpoint packet in `docs/todo/PH1_M35_CHECKPOINT.md`.
+
+### `PH1-M36` (`in_progress`)
+
+Purpose:
+
+- Tighten launch preflight evidence fidelity so preflight reason tags, launch outcomes, and resolved executable path evidence stay strictly consistent.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M36_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- define PH1-M36 strictness plan and reason-fidelity boundaries
+- align launch preflight reason taxonomy with terminal launch outcome contracts
+- normalize resolved executable evidence for deterministic artifact/report/compare usage
+- enforce strict schema and compare invariants for preflight + launch consistency
+- extend smoke docs with reason-fidelity and path-consistency checks
+- PH1-M36 checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-3601` through `ANA-3610` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-380` reached and reported.
+
+Non-goals:
+
+- full VT stream replay and assertion engine
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [ ] Execute `ANA-3601` through `ANA-3610` in order from `docs/todo/PH1_M36_TICKETS.md`.
+- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [ ] Stop only at `ANA-GATE-380` (post `ANA-3610`) unless truly blocked.
+- [ ] Submit checkpoint packet in `docs/todo/PH1_M36_CHECKPOINT.md`.
