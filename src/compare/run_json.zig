@@ -33,6 +33,8 @@ pub const RunMeta = struct {
     compare_envelope_fingerprint_version: ?[]const u8 = null,
     run_envelope_fingerprint_digest: ?[]const u8 = null,
     run_envelope_fingerprint_version: ?[]const u8 = null,
+    session_envelope_fingerprint_digest: ?[]const u8 = null,
+    session_envelope_fingerprint_version: ?[]const u8 = null,
     guarded_opt_in: ?[]const u8 = null,
     guarded_state: ?[]const u8 = null,
     pty_capability_notes: ?[]const u8 = null,
@@ -93,6 +95,8 @@ pub fn parseRunMeta(allocator: std.mem.Allocator, root: std.json.Value) !RunMeta
     m.compare_envelope_fingerprint_version = readOptString(obj, "compare_envelope_fingerprint_version");
     m.run_envelope_fingerprint_digest = readOptString(obj, "run_envelope_fingerprint_digest");
     m.run_envelope_fingerprint_version = readOptString(obj, "run_envelope_fingerprint_version");
+    m.session_envelope_fingerprint_digest = readOptString(obj, "session_envelope_fingerprint_digest");
+    m.session_envelope_fingerprint_version = readOptString(obj, "session_envelope_fingerprint_version");
     if (obj.get("terminal")) |t| switch (t) {
         .object => |term_o| {
             m.terminal_name = readOptString(term_o, "name");
@@ -185,7 +189,7 @@ fn metaDelta(l: ?[]const u8, r: ?[]const u8) []const u8 {
 }
 
 /// Fixed field order for deterministic compare output.
-pub fn diffRunMeta(left: RunMeta, right: RunMeta) [45]MetaDiffRow {
+pub fn diffRunMeta(left: RunMeta, right: RunMeta) [47]MetaDiffRow {
     return .{
         .{ .field = "comparison_id", .left = left.comparison_id, .right = right.comparison_id, .delta = metaDelta(left.comparison_id, right.comparison_id) },
         .{ .field = "execution_mode", .left = left.execution_mode, .right = right.execution_mode, .delta = metaDelta(left.execution_mode, right.execution_mode) },
@@ -224,6 +228,8 @@ pub fn diffRunMeta(left: RunMeta, right: RunMeta) [45]MetaDiffRow {
         .{ .field = "compare_envelope_fingerprint_version", .left = left.compare_envelope_fingerprint_version, .right = right.compare_envelope_fingerprint_version, .delta = metaDelta(left.compare_envelope_fingerprint_version, right.compare_envelope_fingerprint_version) },
         .{ .field = "run_envelope_fingerprint_digest", .left = left.run_envelope_fingerprint_digest, .right = right.run_envelope_fingerprint_digest, .delta = metaDelta(left.run_envelope_fingerprint_digest, right.run_envelope_fingerprint_digest) },
         .{ .field = "run_envelope_fingerprint_version", .left = left.run_envelope_fingerprint_version, .right = right.run_envelope_fingerprint_version, .delta = metaDelta(left.run_envelope_fingerprint_version, right.run_envelope_fingerprint_version) },
+        .{ .field = "session_envelope_fingerprint_digest", .left = left.session_envelope_fingerprint_digest, .right = right.session_envelope_fingerprint_digest, .delta = metaDelta(left.session_envelope_fingerprint_digest, right.session_envelope_fingerprint_digest) },
+        .{ .field = "session_envelope_fingerprint_version", .left = left.session_envelope_fingerprint_version, .right = right.session_envelope_fingerprint_version, .delta = metaDelta(left.session_envelope_fingerprint_version, right.session_envelope_fingerprint_version) },
         .{ .field = "run_group", .left = left.run_group, .right = right.run_group, .delta = metaDelta(left.run_group, right.run_group) },
         .{ .field = "suite", .left = left.suite, .right = right.suite, .delta = metaDelta(left.suite, right.suite) },
         .{ .field = "term", .left = left.term, .right = right.term, .delta = metaDelta(left.term, right.term) },
@@ -468,8 +474,8 @@ test "diffRunMeta detects transport_mode mismatch" {
     const left = RunMeta{ .transport_mode = "none" };
     const right = RunMeta{ .transport_mode = "pty_stub" };
     const rows = diffRunMeta(left, right);
-    try std.testing.expectEqualStrings("transport_mode", rows[43].field);
-    try std.testing.expectEqualStrings("changed", rows[43].delta);
+    try std.testing.expectEqualStrings("transport_mode", rows[45].field);
+    try std.testing.expectEqualStrings("changed", rows[45].delta);
 }
 
 test "diffRunMeta detects pty_experiment_open_ok mismatch" {
@@ -592,12 +598,20 @@ test "diffRunMeta detects run_envelope_fingerprint_digest mismatch" {
     try std.testing.expectEqualStrings("changed", rows[35].delta);
 }
 
+test "diffRunMeta detects session_envelope_fingerprint_digest mismatch" {
+    const left = RunMeta{ .session_envelope_fingerprint_digest = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" };
+    const right = RunMeta{ .session_envelope_fingerprint_digest = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" };
+    const rows = diffRunMeta(left, right);
+    try std.testing.expectEqualStrings("session_envelope_fingerprint_digest", rows[37].field);
+    try std.testing.expectEqualStrings("changed", rows[37].delta);
+}
+
 test "parseRunMeta reads root host identity fields" {
     var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena.deinit();
     const a = arena.allocator();
     const text =
-        \\{"host_identity_machine":"aarch64","host_identity_release":"6.6.0","host_identity_sysname":"Linux","run_fingerprint_digest":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","run_fingerprint_version":"1","specset_fingerprint_digest":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc","specset_fingerprint_version":"1","resultset_fingerprint_digest":"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd","resultset_fingerprint_version":"1","transport_fingerprint_digest":"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee","transport_fingerprint_version":"1","exec_summary_fingerprint_digest":"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff","exec_summary_fingerprint_version":"1","context_summary_fingerprint_digest":"1111111111111111111111111111111111111111111111111111111111111111","context_summary_fingerprint_version":"1","metadata_envelope_fingerprint_digest":"2222222222222222222222222222222222222222222222222222222222222222","metadata_envelope_fingerprint_version":"1","artifact_bundle_fingerprint_digest":"3333333333333333333333333333333333333333333333333333333333333333","artifact_bundle_fingerprint_version":"1","report_envelope_fingerprint_digest":"4444444444444444444444444444444444444444444444444444444444444444","report_envelope_fingerprint_version":"1","compare_envelope_fingerprint_digest":"5555555555555555555555555555555555555555555555555555555555555555","compare_envelope_fingerprint_version":"1","run_envelope_fingerprint_digest":"6666666666666666666666666666666666666666666666666666666666666666","run_envelope_fingerprint_version":"1","transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":1}}
+        \\{"host_identity_machine":"aarch64","host_identity_release":"6.6.0","host_identity_sysname":"Linux","run_fingerprint_digest":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","run_fingerprint_version":"1","specset_fingerprint_digest":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc","specset_fingerprint_version":"1","resultset_fingerprint_digest":"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd","resultset_fingerprint_version":"1","transport_fingerprint_digest":"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee","transport_fingerprint_version":"1","exec_summary_fingerprint_digest":"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff","exec_summary_fingerprint_version":"1","context_summary_fingerprint_digest":"1111111111111111111111111111111111111111111111111111111111111111","context_summary_fingerprint_version":"1","metadata_envelope_fingerprint_digest":"2222222222222222222222222222222222222222222222222222222222222222","metadata_envelope_fingerprint_version":"1","artifact_bundle_fingerprint_digest":"3333333333333333333333333333333333333333333333333333333333333333","artifact_bundle_fingerprint_version":"1","report_envelope_fingerprint_digest":"4444444444444444444444444444444444444444444444444444444444444444","report_envelope_fingerprint_version":"1","compare_envelope_fingerprint_digest":"5555555555555555555555555555555555555555555555555555555555555555","compare_envelope_fingerprint_version":"1","run_envelope_fingerprint_digest":"6666666666666666666666666666666666666666666666666666666666666666","run_envelope_fingerprint_version":"1","session_envelope_fingerprint_digest":"7777777777777777777777777777777777777777777777777777777777777777","session_envelope_fingerprint_version":"1","transport":{"guarded_opt_in":false,"guarded_state":"na","handshake":null,"handshake_latency_ns":0,"mode":"none","timeout_ms":1}}
     ;
     const parsed = try std.json.parseFromSlice(std.json.Value, std.testing.allocator, text, .{});
     defer parsed.deinit();
@@ -627,6 +641,8 @@ test "parseRunMeta reads root host identity fields" {
     try std.testing.expectEqualStrings("1", m.compare_envelope_fingerprint_version.?);
     try std.testing.expectEqualStrings("6666666666666666666666666666666666666666666666666666666666666666", m.run_envelope_fingerprint_digest.?);
     try std.testing.expectEqualStrings("1", m.run_envelope_fingerprint_version.?);
+    try std.testing.expectEqualStrings("7777777777777777777777777777777777777777777777777777777777777777", m.session_envelope_fingerprint_digest.?);
+    try std.testing.expectEqualStrings("1", m.session_envelope_fingerprint_version.?);
 }
 
 test "parseRunMeta reads PTY experiment telemetry numbers" {
