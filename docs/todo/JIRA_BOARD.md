@@ -20,28 +20,28 @@ This file is the canonical ticket board for active execution.
 
 ## Current Sprint
 
-- Sprint ID: `PH1-M25-S1`
-- Objective: provenance-envelope fingerprint integrity hardening (`ANA-2501`..`ANA-2510`)
+- Sprint ID: `PH1-M26-S1`
+- Objective: integrity-envelope fingerprint hardening (`ANA-2601`..`ANA-2610`)
 - Commit budget before checkpoint: `10`
-- Super-gate: `ANA-GATE-270`
+- Super-gate: `ANA-GATE-280`
 
-## Ticket Order (`PH1-M25-S1`)
+## Ticket Order (`PH1-M26-S1`)
 
-1. `ANA-2501`
-2. `ANA-2502`
-3. `ANA-2503`
-4. `ANA-2504`
-5. `ANA-2505`
-6. `ANA-2506`
-7. `ANA-2507`
-8. `ANA-2508`
-9. `ANA-2509`
-10. `ANA-2510`
+1. `ANA-2601`
+2. `ANA-2602`
+3. `ANA-2603`
+4. `ANA-2604`
+5. `ANA-2605`
+6. `ANA-2606`
+7. `ANA-2607`
+8. `ANA-2608`
+9. `ANA-2609`
+10. `ANA-2610`
 
 ## Current State
 
-- `in_progress`: none
-- `todo`: none
+- `in_progress`: `ANA-2601`
+- `todo`: `ANA-2602`..`ANA-2610`
 - `blocked`: none
-- `review_gate`: `ANA-GATE-270` (PH1-M25 checkpoint; see `docs/todo/PH1_M25_CHECKPOINT.md`)
-- `done`: `ANA-101`..`ANA-123`, `ANA-201`..`ANA-223`, `ANA-301`..`ANA-310`, `ANA-401`..`ANA-410`, `ANA-501`..`ANA-510`, `ANA-601`..`ANA-610`, `ANA-701`..`ANA-710`, `ANA-801`..`ANA-810`, `ANA-901`..`ANA-913`, `ANA-1001`..`ANA-1010`, `ANA-1101`..`ANA-1110`, `ANA-1201`..`ANA-1210`, `ANA-1301`..`ANA-1310`, `ANA-1401`..`ANA-1410`, `ANA-1501`..`ANA-1510`, `ANA-1601`..`ANA-1610`, `ANA-1701`..`ANA-1710`, `ANA-1801`..`ANA-1810`, `ANA-1901`..`ANA-1910`, `ANA-2001`..`ANA-2010`, `ANA-2101`..`ANA-2110`, `ANA-2201`..`ANA-2210`, `ANA-2301`..`ANA-2310`, `ANA-2401`..`ANA-2410` (accepted), `ANA-2501`..`ANA-2509` (pending Architect acceptance at `ANA-GATE-270`)
+- `review_gate`: none
+- `done`: `ANA-101`..`ANA-123`, `ANA-201`..`ANA-223`, `ANA-301`..`ANA-310`, `ANA-401`..`ANA-410`, `ANA-501`..`ANA-510`, `ANA-601`..`ANA-610`, `ANA-701`..`ANA-710`, `ANA-801`..`ANA-810`, `ANA-901`..`ANA-913`, `ANA-1001`..`ANA-1010`, `ANA-1101`..`ANA-1110`, `ANA-1201`..`ANA-1210`, `ANA-1301`..`ANA-1310`, `ANA-1401`..`ANA-1410`, `ANA-1501`..`ANA-1510`, `ANA-1601`..`ANA-1610`, `ANA-1701`..`ANA-1710`, `ANA-1801`..`ANA-1810`, `ANA-1901`..`ANA-1910`, `ANA-2001`..`ANA-2010`, `ANA-2101`..`ANA-2110`, `ANA-2201`..`ANA-2210`, `ANA-2301`..`ANA-2310`, `ANA-2401`..`ANA-2410`, `ANA-2501`..`ANA-2510` (accepted)
