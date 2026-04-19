@@ -100,6 +100,11 @@ pub fn populate(ctx: *RunContext, allocator: std.mem.Allocator, run_id: []const 
         } else {
             try canon.appendSlice(allocator, "null\n");
         }
+        if (ctx.terminal_launch_outcome) |o| {
+            try canon.print(allocator, "{s}\n", .{o});
+        } else {
+            try canon.appendSlice(allocator, "null\n");
+        }
     }
 
     var digest: [32]u8 = undefined;

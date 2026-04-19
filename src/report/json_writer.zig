@@ -275,6 +275,12 @@ pub fn writeRun(
         } else {
             try buf.appendSlice(allocator, "null");
         }
+        try buf.appendSlice(allocator, ",\n    \"terminal_launch_outcome\": ");
+        if (ctx.terminal_launch_outcome) |o| {
+            try buf.print(allocator, "\"{s}\"", .{o});
+        } else {
+            try buf.appendSlice(allocator, "null");
+        }
     }
 
     try buf.print(allocator, ",\n    \"timeout_ms\": {d}\n  }}", .{ctx.timeout_ms});
