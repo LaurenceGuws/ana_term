@@ -3,7 +3,7 @@
 Sprint: `PH1-M34-S1`  
 Super-gate: `ANA-GATE-360`
 
-Status: **Engineer batch complete**; awaiting **Architect** review at `ANA-GATE-360`.
+Status: **Accepted by Architect** at `ANA-GATE-360`.
 
 ## Ticket commits (strict order, one commit per ticket)
 

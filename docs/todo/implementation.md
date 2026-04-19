@@ -1327,7 +1327,7 @@ Non-goals:
 
 Outcome:
 
-- Engineer batch complete; super-gate `ANA-GATE-360` open for Architect review.
+- Accepted at `ANA-GATE-360`.
 
 Queue lines (exact):
 
@@ -1335,3 +1335,44 @@ Queue lines (exact):
 - [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
 - [x] Stop only at `ANA-GATE-360` (post `ANA-3410`) unless truly blocked.
 - [x] Submit checkpoint packet in `docs/todo/PH1_M34_CHECKPOINT.md`.
+
+### `PH1-M35` (`in_progress`)
+
+Purpose:
+
+- Harden launch preflight and availability evidence so missing binaries and launchability issues are surfaced deterministically before execution.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M35_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- define PH1-M35 preflight/availability plan and boundaries
+- add preflight checks for resolved argv executable availability and launch prerequisites
+- emit preflight evidence fields in run artifacts
+- enforce report/compare invariants for preflight fields
+- extend smoke docs with missing-binary and availability checks
+- PH1-M35 checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-3501` through `ANA-3510` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-370` reached and reported.
+
+Non-goals:
+
+- full VT stream replay and assertion engine
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [ ] Execute `ANA-3501` through `ANA-3510` in order from `docs/todo/PH1_M35_TICKETS.md`.
+- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [ ] Stop only at `ANA-GATE-370` (post `ANA-3510`) unless truly blocked.
+- [ ] Submit checkpoint packet in `docs/todo/PH1_M35_CHECKPOINT.md`.
