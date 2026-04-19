@@ -93,6 +93,9 @@ pub const RunContext = struct {
     /// PH1-M23: 64-char lowercase SHA-256 hex; length 0 until `environment_envelope_fingerprint.populate`.
     environment_envelope_fingerprint_digest_hex: [64]u8,
     environment_envelope_fingerprint_digest_len: u8,
+    /// PH1-M24: 64-char lowercase SHA-256 hex; length 0 until `artifact_manifest_fingerprint.populate`.
+    artifact_manifest_fingerprint_digest_hex: [64]u8,
+    artifact_manifest_fingerprint_digest_len: u8,
 
     pub fn initDefault() RunContext {
         return .{
@@ -150,6 +153,8 @@ pub const RunContext = struct {
             .session_envelope_fingerprint_digest_len = 0,
             .environment_envelope_fingerprint_digest_hex = std.mem.zeroes([64]u8),
             .environment_envelope_fingerprint_digest_len = 0,
+            .artifact_manifest_fingerprint_digest_hex = std.mem.zeroes([64]u8),
+            .artifact_manifest_fingerprint_digest_len = 0,
         };
     }
 
