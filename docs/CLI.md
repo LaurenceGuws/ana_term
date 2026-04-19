@@ -120,6 +120,11 @@ These flags identify **which terminal** is under test and how it would be invoke
 - Full runs include **`integrity_envelope_fingerprint_digest`** (64-char lowercase hex) and **`integrity_envelope_fingerprint_version`** (**`1`**) derived from a documented canonical payload (see **`docs/INTEGRITY_ENVELOPE_FINGERPRINT_PLAN.md`**).
 - **`--dry-run`** does not write `run.json`; integrity-envelope fingerprint keys are not applicable.
 
+**PH1-M27 consistency-envelope fingerprint (`run.json` root)**
+
+- Full runs include **`consistency_envelope_fingerprint_digest`** (64-char lowercase hex) and **`consistency_envelope_fingerprint_version`** (**`1`**) derived from a documented canonical payload (see **`docs/CONSISTENCY_ENVELOPE_FINGERPRINT_PLAN.md`**).
+- **`--dry-run`** does not write `run.json`; consistency-envelope fingerprint keys are not applicable.
+
 ## Transport configuration (`run`, `run-suite`, PH1-M5+)
 
 These flags describe the **transport seam** (how the harness would attach to a terminal for I/O). They complement **`--terminal`**, which names the *logical* terminal identity for comparison metadata.
