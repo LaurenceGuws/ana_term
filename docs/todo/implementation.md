@@ -1417,7 +1417,7 @@ Non-goals:
 
 Outcome:
 
-- Engineer batch complete; **Architect review** at `ANA-GATE-380`.
+- Accepted at `ANA-GATE-380`.
 
 Queue lines (exact):
 
@@ -1425,3 +1425,44 @@ Queue lines (exact):
 - [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
 - [x] Stop only at `ANA-GATE-380` (post `ANA-3610`) unless truly blocked.
 - [x] Submit checkpoint packet in `docs/todo/PH1_M36_CHECKPOINT.md`.
+
+### `PH1-M37` (`in_progress`)
+
+Purpose:
+
+- Make guarded-launch failures more diagnosable by capturing deterministic launch failure envelope data across artifacts, report validation, and compare output.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M37_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- define PH1-M37 launch-failure diagnostics envelope and boundaries
+- capture normalized failure evidence for spawn/preflight/launch termination paths
+- emit launch diagnostics envelope in `run.json` and summary output
+- enforce report/compare invariants for diagnostics envelope fields
+- extend smoke docs for missing binary, non-executable, and launch error paths
+- PH1-M37 checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-3701` through `ANA-3710` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-390` reached and reported.
+
+Non-goals:
+
+- full VT stream replay and assertion engine
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [ ] Execute `ANA-3701` through `ANA-3710` in order from `docs/todo/PH1_M37_TICKETS.md`.
+- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [ ] Stop only at `ANA-GATE-390` (post `ANA-3710`) unless truly blocked.
+- [ ] Submit checkpoint packet in `docs/todo/PH1_M37_CHECKPOINT.md`.
