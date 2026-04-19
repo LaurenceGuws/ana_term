@@ -32,3 +32,47 @@ pub fn populate(ctx: *RunContext, allocator: std.mem.Allocator) !void {
     writeHexLower(&ctx.state_envelope_fingerprint_digest_hex, &digest);
     ctx.state_envelope_fingerprint_digest_len = 64;
 }
+
+fn fillDigest(dst: *[64]u8, len: *u8, hex_lower_64: *const [64]u8) void {
+    @memcpy(dst, hex_lower_64);
+    len.* = 64;
+}
+
+fn testCtxWithLineage(lineage: *const [64]u8) RunContext {
+    var ctx = RunContext.initDefault();
+    fillDigest(&ctx.lineage_envelope_fingerprint_digest_hex, &ctx.lineage_envelope_fingerprint_digest_len, lineage);
+    return ctx;
+}
+
+test "state envelope fingerprint is deterministic for fixed lineage-envelope digest" {
+    var a = testCtxWithLineage(&"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".*);
+    var b = testCtxWithLineage(&"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".*);
+    try populate(&a, std.testing.allocator);
+    try populate(&b, std.testing.allocator);
+    try std.testing.expectEqual(a.state_envelope_fingerprint_digest_len, b.state_envelope_fingerprint_digest_len);
+    try std.testing.expectEqualSlices(
+        u8,
+        a.state_envelope_fingerprint_digest_hex[0..a.state_envelope_fingerprint_digest_len],
+        b.state_envelope_fingerprint_digest_hex[0..b.state_envelope_fingerprint_digest_len],
+    );
+}
+
+test "state envelope fingerprint changes when lineage-envelope digest changes" {
+    var a = testCtxWithLineage(&"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".*);
+    var b = testCtxWithLineage(&"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb".*);
+    try populate(&a, std.testing.allocator);
+    try populate(&b, std.testing.allocator);
+    try std.testing.expect(!std.mem.eql(
+        u8,
+        a.state_envelope_fingerprint_digest_hex[0..a.state_envelope_fingerprint_digest_len],
+        b.state_envelope_fingerprint_digest_hex[0..b.state_envelope_fingerprint_digest_len],
+    ));
+}
+
+test "state envelope fingerprint matches golden for M29 lineage-envelope digest chain" {
+    const golden_state = "fc9e33e37e4d5cc403f7738cb104509dee956b6cfee8c3170f119ecfa078a6ee";
+    var ctx = testCtxWithLineage(&"ab0d29132d75a50c33523822984a11df745fa6cd934d2ee9d638b240a84c8659".*);
+    try populate(&ctx, std.testing.allocator);
+    try std.testing.expectEqual(@as(u8, 64), ctx.state_envelope_fingerprint_digest_len);
+    try std.testing.expectEqualStrings(golden_state, ctx.state_envelope_fingerprint_digest_hex[0..ctx.state_envelope_fingerprint_digest_len]);
+}
