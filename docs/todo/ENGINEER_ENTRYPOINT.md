@@ -4,7 +4,7 @@ Read this file first in Dual Agent Mode.
 
 ## Active Batch
 
-- Execute only `PH1-M29` / sprint `PH1-M29-S1`.
+- Execute only `PH1-M29` / sprint `PH1-M29-S1` (engineering execution complete; Architect review at `ANA-GATE-310`).
 - Super-gate: `ANA-GATE-310` (report after `ANA-2910` or hard blocker).
 - Ticket source: `docs/todo/PH1_M29_TICKETS.md`.
 - Board source: `docs/todo/JIRA_BOARD.md`.
