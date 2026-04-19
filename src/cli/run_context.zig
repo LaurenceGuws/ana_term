@@ -114,6 +114,16 @@ pub const RunContext = struct {
     /// PH1-M30: 64-char lowercase SHA-256 hex; length 0 until `state_envelope_fingerprint.populate`.
     state_envelope_fingerprint_digest_hex: [64]u8,
     state_envelope_fingerprint_digest_len: u8,
+    /// PH1-M31: `1` when real terminal launch ran; `null` when not applicable / not attempted.
+    terminal_launch_attempt: ?u32,
+    /// PH1-M31: wall-time nanoseconds for launch block; `null` when no attempt.
+    terminal_launch_elapsed_ns: ?u64,
+    /// PH1-M31: child exit status when reaped; `null` on spawn failure or timeout before status.
+    terminal_launch_exit_code: ?u32,
+    /// PH1-M31: `true` iff exit status 0 when known; `null` when no attempt.
+    terminal_launch_ok: ?bool,
+    /// PH1-M31: short static tag (`timeout`, `spawn_failed`, …); `null` when none.
+    terminal_launch_error: ?[]const u8,
 
     pub fn initDefault() RunContext {
         return .{
@@ -185,6 +195,11 @@ pub const RunContext = struct {
             .lineage_envelope_fingerprint_digest_len = 0,
             .state_envelope_fingerprint_digest_hex = std.mem.zeroes([64]u8),
             .state_envelope_fingerprint_digest_len = 0,
+            .terminal_launch_attempt = null,
+            .terminal_launch_elapsed_ns = null,
+            .terminal_launch_exit_code = null,
+            .terminal_launch_ok = null,
+            .terminal_launch_error = null,
         };
     }
 
