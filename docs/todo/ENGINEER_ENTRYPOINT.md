@@ -4,9 +4,9 @@ Read this file first in Dual Agent Mode.
 
 ## Active Batch
 
-- Execute only `PH1-M35` / sprint `PH1-M35-S1`.
-- Super-gate: `ANA-GATE-370` (report after `ANA-3510` or hard blocker).
-- Ticket source: `docs/todo/PH1_M35_TICKETS.md`.
+- Sprint `PH1-M35-S1` engineer execution is **complete** (tickets `ANA-3501`..`ANA-3510`).
+- Super-gate: **`ANA-GATE-370`** — **Architect review** of PH1-M35 checkpoint (`docs/todo/PH1_M35_CHECKPOINT.md`).
+- Ticket source (reference): `docs/todo/PH1_M35_TICKETS.md`.
 - Board source: `docs/todo/JIRA_BOARD.md`.
 
 ## Required Read Order

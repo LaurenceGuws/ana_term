@@ -5,7 +5,7 @@ Session entrypoint only. Keep this file short and current.
 ## Active Focus
 
 - Product lane: text-first terminal harness
-- Active macro batch (`in_progress`): `PH1-M35` (`PH1-M35-S1`) — launch preflight + availability evidence (`ANA-3501`..`ANA-3510`)
+- Last completed engineer batch: `PH1-M35` (`PH1-M35-S1`) — launch preflight + availability evidence (`ANA-3501`..`ANA-3510`); checkpoint `docs/todo/PH1_M35_CHECKPOINT.md`
 - Super-gate (Architect review): `ANA-GATE-370`
 - Active queue authority: `docs/todo/implementation.md`
 - Ticket board authority: `docs/todo/JIRA_BOARD.md`
