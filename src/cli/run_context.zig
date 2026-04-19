@@ -160,6 +160,8 @@ pub const RunContext = struct {
     terminal_launch_preflight_ok: ?bool,
     /// PH1-M35: static reason tag (`launch_preflight.reason_*`); `null` when not applicable.
     terminal_launch_preflight_reason: ?[]const u8,
+    /// PH1-M36: `canonical` \| `literal` \| `null` when no path (see `docs/LAUNCH_PREFLIGHT_STRICTNESS_PLAN.md`).
+    terminal_exec_resolved_path_normalization: ?[]const u8,
     /// PH1-M35: resolved path buffer for `argv[0]` probe.
     terminal_exec_resolved_path_buf: [terminal_exec_resolved_path_cap]u8,
     terminal_exec_resolved_path_len: u16,
@@ -255,6 +257,7 @@ pub const RunContext = struct {
             .terminal_launch_outcome = null,
             .terminal_launch_preflight_ok = null,
             .terminal_launch_preflight_reason = null,
+            .terminal_exec_resolved_path_normalization = null,
             .terminal_exec_resolved_path_buf = std.mem.zeroes([terminal_exec_resolved_path_cap]u8),
             .terminal_exec_resolved_path_len = 0,
         };

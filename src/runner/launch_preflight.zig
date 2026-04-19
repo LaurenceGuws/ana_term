@@ -13,12 +13,21 @@ pub const reason_missing_executable = "missing_executable";
 /// Path exists but is not a regular executable file.
 pub const reason_not_executable = "not_executable";
 
+/// PH1-M36: no resolved path for normalization (failed probe or pre-`realpath`).
+pub const path_normalization_na = "na";
+/// PH1-M36: `realpath` produced **`terminal_exec_resolved_path`** (see `tryCanonicalizeResolvedPathLinux`).
+pub const path_normalization_canonical = "canonical";
+/// PH1-M36: probe path kept verbatim (`realpath` unavailable or failed).
+pub const path_normalization_literal = "literal";
+
 /// Result of an `argv[0]` availability probe; copied into `RunContext` for artifacts.
 pub const Probe = struct {
     ok: bool,
     reason: []const u8,
     resolved_path_buf: [512]u8 = std.mem.zeroes([512]u8),
     resolved_path_len: u16 = 0,
+    /// PH1-M36: how **`terminal_exec_resolved_path`** will be labeled when emitted.
+    path_normalization: []const u8 = path_normalization_na,
 
     pub fn resolvedPathSlice(self: *const Probe) ?[]const u8 {
         if (self.resolved_path_len == 0) return null;
@@ -43,7 +52,7 @@ fn finishFromOpenedFile(file: std.fs.File, path: []const u8) Probe {
     posix.access(path, posix.X_OK) catch {
         return .{ .ok = false, .reason = reason_not_executable };
     };
-    var p = Probe{ .ok = true, .reason = reason_ok };
+    var p = Probe{ .ok = true, .reason = reason_ok, .path_normalization = path_normalization_literal };
     copyResolvedPath(&p, path);
     return p;
 }
@@ -87,10 +96,12 @@ pub fn applyProbeToContext(ctx: *run_context_mod.RunContext, probe: *const Probe
     ctx.terminal_launch_preflight_ok = probe.ok;
     ctx.terminal_launch_preflight_reason = probe.reason;
     ctx.terminal_exec_resolved_path_len = 0;
+    ctx.terminal_exec_resolved_path_normalization = null;
     if (probe.resolvedPathSlice()) |rp| {
         const n = @min(rp.len, run_context_mod.terminal_exec_resolved_path_cap);
         @memcpy(ctx.terminal_exec_resolved_path_buf[0..n], rp[0..n]);
         ctx.terminal_exec_resolved_path_len = @intCast(n);
+        ctx.terminal_exec_resolved_path_normalization = probe.path_normalization;
     }
 }
 
