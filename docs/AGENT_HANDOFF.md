@@ -5,7 +5,7 @@ Session entrypoint only. Keep this file short and current.
 ## Active Focus
 
 - Product lane: text-first terminal harness
-- Active macro batch (`in_progress`): `PH1-M22` (`PH1-M22-S1`) — session-envelope fingerprint integrity hardening (`ANA-2201`..`ANA-2210`)
+- Active macro batch: `PH1-M22` (`PH1-M22-S1`) — session-envelope fingerprint integrity hardening; sprint execution complete at **`ANA-GATE-240`** (awaiting Architect review)
 - Super-gate (Architect review): `ANA-GATE-240`
 - Active queue authority: `docs/todo/implementation.md`
 - Ticket board authority: `docs/todo/JIRA_BOARD.md`
