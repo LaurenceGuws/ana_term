@@ -5,8 +5,8 @@ Session entrypoint only. Keep this file short and current.
 ## Active Focus
 
 - Product lane: text-first terminal harness
-- Active macro batch (`in_progress`): `PH1-M26` (`PH1-M26-S1`) — integrity-envelope fingerprint hardening (`ANA-2601`..`ANA-2610`)
-- Super-gate (Architect review): `ANA-GATE-280`
+- Active macro batch (`review_gate`): `PH1-M26` (`PH1-M26-S1`) — integrity-envelope fingerprint hardening (`ANA-2601`..`ANA-2610`)
+- Super-gate (Architect review): `ANA-GATE-280` (checkpoint: `docs/todo/PH1_M26_CHECKPOINT.md`)
 - Active queue authority: `docs/todo/implementation.md`
 - Ticket board authority: `docs/todo/JIRA_BOARD.md`
 - Engineer entrypoint: `docs/todo/ENGINEER_ENTRYPOINT.md`
