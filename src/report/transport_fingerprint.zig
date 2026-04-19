@@ -17,7 +17,7 @@ pub fn populate(ctx: *RunContext, allocator: std.mem.Allocator, run_id: []const 
     var canon: std.ArrayList(u8) = .empty;
     defer canon.deinit(allocator);
 
-    try canon.appendSlice(allocator, "PH1-M14/transport/fp/v2\n");
+    try canon.appendSlice(allocator, "PH1-M14/transport/fp/v3\n");
 
     const guarded_opt_in = ctx.transport_mode == .pty_guarded;
     const guarded_state: []const u8 = blk: {
@@ -117,6 +117,11 @@ pub fn populate(ctx: *RunContext, allocator: std.mem.Allocator, run_id: []const 
         }
         if (ctx.terminal_exec_resolved_path_len > 0) {
             try canon.print(allocator, "{s}\n", .{ctx.terminal_exec_resolved_path_buf[0..ctx.terminal_exec_resolved_path_len]});
+        } else {
+            try canon.appendSlice(allocator, "null\n");
+        }
+        if (ctx.terminal_exec_resolved_path_normalization) |tag| {
+            try canon.print(allocator, "{s}\n", .{tag});
         } else {
             try canon.appendSlice(allocator, "null\n");
         }

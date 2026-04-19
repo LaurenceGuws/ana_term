@@ -64,6 +64,9 @@ pub fn writeRunSummary(
     if (ctx.terminal_exec_resolved_path_len > 0) {
         try buf.print(allocator, "- terminal_exec_resolved_path: {s}\n", .{ctx.terminal_exec_resolved_path_buf[0..ctx.terminal_exec_resolved_path_len]});
     }
+    if (ctx.terminal_exec_resolved_path_normalization) |tag| {
+        try buf.print(allocator, "- terminal_exec_resolved_path_normalization: {s}\n", .{tag});
+    }
     if (ctx.suite_name) |s| {
         try buf.print(allocator, "- suite: {s}\n", .{s});
     } else {

@@ -14,7 +14,7 @@ Add a **deterministic transport fingerprint** to **`run.json` root** (alongside 
 | Key | Type | Rule |
 |-----|------|------|
 | `transport_fingerprint_digest` | string | **64** lowercase hex chars (SHA-256 of canonical payload). |
-| `transport_fingerprint_version` | string | **`1`** (legacy) or **`2`** (**PH1-M35**: preflight canonical lines when **`pty_guarded`**). |
+| `transport_fingerprint_version` | string | **`1`** (legacy), **`2`** (**PH1-M35**: preflight lines), or **`3`** (**PH1-M36**: path normalization line after preflight path). |
 
 **Serialization order**: immediately after **`resultset_fingerprint_version`**, before the nested **`transport`** object: **`transport_fingerprint_digest`**, **`transport_fingerprint_version`** (lexicographic among these two keys).
 
@@ -31,6 +31,18 @@ When **`mode`** is **`pty_guarded`**, after **`terminal_launch_outcome`** (line 
 17. **`terminal_exec_resolved_path`**: string body (resolved probe path), or literal `null`.
 
 For **`none`** / **`pty_stub`**, the prefix is still **`v2`**; lines 8–17 are not appended (same shape as v1 non-guarded).
+
+## Canonical payload (version `3`, PH1-M36+)
+
+Same as version **`2`**, except:
+
+1. Literal prefix: `PH1-M14/transport/fp/v3` (replaces `v2`).
+
+When **`mode`** is **`pty_guarded`**, after line 17 (**`terminal_exec_resolved_path`**), append:
+
+18. **`terminal_exec_resolved_path_normalization`**: `canonical`, `literal`, or literal `null`.
+
+For **`none`** / **`pty_stub`**, the prefix is still **`v3`**; guarded-only lines 8–18 are not appended (same shape as v1 non-guarded).
 
 ## Canonical payload (version `1`)
 
