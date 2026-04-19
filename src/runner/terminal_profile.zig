@@ -82,6 +82,43 @@ test "resolve profile for kitty" {
     try std.testing.expectEqualStrings("kitty", profileIdSlice(&ctx));
 }
 
+test "resolve profile for ghostty" {
+    var ctx = RunContext.initDefault();
+    ctx.terminal_name = "GhOsTTY";
+    resolveEffective(&ctx);
+    try std.testing.expectEqualStrings("ghostty", ctx.terminal_cmd);
+    try std.testing.expectEqualStrings(source_profile, ctx.terminal_cmd_source);
+    try std.testing.expectEqualStrings("ghostty", profileIdSlice(&ctx));
+}
+
+test "resolve profile for konsole" {
+    var ctx = RunContext.initDefault();
+    ctx.terminal_name = "KONsole";
+    resolveEffective(&ctx);
+    try std.testing.expectEqualStrings("konsole", ctx.terminal_cmd);
+    try std.testing.expectEqualStrings(source_profile, ctx.terminal_cmd_source);
+    try std.testing.expectEqualStrings("konsole", profileIdSlice(&ctx));
+}
+
+test "resolve profile for zide-terminal" {
+    var ctx = RunContext.initDefault();
+    ctx.terminal_name = "ZIDE-TERMINAL";
+    resolveEffective(&ctx);
+    try std.testing.expectEqualStrings("zide-terminal", ctx.terminal_cmd);
+    try std.testing.expectEqualStrings(source_profile, ctx.terminal_cmd_source);
+    try std.testing.expectEqualStrings("zide-terminal", profileIdSlice(&ctx));
+}
+
+test "resolve cli_override with unknown terminal leaves profile id empty" {
+    var ctx = RunContext.initDefault();
+    ctx.terminal_name = "foot";
+    ctx.terminal_cmd_cli = "my-term -e sh";
+    resolveEffective(&ctx);
+    try std.testing.expectEqualStrings("my-term -e sh", ctx.terminal_cmd);
+    try std.testing.expectEqualStrings(source_cli_override, ctx.terminal_cmd_source);
+    try std.testing.expectEqual(@as(u8, 0), ctx.terminal_profile_id_len);
+}
+
 test "resolve fallback uses terminal name" {
     var ctx = RunContext.initDefault();
     ctx.terminal_name = "alacritty";
