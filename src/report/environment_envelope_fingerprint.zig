@@ -32,3 +32,47 @@ pub fn populate(ctx: *RunContext, allocator: std.mem.Allocator) !void {
     writeHexLower(&ctx.environment_envelope_fingerprint_digest_hex, &digest);
     ctx.environment_envelope_fingerprint_digest_len = 64;
 }
+
+fn fillDigest(dst: *[64]u8, len: *u8, hex_lower_64: *const [64]u8) void {
+    @memcpy(dst, hex_lower_64);
+    len.* = 64;
+}
+
+fn testCtxWithSessionEnvelope(se: *const [64]u8) RunContext {
+    var ctx = RunContext.initDefault();
+    fillDigest(&ctx.session_envelope_fingerprint_digest_hex, &ctx.session_envelope_fingerprint_digest_len, se);
+    return ctx;
+}
+
+test "environment envelope fingerprint is deterministic for fixed session-envelope digest" {
+    var a = testCtxWithSessionEnvelope(&"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".*);
+    var b = testCtxWithSessionEnvelope(&"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".*);
+    try populate(&a, std.testing.allocator);
+    try populate(&b, std.testing.allocator);
+    try std.testing.expectEqual(a.environment_envelope_fingerprint_digest_len, b.environment_envelope_fingerprint_digest_len);
+    try std.testing.expectEqualSlices(
+        u8,
+        a.environment_envelope_fingerprint_digest_hex[0..a.environment_envelope_fingerprint_digest_len],
+        b.environment_envelope_fingerprint_digest_hex[0..b.environment_envelope_fingerprint_digest_len],
+    );
+}
+
+test "environment envelope fingerprint changes when session-envelope digest changes" {
+    var a = testCtxWithSessionEnvelope(&"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".*);
+    var b = testCtxWithSessionEnvelope(&"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb".*);
+    try populate(&a, std.testing.allocator);
+    try populate(&b, std.testing.allocator);
+    try std.testing.expect(!std.mem.eql(
+        u8,
+        a.environment_envelope_fingerprint_digest_hex[0..a.environment_envelope_fingerprint_digest_len],
+        b.environment_envelope_fingerprint_digest_hex[0..b.environment_envelope_fingerprint_digest_len],
+    ));
+}
+
+test "environment envelope fingerprint matches golden for M22 session-envelope digest chain" {
+    const golden_environment_envelope = "dd59e6d080adfc5aac4cbc34c6aff533718ac40fd453ccb8f1ef4f85288e3acc";
+    var ctx = testCtxWithSessionEnvelope(&"d9ac103387a17fd9217799a54fd1f2ba121ade49f8a171a0ce00bb7e6e79e0b3".*);
+    try populate(&ctx, std.testing.allocator);
+    try std.testing.expectEqual(@as(u8, 64), ctx.environment_envelope_fingerprint_digest_len);
+    try std.testing.expectEqualStrings(golden_environment_envelope, ctx.environment_envelope_fingerprint_digest_hex[0..ctx.environment_envelope_fingerprint_digest_len]);
+}
