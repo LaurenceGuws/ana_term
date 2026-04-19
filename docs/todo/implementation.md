@@ -937,7 +937,7 @@ Outcome:
 
 - Accepted at `ANA-GATE-270`.
 
-### `PH1-M26` (`review_gate`)
+### `PH1-M26` (`completed`)
 
 Purpose:
 
@@ -976,3 +976,47 @@ Queue lines (exact):
 - [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
 - [x] Stop only at `ANA-GATE-280` (post `ANA-2610`) unless truly blocked.
 - [x] Submit checkpoint packet in `docs/todo/PH1_M26_CHECKPOINT.md`.
+
+Outcome:
+
+- Accepted at `ANA-GATE-280`.
+
+### `PH1-M27` (`in_progress`)
+
+Purpose:
+
+- Improve consistency-level audit coverage with a deterministic consistency-envelope fingerprint that composes canonical cross-fingerprint chain metadata into one replay handle.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M27_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- define PH1-M27 consistency-envelope fingerprint plan and boundaries
+- emit root consistency-envelope fingerprint fields in `run.json`
+- add report schema invariants and compare metadata coverage for consistency-envelope fingerprint fields
+- expand regression tests and smoke coverage
+- PH1-M27 checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-2701` through `ANA-2710` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-290` reached and reported.
+
+Non-goals:
+
+- Windows ConPTY implementation
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [ ] Execute `ANA-2701` through `ANA-2710` in order from `docs/todo/PH1_M27_TICKETS.md`.
+- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [ ] Stop only at `ANA-GATE-290` (post `ANA-2710`) unless truly blocked.
+- [ ] Submit checkpoint packet in `docs/todo/PH1_M27_CHECKPOINT.md`.
