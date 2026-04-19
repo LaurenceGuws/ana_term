@@ -4,6 +4,7 @@ const discovery = @import("../dsl/discovery.zig");
 const modes = @import("../capture/modes.zig");
 const run_pipeline = @import("run_pipeline.zig");
 const RunContext = @import("run_context.zig").RunContext;
+const terminal_profile = @import("../runner/terminal_profile.zig");
 const ExecutionMode = @import("../runner/execution_mode.zig").ExecutionMode;
 const TransportMode = @import("../runner/transport_mode.zig").TransportMode;
 
@@ -99,7 +100,7 @@ pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
                 printErr("--terminal-cmd requires a value\n") catch {};
                 return errors.Category.unknown_command.exitCode();
             }
-            ctx.terminal_cmd = argv[i + 1];
+            ctx.terminal_cmd_cli = argv[i + 1];
             i += 2;
             continue;
         }
@@ -143,6 +144,7 @@ pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
     const spec_paths = discovery.discover(allocator, roots_slice) catch return errors.Category.runtime_failure.exitCode();
     defer discovery.freePaths(allocator, spec_paths);
 
+    terminal_profile.resolveEffective(&ctx);
     return run_pipeline.executeSpecPaths(allocator, spec_paths, ctx);
 }
 

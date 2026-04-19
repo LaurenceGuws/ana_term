@@ -4,6 +4,7 @@ const modes = @import("../capture/modes.zig");
 const suite_manifest = @import("suite_manifest.zig");
 const run_pipeline = @import("run_pipeline.zig");
 const RunContext = @import("run_context.zig").RunContext;
+const terminal_profile = @import("../runner/terminal_profile.zig");
 const ExecutionMode = @import("../runner/execution_mode.zig").ExecutionMode;
 const TransportMode = @import("../runner/transport_mode.zig").TransportMode;
 
@@ -109,7 +110,7 @@ pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
                 printErr("--terminal-cmd requires a value\n") catch {};
                 return errors.Category.unknown_command.exitCode();
             }
-            ctx.terminal_cmd = argv[i + 1];
+            ctx.terminal_cmd_cli = argv[i + 1];
             i += 2;
             continue;
         }
@@ -165,6 +166,7 @@ pub fn execute(allocator: std.mem.Allocator, argv: []const []const u8) u8 {
     };
     defer suite_manifest.freePathList(allocator, paths);
 
+    terminal_profile.resolveEffective(&ctx);
     return run_pipeline.executeSpecPaths(allocator, paths, ctx);
 }
 

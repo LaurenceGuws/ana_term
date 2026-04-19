@@ -49,7 +49,7 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
     }
 
     if (ctx.transport_mode == .pty_guarded and !ctx.dry_run and posix_pty.runtimeHostIsLinux() and ctx.terminal_cmd.len == 0) {
-        printErr("pty_guarded full run on Linux requires --terminal-cmd (see docs/CLI.md)\n") catch {};
+        printErr("pty_guarded full run on Linux requires a non-empty resolved terminal command (--terminal-cmd and/or a PH1-M33 profile; see docs/CLI.md)\n") catch {};
         return errors.Category.invalid_spec.exitCode();
     }
 
