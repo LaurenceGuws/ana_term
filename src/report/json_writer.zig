@@ -1,6 +1,7 @@
 const std = @import("std");
 const run_execute = @import("../runner/run_execute.zig");
 const RunContext = @import("../cli/run_context.zig").RunContext;
+const terminal_profile = @import("../runner/terminal_profile.zig");
 const run_json_validate = @import("run_json_validate.zig");
 const transport_stub = @import("../runner/transport_stub.zig");
 const run_fingerprint = @import("run_fingerprint.zig");
@@ -34,6 +35,7 @@ fn appendJsonEncodedString(allocator: std.mem.Allocator, buf: *std.ArrayList(u8)
 /// Writes a minimal `run.json` placeholder (`docs/REPORT_FORMAT.md`).
 pub fn writePlaceholder(allocator: std.mem.Allocator, run_dir: []const u8, run_id: []const u8) !void {
     var ctx = RunContext.initDefault();
+    terminal_profile.resolveEffective(&ctx);
     ctx.captureHostIdentity();
     try run_fingerprint.populate(&ctx, allocator, run_id, &.{});
     try specset_fingerprint.populate(&ctx, allocator, &.{});
@@ -99,6 +101,18 @@ pub fn writeRun(
     }
 
     try buf.print(allocator, ",\n  \"execution_mode\": \"{s}\"", .{ctx.execution_mode.tag()});
+
+    if (ctx.terminal_profile_id_len == 0) {
+        try buf.appendSlice(allocator, ",\n  \"terminal_profile_id\": null");
+    } else {
+        try buf.appendSlice(allocator, ",\n  \"terminal_profile_id\": ");
+        try appendJsonEncodedString(allocator, &buf, ctx.terminal_profile_id_buf[0..ctx.terminal_profile_id_len]);
+    }
+    const src = if (ctx.terminal_cmd_source.len > 0) ctx.terminal_cmd_source else terminal_profile.source_fallback;
+    try buf.appendSlice(allocator, ",\n  \"terminal_cmd_source\": ");
+    try appendJsonEncodedString(allocator, &buf, src);
+    try buf.appendSlice(allocator, ",\n  \"resolved_terminal_cmd\": ");
+    try appendJsonEncodedString(allocator, &buf, ctx.terminal_cmd);
 
     try buf.appendSlice(allocator, ",\n  \"host_identity_machine\": ");
     try appendJsonEncodedString(allocator, &buf, ctx.host_identity_machine[0..ctx.host_identity_machine_len]);

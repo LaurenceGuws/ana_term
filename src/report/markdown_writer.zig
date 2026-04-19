@@ -1,10 +1,13 @@
 const std = @import("std");
 const run_execute = @import("../runner/run_execute.zig");
 const RunContext = @import("../cli/run_context.zig").RunContext;
+const terminal_profile = @import("../runner/terminal_profile.zig");
 
 /// Writes a minimal `summary.md` placeholder (`docs/REPORT_FORMAT.md`).
 pub fn writePlaceholder(allocator: std.mem.Allocator, run_dir: []const u8, run_id: []const u8) !void {
-    try writeRunSummary(allocator, run_dir, run_id, &.{}, RunContext.initDefault());
+    var ctx = RunContext.initDefault();
+    terminal_profile.resolveEffective(&ctx);
+    try writeRunSummary(allocator, run_dir, run_id, &.{}, ctx);
 }
 
 pub fn writeRunSummary(
@@ -23,7 +26,8 @@ pub fn writeRunSummary(
     defer buf.deinit(allocator);
 
     try buf.print(allocator, "# Run {s}\n\n## Environment\n\n", .{run_id});
-    try buf.print(allocator, "- platform: {s}\n- TERM: {s}\n- terminal (logical): {s}\n- execution_mode: {s}\n- transport: mode={s} timeout_ms={d}\n", .{ ctx.platform, term, ctx.terminal_name, ctx.execution_mode.tag(), ctx.transport_mode.tag(), ctx.timeout_ms });
+    const cmd_src = if (ctx.terminal_cmd_source.len > 0) ctx.terminal_cmd_source else terminal_profile.source_fallback;
+    try buf.print(allocator, "- platform: {s}\n- TERM: {s}\n- terminal (logical): {s}\n- execution_mode: {s}\n- terminal_cmd_source: {s}\n- transport: mode={s} timeout_ms={d}\n", .{ ctx.platform, term, ctx.terminal_name, ctx.execution_mode.tag(), cmd_src, ctx.transport_mode.tag(), ctx.timeout_ms });
     if (ctx.transport_mode == .pty_guarded) {
         if (ctx.dry_run) {
             try buf.appendSlice(allocator, "- guarded transport: scaffold_only (dry-run; deterministic stub handshake)\n");
@@ -31,8 +35,11 @@ pub fn writeRunSummary(
             try buf.print(allocator, "- guarded transport: experiment_linux_pty open_ok={any}\n", .{ctx.pty_experiment_open_ok});
         }
     }
+    if (ctx.terminal_profile_id_len > 0) {
+        try buf.print(allocator, "- terminal_profile_id: {s}\n", .{ctx.terminal_profile_id_buf[0..ctx.terminal_profile_id_len]});
+    }
     if (ctx.terminal_cmd.len > 0) {
-        try buf.print(allocator, "- terminal-cmd: `{s}`\n", .{ctx.terminal_cmd});
+        try buf.print(allocator, "- resolved_terminal_cmd: `{s}`\n", .{ctx.terminal_cmd});
     }
     if (ctx.suite_name) |s| {
         try buf.print(allocator, "- suite: {s}\n", .{s});
