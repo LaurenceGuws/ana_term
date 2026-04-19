@@ -4,8 +4,8 @@ Read this file first in Dual Agent Mode.
 
 ## Active Batch
 
-- Sprint `PH1-M36-S1` engineer execution is **active** (tickets `ANA-3601`..`ANA-3610`).
-- Super-gate: **`ANA-GATE-380`** — stop and report after checkpoint publication.
+- Sprint `PH1-M36-S1` engineer execution is **complete** (tickets `ANA-3601`..`ANA-3610`).
+- Super-gate: **`ANA-GATE-380`** — **Architect review** of PH1-M36 checkpoint (`docs/todo/PH1_M36_CHECKPOINT.md`).
 - Ticket source (reference): `docs/todo/PH1_M36_TICKETS.md`.
 - Board source: `docs/todo/JIRA_BOARD.md`.
 
