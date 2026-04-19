@@ -761,7 +761,7 @@ Outcome:
 
 - Accepted at `ANA-GATE-230`.
 
-### `PH1-M22` (`review_gate`)
+### `PH1-M22` (`completed`)
 
 Purpose:
 
@@ -800,3 +800,47 @@ Queue lines (exact):
 - [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
 - [x] Stop only at `ANA-GATE-240` (post `ANA-2210`) unless truly blocked.
 - [x] Submit checkpoint packet in `docs/todo/PH1_M22_CHECKPOINT.md`.
+
+Outcome:
+
+- Accepted at `ANA-GATE-240`.
+
+### `PH1-M23` (`in_progress`)
+
+Purpose:
+
+- Improve environment-level audit integrity with a deterministic environment-envelope fingerprint that composes canonical environment-facing metadata into one replay handle.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M23_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- define PH1-M23 environment-envelope fingerprint plan and boundaries
+- emit root environment-envelope fingerprint fields in `run.json`
+- add report schema invariants and compare metadata coverage for environment-envelope fingerprint fields
+- expand regression tests and smoke coverage
+- PH1-M23 checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-2301` through `ANA-2310` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-250` reached and reported.
+
+Non-goals:
+
+- Windows ConPTY implementation
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [ ] Execute `ANA-2301` through `ANA-2310` in order from `docs/todo/PH1_M23_TICKETS.md`.
+- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [ ] Stop only at `ANA-GATE-250` (post `ANA-2310`) unless truly blocked.
+- [ ] Submit checkpoint packet in `docs/todo/PH1_M23_CHECKPOINT.md`.
