@@ -108,6 +108,7 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
             ctx.terminal_launch_exit_code = telem.exit_code;
             ctx.terminal_launch_ok = telem.ok;
             ctx.terminal_launch_error = telem.err;
+            ctx.terminal_launch_outcome = telem.outcome;
         }
     }
 
