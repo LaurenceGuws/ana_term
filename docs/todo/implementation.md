@@ -1237,7 +1237,7 @@ Non-goals:
 
 Outcome:
 
-- Checkpoint published at `ANA-GATE-340` (Architect acceptance pending).
+- Accepted at `ANA-GATE-340`.
 
 Queue lines (exact):
 
@@ -1245,3 +1245,44 @@ Queue lines (exact):
 - [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
 - [x] Stop only at `ANA-GATE-340` (post `ANA-3210`) unless truly blocked.
 - [x] Submit checkpoint packet in `docs/todo/PH1_M32_CHECKPOINT.md`.
+
+### `PH1-M33` (`in_progress`)
+
+Purpose:
+
+- Add terminal profile adapters so named local terminals (kitty, ghostty, konsole, zide-terminal) map to deterministic launch commands and comparable artifacts.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M33_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- define PH1-M33 terminal profile adapter plan and boundaries
+- add profile resolver for supported terminals and explicit override precedence
+- emit resolved launch profile metadata in run artifacts
+- add report/compare coverage for profile metadata deltas
+- extend smoke docs with local multi-terminal adapter path
+- PH1-M33 checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-3301` through `ANA-3310` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-350` reached and reported.
+
+Non-goals:
+
+- full VT stream replay and assertion engine
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [ ] Execute `ANA-3301` through `ANA-3310` in order from `docs/todo/PH1_M33_TICKETS.md`.
+- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [ ] Stop only at `ANA-GATE-350` (post `ANA-3310`) unless truly blocked.
+- [ ] Submit checkpoint packet in `docs/todo/PH1_M33_CHECKPOINT.md`.
