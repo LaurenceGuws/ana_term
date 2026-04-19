@@ -180,7 +180,8 @@ On **non-Linux** hosts, `pty_guarded` (non-dry-run) fails with exit **2** before
 
 - **When**: `pty_guarded`, not **`--dry-run`**, Linux host, **`guarded_state == experiment_linux_pty`**, and **`--terminal-cmd`** is non-empty (after the minimal PTY experiment block). The harness runs **`/bin/sh -c <terminal_cmd>`** with wall-clock budget **`transport.timeout_ms`** (poll **`waitpid`**, **`SIGKILL`** on timeout); see **`docs/REAL_TERMINAL_LAUNCH_PLAN.md`**.
 - **Fail-closed**: a guarded **full** run on Linux **requires** a non-empty **`--terminal-cmd`**; otherwise the run exits before writing artifacts with a clear stderr message.
-- **Telemetry**: **`terminal_launch_*`** fields under **`transport`** (attempt, elapsed ns, exit code, ok flag, short error tag). Full contract: **`docs/REPORT_FORMAT.md`**.
+- **Telemetry**: **`terminal_launch_*`** fields under **`transport`** (attempt, elapsed ns, exit code, ok flag, short error tag, **PH1-M32** outcome class). Full contract: **`docs/REPORT_FORMAT.md`**.
+- **PH1-M32 outcome class**: **`terminal_launch_outcome`** is one of **`ok`**, **`nonzero_exit`**, **`signaled`**, **`timeout`**, **`spawn_failed`** when a launch was attempted; it must agree with **`terminal_launch_ok`**, **`terminal_launch_error`**, and **`terminal_launch_exit_code`** per **`docs/TERMINAL_LAUNCH_SEMANTICS_PLAN.md`**.
 
 ## `list`
 

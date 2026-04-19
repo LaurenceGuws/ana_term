@@ -236,7 +236,7 @@ Phase-1 placeholder runs may use minimal values but must preserve these keys for
 
 The harness emits a **`transport`** object alongside core run fields. Keys are stable for `report` / `compare`.
 
-**Serialization order (PH1-M9+)**: when `mode` is `pty_guarded`, the harness writes transport keys in lexicographic order: `guarded_opt_in`, `guarded_state`, `handshake`, `handshake_latency_ns`, `mode`, `pty_capability_notes`, `pty_experiment_attempt`, `pty_experiment_elapsed_ns`, `pty_experiment_error`, `pty_experiment_host_machine`, `pty_experiment_host_release`, `pty_experiment_open_ok`, `terminal_launch_attempt`, `terminal_launch_elapsed_ns`, `terminal_launch_error`, `terminal_launch_exit_code`, `terminal_launch_ok`, `timeout_ms`.
+**Serialization order (PH1-M9+)**: when `mode` is `pty_guarded`, the harness writes transport keys in lexicographic order: `guarded_opt_in`, `guarded_state`, `handshake`, `handshake_latency_ns`, `mode`, `pty_capability_notes`, `pty_experiment_attempt`, `pty_experiment_elapsed_ns`, `pty_experiment_error`, `pty_experiment_host_machine`, `pty_experiment_host_release`, `pty_experiment_open_ok`, `terminal_launch_attempt`, `terminal_launch_elapsed_ns`, `terminal_launch_error`, `terminal_launch_exit_code`, `terminal_launch_ok`, `terminal_launch_outcome`, `timeout_ms`.
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -270,6 +270,12 @@ See **`docs/PTY_EXPERIMENT_HARDENING_PLAN.md`** (PH1-M8) and **`docs/PTY_REPRODU
 | `terminal_launch_error` | string or `null` | Short static reason (`timeout`, `spawn_failed`, …) or **`null`**. |
 | `terminal_launch_exit_code` | integer or `null` | Child exit code when reaped normally; **`null`** on spawn failure or timeout before status. |
 | `terminal_launch_ok` | boolean or `null` | **`true`** / **`false`** when a launch ran to completion; **`null`** when no attempt. |
+
+**PH1-M32 (launch outcome class)** — when **`terminal_launch_attempt`** is **`1`**, **`terminal_launch_outcome`** is set (see **`docs/TERMINAL_LAUNCH_SEMANTICS_PLAN.md`**):
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `terminal_launch_outcome` | string or `null` | One of: **`ok`**, **`nonzero_exit`**, **`signaled`**, **`timeout`**, **`spawn_failed`**; **`null`** when no launch attempt. |
 
 ## `summary.md` (required)
 
