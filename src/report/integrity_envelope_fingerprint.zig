@@ -32,3 +32,47 @@ pub fn populate(ctx: *RunContext, allocator: std.mem.Allocator) !void {
     writeHexLower(&ctx.integrity_envelope_fingerprint_digest_hex, &digest);
     ctx.integrity_envelope_fingerprint_digest_len = 64;
 }
+
+fn fillDigest(dst: *[64]u8, len: *u8, hex_lower_64: *const [64]u8) void {
+    @memcpy(dst, hex_lower_64);
+    len.* = 64;
+}
+
+fn testCtxWithProvenance(pe: *const [64]u8) RunContext {
+    var ctx = RunContext.initDefault();
+    fillDigest(&ctx.provenance_envelope_fingerprint_digest_hex, &ctx.provenance_envelope_fingerprint_digest_len, pe);
+    return ctx;
+}
+
+test "integrity envelope fingerprint is deterministic for fixed provenance-envelope digest" {
+    var a = testCtxWithProvenance(&"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".*);
+    var b = testCtxWithProvenance(&"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".*);
+    try populate(&a, std.testing.allocator);
+    try populate(&b, std.testing.allocator);
+    try std.testing.expectEqual(a.integrity_envelope_fingerprint_digest_len, b.integrity_envelope_fingerprint_digest_len);
+    try std.testing.expectEqualSlices(
+        u8,
+        a.integrity_envelope_fingerprint_digest_hex[0..a.integrity_envelope_fingerprint_digest_len],
+        b.integrity_envelope_fingerprint_digest_hex[0..b.integrity_envelope_fingerprint_digest_len],
+    );
+}
+
+test "integrity envelope fingerprint changes when provenance-envelope digest changes" {
+    var a = testCtxWithProvenance(&"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".*);
+    var b = testCtxWithProvenance(&"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb".*);
+    try populate(&a, std.testing.allocator);
+    try populate(&b, std.testing.allocator);
+    try std.testing.expect(!std.mem.eql(
+        u8,
+        a.integrity_envelope_fingerprint_digest_hex[0..a.integrity_envelope_fingerprint_digest_len],
+        b.integrity_envelope_fingerprint_digest_hex[0..b.integrity_envelope_fingerprint_digest_len],
+    ));
+}
+
+test "integrity envelope fingerprint matches golden for M25 provenance-envelope digest chain" {
+    const golden_integrity = "85006478d27f84d40319d5107072b420417a8bf12a81c966bf04e0d15dd01fa0";
+    var ctx = testCtxWithProvenance(&"f56eb65942e63e5d5889c29130529cdbf681764c4d2beab18b0d3d8ebcb06e79".*);
+    try populate(&ctx, std.testing.allocator);
+    try std.testing.expectEqual(@as(u8, 64), ctx.integrity_envelope_fingerprint_digest_len);
+    try std.testing.expectEqualStrings(golden_integrity, ctx.integrity_envelope_fingerprint_digest_hex[0..ctx.integrity_envelope_fingerprint_digest_len]);
+}
