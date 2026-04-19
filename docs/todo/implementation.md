@@ -1069,7 +1069,7 @@ Outcome:
 
 - Accepted at `ANA-GATE-300`.
 
-### `PH1-M29` (`review_gate`)
+### `PH1-M29` (`completed`)
 
 Purpose:
 
@@ -1108,3 +1108,47 @@ Queue lines (exact):
 - [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
 - [x] Stop only at `ANA-GATE-310` (post `ANA-2910`) unless truly blocked.
 - [x] Submit checkpoint packet in `docs/todo/PH1_M29_CHECKPOINT.md`.
+
+Outcome:
+
+- Accepted at `ANA-GATE-310`.
+
+### `PH1-M30` (`in_progress`)
+
+Purpose:
+
+- Improve state-level audit coverage with a deterministic state-envelope fingerprint that composes canonical state-facing metadata into one replay handle.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M30_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- define PH1-M30 state-envelope fingerprint plan and boundaries
+- emit root state-envelope fingerprint fields in `run.json`
+- add report schema invariants and compare metadata coverage for state-envelope fingerprint fields
+- expand regression tests and smoke coverage
+- PH1-M30 checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-3001` through `ANA-3010` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-320` reached and reported.
+
+Non-goals:
+
+- Windows ConPTY implementation
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [ ] Execute `ANA-3001` through `ANA-3010` in order from `docs/todo/PH1_M30_TICKETS.md`.
+- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [ ] Stop only at `ANA-GATE-320` (post `ANA-3010`) unless truly blocked.
+- [ ] Submit checkpoint packet in `docs/todo/PH1_M30_CHECKPOINT.md`.
