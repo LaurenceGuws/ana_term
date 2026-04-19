@@ -893,7 +893,7 @@ Outcome:
 
 - Accepted at `ANA-GATE-260`.
 
-### `PH1-M25` (`in_progress`)
+### `PH1-M25` (`review_gate`)
 
 Purpose:
 
@@ -928,7 +928,7 @@ Non-goals:
 
 Queue lines (exact):
 
-- [ ] Execute `ANA-2501` through `ANA-2510` in order from `docs/todo/PH1_M25_TICKETS.md`.
-- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
-- [ ] Stop only at `ANA-GATE-270` (post `ANA-2510`) unless truly blocked.
-- [ ] Submit checkpoint packet in `docs/todo/PH1_M25_CHECKPOINT.md`.
+- [x] Execute `ANA-2501` through `ANA-2510` in order from `docs/todo/PH1_M25_TICKETS.md`.
+- [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [x] Stop only at `ANA-GATE-270` (post `ANA-2510`) unless truly blocked.
+- [x] Submit checkpoint packet in `docs/todo/PH1_M25_CHECKPOINT.md`.
