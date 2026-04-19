@@ -55,6 +55,15 @@ pub fn writeRunSummary(
         try buf.print(allocator, "- terminal_exec_template_id: {s}\n", .{ctx.terminal_exec_template_id_buf[0..ctx.terminal_exec_template_id_len]});
         try buf.print(allocator, "- terminal_exec_template_version: {s}\n", .{ctx.terminal_exec_template_version_buf[0..ctx.terminal_exec_template_version_len]});
     }
+    if (ctx.terminal_launch_preflight_ok) |b| {
+        try buf.print(allocator, "- terminal_launch_preflight_ok: {any}\n", .{b});
+    }
+    if (ctx.terminal_launch_preflight_reason) |r| {
+        try buf.print(allocator, "- terminal_launch_preflight_reason: {s}\n", .{r});
+    }
+    if (ctx.terminal_exec_resolved_path_len > 0) {
+        try buf.print(allocator, "- terminal_exec_resolved_path: {s}\n", .{ctx.terminal_exec_resolved_path_buf[0..ctx.terminal_exec_resolved_path_len]});
+    }
     if (ctx.suite_name) |s| {
         try buf.print(allocator, "- suite: {s}\n", .{s});
     } else {

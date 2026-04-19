@@ -14,9 +14,23 @@ Add a **deterministic transport fingerprint** to **`run.json` root** (alongside 
 | Key | Type | Rule |
 |-----|------|------|
 | `transport_fingerprint_digest` | string | **64** lowercase hex chars (SHA-256 of canonical payload). |
-| `transport_fingerprint_version` | string | Phase-1 value **`1`**. |
+| `transport_fingerprint_version` | string | **`1`** (legacy) or **`2`** (**PH1-M35**: preflight canonical lines when **`pty_guarded`**). |
 
 **Serialization order**: immediately after **`resultset_fingerprint_version`**, before the nested **`transport`** object: **`transport_fingerprint_digest`**, **`transport_fingerprint_version`** (lexicographic among these two keys).
+
+## Canonical payload (version `2`, PH1-M35+)
+
+Same as version **`1`**, except:
+
+1. Literal prefix: `PH1-M14/transport/fp/v2` (replaces `v1`).
+
+When **`mode`** is **`pty_guarded`**, after **`terminal_launch_outcome`** (line 14 in the v1 guarded appendix), append:
+
+15. **`terminal_launch_preflight_ok`**: `true`, `false`, or literal `null`.
+16. **`terminal_launch_preflight_reason`**: string body, or literal `null`.
+17. **`terminal_exec_resolved_path`**: string body (resolved probe path), or literal `null`.
+
+For **`none`** / **`pty_stub`**, the prefix is still **`v2`**; lines 8–17 are not appended (same shape as v1 non-guarded).
 
 ## Canonical payload (version `1`)
 

@@ -137,6 +137,25 @@ pub fn writeRun(
         try appendJsonEncodedString(allocator, &buf, ctx.terminal_exec_template_version_buf[0..ctx.terminal_exec_template_version_len]);
     }
 
+    try buf.appendSlice(allocator, ",\n  \"terminal_exec_resolved_path\": ");
+    if (ctx.terminal_exec_resolved_path_len == 0) {
+        try buf.appendSlice(allocator, "null");
+    } else {
+        try appendJsonEncodedString(allocator, &buf, ctx.terminal_exec_resolved_path_buf[0..ctx.terminal_exec_resolved_path_len]);
+    }
+    try buf.appendSlice(allocator, ",\n  \"terminal_launch_preflight_ok\": ");
+    if (ctx.terminal_launch_preflight_ok) |b| {
+        try buf.print(allocator, "{}", .{b});
+    } else {
+        try buf.appendSlice(allocator, "null");
+    }
+    try buf.appendSlice(allocator, ",\n  \"terminal_launch_preflight_reason\": ");
+    if (ctx.terminal_launch_preflight_reason) |r| {
+        try appendJsonEncodedString(allocator, &buf, r);
+    } else {
+        try buf.appendSlice(allocator, "null");
+    }
+
     try buf.appendSlice(allocator, ",\n  \"host_identity_machine\": ");
     try appendJsonEncodedString(allocator, &buf, ctx.host_identity_machine[0..ctx.host_identity_machine_len]);
     try buf.appendSlice(allocator, ",\n  \"host_identity_release\": ");
@@ -155,7 +174,7 @@ pub fn writeRun(
     try buf.appendSlice(allocator, ",\n  \"resultset_fingerprint_version\": \"1\"");
     try buf.appendSlice(allocator, ",\n  \"transport_fingerprint_digest\": ");
     try appendJsonEncodedString(allocator, &buf, ctx.transport_fingerprint_digest_hex[0..ctx.transport_fingerprint_digest_len]);
-    try buf.appendSlice(allocator, ",\n  \"transport_fingerprint_version\": \"1\"");
+    try buf.appendSlice(allocator, ",\n  \"transport_fingerprint_version\": \"2\"");
     try buf.appendSlice(allocator, ",\n  \"exec_summary_fingerprint_digest\": ");
     try appendJsonEncodedString(allocator, &buf, ctx.exec_summary_fingerprint_digest_hex[0..ctx.exec_summary_fingerprint_digest_len]);
     try buf.appendSlice(allocator, ",\n  \"exec_summary_fingerprint_version\": \"1\"");
@@ -401,7 +420,7 @@ test "writeRun JSON-encodes guarded PTY host snapshot strings" {
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"specset_fingerprint_digest\": \"") != null);
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"resultset_fingerprint_version\": \"1\"") != null);
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"resultset_fingerprint_digest\": \"") != null);
-    try std.testing.expect(std.mem.indexOf(u8, json_text, "\"transport_fingerprint_version\": \"1\"") != null);
+    try std.testing.expect(std.mem.indexOf(u8, json_text, "\"transport_fingerprint_version\": \"2\"") != null);
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"transport_fingerprint_digest\": \"") != null);
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"exec_summary_fingerprint_version\": \"1\"") != null);
     try std.testing.expect(std.mem.indexOf(u8, json_text, "\"exec_summary_fingerprint_digest\": \"") != null);
