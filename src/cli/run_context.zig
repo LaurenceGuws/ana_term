@@ -124,6 +124,8 @@ pub const RunContext = struct {
     terminal_launch_ok: ?bool,
     /// PH1-M31: short static tag (`timeout`, `spawn_failed`, …); `null` when none.
     terminal_launch_error: ?[]const u8,
+    /// PH1-M32: `ok` \| `nonzero_exit` \| `signaled` \| `timeout` \| `spawn_failed`; `null` when no attempt.
+    terminal_launch_outcome: ?[]const u8,
 
     pub fn initDefault() RunContext {
         return .{
@@ -200,6 +202,7 @@ pub const RunContext = struct {
             .terminal_launch_exit_code = null,
             .terminal_launch_ok = null,
             .terminal_launch_error = null,
+            .terminal_launch_outcome = null,
         };
     }
 

@@ -9,10 +9,18 @@ pub const LaunchTelemetry = struct {
     exit_code: ?u32 = null,
     ok: ?bool = null,
     err: ?[]const u8 = null,
+    /// PH1-M32 explicit outcome class (`transport.terminal_launch_outcome`).
+    outcome: ?[]const u8 = null,
 };
 
 pub const err_spawn_failed: []const u8 = "spawn_failed";
 pub const err_timeout: []const u8 = "timeout";
+
+pub const outcome_ok: []const u8 = "ok";
+pub const outcome_nonzero_exit: []const u8 = "nonzero_exit";
+pub const outcome_signaled: []const u8 = "signaled";
+pub const outcome_timeout: []const u8 = "timeout";
+pub const outcome_spawn_failed: []const u8 = "spawn_failed";
 
 fn clampJsonNs(raw: u64) u64 {
     return @min(raw, @as(u64, @intCast(std.math.maxInt(i64))));
