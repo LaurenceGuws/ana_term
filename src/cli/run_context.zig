@@ -25,6 +25,8 @@ pub const terminal_exec_argc_max: usize = 16;
 pub const terminal_exec_arg_max: usize = 256;
 /// PH1-M34: max bytes for `terminal_exec_template_id` in artifacts.
 pub const terminal_exec_template_id_cap: usize = 64;
+/// PH1-M35: max bytes for `terminal_exec_resolved_path` in artifacts.
+pub const terminal_exec_resolved_path_cap: usize = 512;
 
 pub const RunContext = struct {
     capture_mode: []const u8,
@@ -154,6 +156,13 @@ pub const RunContext = struct {
     terminal_launch_error: ?[]const u8,
     /// PH1-M32: `ok` \| `nonzero_exit` \| `signaled` \| `timeout` \| `spawn_failed`; `null` when no attempt.
     terminal_launch_outcome: ?[]const u8,
+    /// PH1-M35: preflight probe outcome when applicable; `null` when not run.
+    terminal_launch_preflight_ok: ?bool,
+    /// PH1-M35: static reason tag (`launch_preflight.reason_*`); `null` when not applicable.
+    terminal_launch_preflight_reason: ?[]const u8,
+    /// PH1-M35: resolved path buffer for `argv[0]` probe.
+    terminal_exec_resolved_path_buf: [terminal_exec_resolved_path_cap]u8,
+    terminal_exec_resolved_path_len: u16,
 
     pub fn initDefault() RunContext {
         return .{
@@ -244,6 +253,10 @@ pub const RunContext = struct {
             .terminal_launch_ok = null,
             .terminal_launch_error = null,
             .terminal_launch_outcome = null,
+            .terminal_launch_preflight_ok = null,
+            .terminal_launch_preflight_reason = null,
+            .terminal_exec_resolved_path_buf = std.mem.zeroes([terminal_exec_resolved_path_cap]u8),
+            .terminal_exec_resolved_path_len = 0,
         };
     }
 
