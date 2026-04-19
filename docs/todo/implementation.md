@@ -1202,7 +1202,7 @@ Queue lines (exact):
 - [x] Stop only at `ANA-GATE-330` (post `ANA-3110`) unless truly blocked.
 - [x] Submit checkpoint packet in `docs/todo/PH1_M31_CHECKPOINT.md`.
 
-### `PH1-M32` (`in_progress`)
+### `PH1-M32` (`completed`)
 
 Purpose:
 
@@ -1235,9 +1235,13 @@ Non-goals:
 - screenshot/OCR systems
 - rich TUI frontend
 
+Outcome:
+
+- Checkpoint published at `ANA-GATE-340` (Architect acceptance pending).
+
 Queue lines (exact):
 
-- [ ] Execute `ANA-3201` through `ANA-3210` in order from `docs/todo/PH1_M32_TICKETS.md`.
-- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
-- [ ] Stop only at `ANA-GATE-340` (post `ANA-3210`) unless truly blocked.
-- [ ] Submit checkpoint packet in `docs/todo/PH1_M32_CHECKPOINT.md`.
+- [x] Execute `ANA-3201` through `ANA-3210` in order from `docs/todo/PH1_M32_TICKETS.md`.
+- [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [x] Stop only at `ANA-GATE-340` (post `ANA-3210`) unless truly blocked.
+- [x] Submit checkpoint packet in `docs/todo/PH1_M32_CHECKPOINT.md`.
