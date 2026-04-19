@@ -1157,7 +1157,7 @@ Outcome:
 
 - Accepted at `ANA-GATE-320`.
 
-### `PH1-M31` (`awaiting_gate`)
+### `PH1-M31` (`completed`)
 
 Purpose:
 
@@ -1193,7 +1193,7 @@ Non-goals:
 
 Outcome:
 
-- Engineer batch complete; checkpoint packet in `docs/todo/PH1_M31_CHECKPOINT.md`. **Architect acceptance** at `ANA-GATE-330` pending.
+- Accepted at `ANA-GATE-330`.
 
 Queue lines (exact):
 
@@ -1201,3 +1201,43 @@ Queue lines (exact):
 - [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
 - [x] Stop only at `ANA-GATE-330` (post `ANA-3110`) unless truly blocked.
 - [x] Submit checkpoint packet in `docs/todo/PH1_M31_CHECKPOINT.md`.
+
+### `PH1-M32` (`in_progress`)
+
+Purpose:
+
+- Harden real terminal launch semantics so telemetry and compare outputs are stable across success, timeout, and non-zero exit paths.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M32_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- define PH1-M32 launch semantics hardening plan and boundaries
+- tighten launch error taxonomy and invariants in artifacts
+- add compare/report coverage for launch outcome semantics
+- extend docs and smoke checks for kitty vs ghostty/konsole launch paths
+- PH1-M32 checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-3201` through `ANA-3210` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-340` reached and reported.
+
+Non-goals:
+
+- full VT stream replay and assertion engine
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [ ] Execute `ANA-3201` through `ANA-3210` in order from `docs/todo/PH1_M32_TICKETS.md`.
+- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [ ] Stop only at `ANA-GATE-340` (post `ANA-3210`) unless truly blocked.
+- [ ] Submit checkpoint packet in `docs/todo/PH1_M32_CHECKPOINT.md`.
