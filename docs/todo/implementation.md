@@ -849,7 +849,7 @@ Outcome:
 
 - Accepted at `ANA-GATE-250`.
 
-### `PH1-M24` (`review_gate`)
+### `PH1-M24` (`completed`)
 
 Purpose:
 
@@ -888,3 +888,47 @@ Queue lines (exact):
 - [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
 - [x] Stop only at `ANA-GATE-260` (post `ANA-2410`) unless truly blocked.
 - [x] Submit checkpoint packet in `docs/todo/PH1_M24_CHECKPOINT.md`.
+
+Outcome:
+
+- Accepted at `ANA-GATE-260`.
+
+### `PH1-M25` (`in_progress`)
+
+Purpose:
+
+- Improve provenance-level audit integrity with a deterministic provenance-envelope fingerprint that composes canonical provenance-facing metadata into one replay handle.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M25_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- define PH1-M25 provenance-envelope fingerprint plan and boundaries
+- emit root provenance-envelope fingerprint fields in `run.json`
+- add report schema invariants and compare metadata coverage for provenance-envelope fingerprint fields
+- expand regression tests and smoke coverage
+- PH1-M25 checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-2501` through `ANA-2510` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-270` reached and reported.
+
+Non-goals:
+
+- Windows ConPTY implementation
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [ ] Execute `ANA-2501` through `ANA-2510` in order from `docs/todo/PH1_M25_TICKETS.md`.
+- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [ ] Stop only at `ANA-GATE-270` (post `ANA-2510`) unless truly blocked.
+- [ ] Submit checkpoint packet in `docs/todo/PH1_M25_CHECKPOINT.md`.
