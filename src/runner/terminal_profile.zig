@@ -233,6 +233,7 @@ test "resolve profile for ghostty" {
     try std.testing.expectEqualStrings("ghostty", profileIdSlice(&ctx));
     try std.testing.expectEqual(@as(u8, 1), ctx.terminal_exec_argc);
     try std.testing.expectEqualStrings(template_id_ghostty_v1, ctx.terminal_exec_template_id_buf[0..ctx.terminal_exec_template_id_len]);
+    try std.testing.expectEqualStrings(exec_template_version, ctx.terminal_exec_template_version_buf[0..ctx.terminal_exec_template_version_len]);
 }
 
 test "resolve profile for konsole" {
@@ -242,6 +243,9 @@ test "resolve profile for konsole" {
     try std.testing.expectEqualStrings("konsole", ctx.terminal_cmd);
     try std.testing.expectEqualStrings(source_profile, ctx.terminal_cmd_source);
     try std.testing.expectEqualStrings("konsole", profileIdSlice(&ctx));
+    try std.testing.expectEqual(@as(u8, 1), ctx.terminal_exec_argc);
+    try std.testing.expectEqualStrings(template_id_konsole_v1, ctx.terminal_exec_template_id_buf[0..ctx.terminal_exec_template_id_len]);
+    try std.testing.expectEqualStrings(exec_template_version, ctx.terminal_exec_template_version_buf[0..ctx.terminal_exec_template_version_len]);
 }
 
 test "resolve profile for zide-terminal" {

@@ -600,6 +600,30 @@ test "diffRunMeta detects terminal_cmd_source mismatch" {
     try std.testing.expectEqualStrings("changed", rows[3].delta);
 }
 
+test "diffRunMeta detects resolved_terminal_argv mismatch" {
+    const left = RunMeta{ .resolved_terminal_argv = "[\"a\"]" };
+    const right = RunMeta{ .resolved_terminal_argv = "[\"b\"]" };
+    const rows = diffRunMeta(left, right);
+    try std.testing.expectEqualStrings("resolved_terminal_argv", rows[5].field);
+    try std.testing.expectEqualStrings("changed", rows[5].delta);
+}
+
+test "diffRunMeta detects terminal_exec_template_id mismatch" {
+    const left = RunMeta{ .terminal_exec_template_id = "kitty_exec_v1" };
+    const right = RunMeta{ .terminal_exec_template_id = "ghostty_exec_v1" };
+    const rows = diffRunMeta(left, right);
+    try std.testing.expectEqualStrings("terminal_exec_template_id", rows[6].field);
+    try std.testing.expectEqualStrings("changed", rows[6].delta);
+}
+
+test "diffRunMeta detects terminal_exec_template_version mismatch" {
+    const left = RunMeta{ .terminal_exec_template_version = "1" };
+    const right = RunMeta{ .terminal_exec_template_version = "2" };
+    const rows = diffRunMeta(left, right);
+    try std.testing.expectEqualStrings("terminal_exec_template_version", rows[7].field);
+    try std.testing.expectEqualStrings("changed", rows[7].delta);
+}
+
 test "diffRunMeta detects transport_mode mismatch" {
     const left = RunMeta{ .transport_mode = "none" };
     const right = RunMeta{ .transport_mode = "pty_stub" };

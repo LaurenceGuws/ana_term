@@ -165,6 +165,72 @@ test "writeFile includes terminal_cmd_source in metadata_deltas" {
     try std.testing.expect(std.mem.indexOf(u8, text, "\"delta\": \"changed\"") != null);
 }
 
+test "writeFile includes resolved_terminal_argv in metadata_deltas" {
+    var tmp = std.testing.tmpDir(.{});
+    defer tmp.cleanup();
+
+    const path = try std.fmt.allocPrint(std.testing.allocator, ".zig-cache/tmp/{s}/compare-resolved-argv.json", .{tmp.sub_path[0..]});
+    defer std.testing.allocator.free(path);
+
+    const rows: []const run_json.DiffRow = &.{};
+    const meta = run_json.diffRunMeta(
+        .{ .resolved_terminal_argv = "[\"kitty\",\"--detach\"]" },
+        .{ .resolved_terminal_argv = "[\"ghostty\"]" },
+    );
+
+    try writeFile(std.testing.allocator, path, rows, "a/run.json", "b/run.json", &meta);
+
+    const text = try std.fs.cwd().readFileAlloc(std.testing.allocator, path, 1 << 20);
+    defer std.testing.allocator.free(text);
+
+    try std.testing.expect(std.mem.indexOf(u8, text, "\"field\": \"resolved_terminal_argv\"") != null);
+    try std.testing.expect(std.mem.indexOf(u8, text, "\"delta\": \"changed\"") != null);
+}
+
+test "writeFile includes terminal_exec_template_id in metadata_deltas" {
+    var tmp = std.testing.tmpDir(.{});
+    defer tmp.cleanup();
+
+    const path = try std.fmt.allocPrint(std.testing.allocator, ".zig-cache/tmp/{s}/compare-template-id.json", .{tmp.sub_path[0..]});
+    defer std.testing.allocator.free(path);
+
+    const rows: []const run_json.DiffRow = &.{};
+    const meta = run_json.diffRunMeta(
+        .{ .terminal_exec_template_id = "kitty_exec_v1" },
+        .{ .terminal_exec_template_id = "ghostty_exec_v1" },
+    );
+
+    try writeFile(std.testing.allocator, path, rows, "a/run.json", "b/run.json", &meta);
+
+    const text = try std.fs.cwd().readFileAlloc(std.testing.allocator, path, 1 << 20);
+    defer std.testing.allocator.free(text);
+
+    try std.testing.expect(std.mem.indexOf(u8, text, "\"field\": \"terminal_exec_template_id\"") != null);
+    try std.testing.expect(std.mem.indexOf(u8, text, "\"delta\": \"changed\"") != null);
+}
+
+test "writeFile includes terminal_exec_template_version in metadata_deltas" {
+    var tmp = std.testing.tmpDir(.{});
+    defer tmp.cleanup();
+
+    const path = try std.fmt.allocPrint(std.testing.allocator, ".zig-cache/tmp/{s}/compare-template-version.json", .{tmp.sub_path[0..]});
+    defer std.testing.allocator.free(path);
+
+    const rows: []const run_json.DiffRow = &.{};
+    const meta = run_json.diffRunMeta(
+        .{ .terminal_exec_template_version = "1" },
+        .{ .terminal_exec_template_version = "2" },
+    );
+
+    try writeFile(std.testing.allocator, path, rows, "a/run.json", "b/run.json", &meta);
+
+    const text = try std.fs.cwd().readFileAlloc(std.testing.allocator, path, 1 << 20);
+    defer std.testing.allocator.free(text);
+
+    try std.testing.expect(std.mem.indexOf(u8, text, "\"field\": \"terminal_exec_template_version\"") != null);
+    try std.testing.expect(std.mem.indexOf(u8, text, "\"delta\": \"changed\"") != null);
+}
+
 test "writeFile includes resultset_fingerprint_digest in metadata_deltas" {
     var tmp = std.testing.tmpDir(.{});
     defer tmp.cleanup();
