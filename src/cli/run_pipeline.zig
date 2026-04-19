@@ -24,6 +24,7 @@ const environment_envelope_fingerprint = @import("../report/environment_envelope
 const artifact_manifest_fingerprint = @import("../report/artifact_manifest_fingerprint.zig");
 const provenance_envelope_fingerprint = @import("../report/provenance_envelope_fingerprint.zig");
 const integrity_envelope_fingerprint = @import("../report/integrity_envelope_fingerprint.zig");
+const consistency_envelope_fingerprint = @import("../report/consistency_envelope_fingerprint.zig");
 const markdown_writer = @import("../report/markdown_writer.zig");
 const env_writer = @import("../report/env_writer.zig");
 const RunContext = @import("run_context.zig").RunContext;
@@ -126,6 +127,7 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
     artifact_manifest_fingerprint.populate(&ctx, allocator) catch return errors.Category.runtime_failure.exitCode();
     provenance_envelope_fingerprint.populate(&ctx, allocator) catch return errors.Category.runtime_failure.exitCode();
     integrity_envelope_fingerprint.populate(&ctx, allocator) catch return errors.Category.runtime_failure.exitCode();
+    consistency_envelope_fingerprint.populate(&ctx, allocator) catch return errors.Category.runtime_failure.exitCode();
     json_writer.writeRun(allocator, run_dir, run_id, records.items, ctx) catch return errors.Category.runtime_failure.exitCode();
     markdown_writer.writeRunSummary(allocator, run_dir, run_id, records.items, ctx) catch return errors.Category.runtime_failure.exitCode();
     env_writer.writeEnvJson(allocator, run_dir, ctx) catch return errors.Category.runtime_failure.exitCode();
