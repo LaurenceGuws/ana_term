@@ -41,6 +41,19 @@ fn copyResolvedPath(p: *Probe, path: []const u8) void {
     p.resolved_path_len = @intCast(n);
 }
 
+/// PH1-M36: replace probe buffer with **`realpath`** output when possible (Linux).
+fn tryCanonicalizeResolvedPathLinux(p: *Probe, probe_path: []const u8) void {
+    const builtin = @import("builtin");
+    if (builtin.target.os.tag != .linux) return;
+    var out_buf: [std.fs.max_path_bytes]u8 = undefined;
+    if (posix.realpath(probe_path, &out_buf)) |canon| {
+        copyResolvedPath(p, canon);
+        p.path_normalization = path_normalization_canonical;
+    } else |_| {
+        p.path_normalization = path_normalization_literal;
+    }
+}
+
 fn finishFromOpenedFile(file: std.fs.File, path: []const u8) Probe {
     defer file.close();
     const st = file.stat() catch {
@@ -54,6 +67,7 @@ fn finishFromOpenedFile(file: std.fs.File, path: []const u8) Probe {
     };
     var p = Probe{ .ok = true, .reason = reason_ok, .path_normalization = path_normalization_literal };
     copyResolvedPath(&p, path);
+    tryCanonicalizeResolvedPathLinux(&p, path);
     return p;
 }
 
@@ -112,7 +126,8 @@ test "probeArgv0ExecutableLinux finds /bin/true" {
     const p = probeArgv0ExecutableLinux("/bin/true");
     try std.testing.expect(p.ok);
     try std.testing.expectEqualStrings(reason_ok, p.reason);
-    try std.testing.expectEqualStrings("/bin/true", p.resolvedPathSlice().?);
+    try std.testing.expectEqualStrings(path_normalization_canonical, p.path_normalization);
+    try std.testing.expect(std.mem.eql(u8, p.resolvedPathSlice().?, "/bin/true") or std.mem.endsWith(u8, p.resolvedPathSlice().?, "/bin/true"));
 }
 
 test "probeArgv0ExecutableLinux bare true uses PATH" {
@@ -122,6 +137,7 @@ test "probeArgv0ExecutableLinux bare true uses PATH" {
     const p = probeArgv0ExecutableLinux("true");
     try std.testing.expect(p.ok);
     try std.testing.expectEqualStrings(reason_ok, p.reason);
+    try std.testing.expectEqualStrings(path_normalization_canonical, p.path_normalization);
     try std.testing.expect(std.mem.endsWith(u8, p.resolvedPathSlice().?, "/true"));
 }
 
