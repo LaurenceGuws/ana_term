@@ -1282,7 +1282,7 @@ Non-goals:
 
 Outcome:
 
-- Engineer batch complete; **Pending Architect acceptance** at `ANA-GATE-350`.
+- Accepted at `ANA-GATE-350`.
 
 Queue lines (exact):
 
@@ -1290,3 +1290,44 @@ Queue lines (exact):
 - [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
 - [x] Stop only at `ANA-GATE-350` (post `ANA-3310`) unless truly blocked.
 - [x] Submit checkpoint packet in `docs/todo/PH1_M33_CHECKPOINT.md`.
+
+### `PH1-M34` (`in_progress`)
+
+Purpose:
+
+- Convert profile resolution into executable per-terminal launch templates so profile-driven runs can produce consistent non-interactive launch outcomes.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M34_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- define PH1-M34 executable template plan and boundaries
+- add per-profile launch templates (kitty, ghostty, konsole, zide-terminal) with deterministic argument handling
+- thread templated launch argv through guarded launch seam
+- emit and validate templated launch metadata in artifacts/report/compare
+- extend smoke docs with executable profile template checks
+- PH1-M34 checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-3401` through `ANA-3410` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-360` reached and reported.
+
+Non-goals:
+
+- full VT stream replay and assertion engine
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [ ] Execute `ANA-3401` through `ANA-3410` in order from `docs/todo/PH1_M34_TICKETS.md`.
+- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [ ] Stop only at `ANA-GATE-360` (post `ANA-3410`) unless truly blocked.
+- [ ] Submit checkpoint packet in `docs/todo/PH1_M34_CHECKPOINT.md`.
