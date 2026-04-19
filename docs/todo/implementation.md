@@ -1113,7 +1113,7 @@ Outcome:
 
 - Accepted at `ANA-GATE-310`.
 
-### `PH1-M30` (`review_gate`)
+### `PH1-M30` (`completed`)
 
 Purpose:
 
@@ -1152,3 +1152,48 @@ Queue lines (exact):
 - [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
 - [x] Stop only at `ANA-GATE-320` (post `ANA-3010`) unless truly blocked.
 - [x] Submit checkpoint packet in `docs/todo/PH1_M30_CHECKPOINT.md`.
+
+Outcome:
+
+- Accepted at `ANA-GATE-320`.
+
+### `PH1-M31` (`in_progress`)
+
+Purpose:
+
+- Establish a first real-terminal launch lane that records deterministic process-level evidence while preserving the text-first artifact contract.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M31_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- define PH1-M31 real-terminal launch plan and boundaries
+- add real launch telemetry fields to run context and artifacts
+- launch terminal command under guarded lane with bounded timeout and deterministic error mapping
+- add report schema invariants and compare metadata coverage for launch telemetry
+- expand regression tests and smoke coverage
+- PH1-M31 checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-3101` through `ANA-3110` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-330` reached and reported.
+
+Non-goals:
+
+- full VT stream replay and assertion engine
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [ ] Execute `ANA-3101` through `ANA-3110` in order from `docs/todo/PH1_M31_TICKETS.md`.
+- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [ ] Stop only at `ANA-GATE-330` (post `ANA-3110`) unless truly blocked.
+- [ ] Submit checkpoint packet in `docs/todo/PH1_M31_CHECKPOINT.md`.
