@@ -35,9 +35,11 @@ const RunContext = run_context_mod.RunContext;
 const transport_guard_preflight = @import("../runner/transport_guard_preflight.zig");
 const posix_pty = @import("../runner/posix_pty.zig");
 const real_terminal_launch = @import("../runner/real_terminal_launch.zig");
+const launch_preflight = @import("../runner/launch_preflight.zig");
 
 pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []const u8, ctx_in: RunContext) u8 {
     var ctx = ctx_in;
+    var launch_preflight_failed: bool = false;
     if (spec_paths.len == 0) {
         printErr("no probe specs to run\n") catch {};
         return errors.Category.invalid_spec.exitCode();
@@ -108,13 +110,22 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
             for (0..na) |k| {
                 launch_argv[k] = ctx.terminal_exec_argv_flat[k][0..ctx.terminal_exec_argv_lens[k]];
             }
-            const telem = real_terminal_launch.runBoundedArgvCommand(allocator, launch_argv[0..na], ctx.timeout_ms);
-            ctx.terminal_launch_attempt = telem.attempt;
-            ctx.terminal_launch_elapsed_ns = telem.elapsed_ns;
-            ctx.terminal_launch_exit_code = telem.exit_code;
-            ctx.terminal_launch_ok = telem.ok;
-            ctx.terminal_launch_error = telem.err;
-            ctx.terminal_launch_outcome = telem.outcome;
+            const probe = launch_preflight.probeArgv0ExecutableLinux(launch_argv[0]);
+            launch_preflight.applyProbeToContext(&ctx, &probe);
+            const block_launch = !probe.ok and
+                (std.mem.eql(u8, probe.reason, launch_preflight.reason_missing_executable) or
+                std.mem.eql(u8, probe.reason, launch_preflight.reason_not_executable));
+            if (block_launch) {
+                launch_preflight_failed = true;
+            } else if (probe.ok) {
+                const telem = real_terminal_launch.runBoundedArgvCommand(allocator, launch_argv[0..na], ctx.timeout_ms);
+                ctx.terminal_launch_attempt = telem.attempt;
+                ctx.terminal_launch_elapsed_ns = telem.elapsed_ns;
+                ctx.terminal_launch_exit_code = telem.exit_code;
+                ctx.terminal_launch_ok = telem.ok;
+                ctx.terminal_launch_error = telem.err;
+                ctx.terminal_launch_outcome = telem.outcome;
+            }
         }
     }
 
@@ -161,6 +172,10 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
     env_writer.writeEnvJson(allocator, run_dir, ctx) catch return errors.Category.runtime_failure.exitCode();
 
     printStdout("wrote run artifacts under {s}\n", .{run_dir}) catch return errors.Category.runtime_failure.exitCode();
+    if (launch_preflight_failed) {
+        printErr("terminal launch preflight failed: argv[0] is not available as an executable (see run.json terminal_launch_preflight_*)\n") catch {};
+        return errors.Category.invalid_spec.exitCode();
+    }
     return 0;
 }
 

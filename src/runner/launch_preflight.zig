@@ -2,6 +2,7 @@
 
 const std = @import("std");
 const posix = std.posix;
+const run_context_mod = @import("../cli/run_context.zig");
 
 /// Preflight not applicable (wrong OS, empty probe, or harness path that skips preflight).
 pub const reason_na = "na";
@@ -79,6 +80,18 @@ pub fn probeArgv0ExecutableLinux(argv0: []const u8) Probe {
     }
 
     return .{ .ok = false, .reason = reason_missing_executable };
+}
+
+/// Copies probe results into `ctx` for **`run.json`** (PH1-M35).
+pub fn applyProbeToContext(ctx: *run_context_mod.RunContext, probe: *const Probe) void {
+    ctx.terminal_launch_preflight_ok = probe.ok;
+    ctx.terminal_launch_preflight_reason = probe.reason;
+    ctx.terminal_exec_resolved_path_len = 0;
+    if (probe.resolvedPathSlice()) |rp| {
+        const n = @min(rp.len, run_context_mod.terminal_exec_resolved_path_cap);
+        @memcpy(ctx.terminal_exec_resolved_path_buf[0..n], rp[0..n]);
+        ctx.terminal_exec_resolved_path_len = @intCast(n);
+    }
 }
 
 test "probeArgv0ExecutableLinux finds /bin/true" {
