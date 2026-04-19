@@ -45,9 +45,17 @@ Top-level JSON object with at least:
 |-------|------|-------------|
 | `terminal_profile_id` | string or `null` | Canonical adapter id when **`--terminal`** matches a built-in profile (e.g. `kitty`); **`null`** when unknown or not applicable. |
 | `terminal_cmd_source` | string | One of: **`cli_override`** (non-empty **`--terminal-cmd`**), **`profile`** (adapter template), **`fallback`** (effective command is the **`--terminal`** string). |
-| `resolved_terminal_cmd` | string | Effective shell command string passed to the bounded launch lane / context fingerprint (JSON-escaped). |
+| `resolved_terminal_cmd` | string | Effective launch summary: **space-joined** argv used for bounded launch / context fingerprint (JSON-escaped); backward-compatible with PH1-M33 string consumers. |
 
-**Serialization order**: after `execution_mode`, before `host_identity_machine`: `terminal_profile_id`, `terminal_cmd_source`, `resolved_terminal_cmd`, then `host_identity_machine`, `host_identity_release`, `host_identity_sysname` (lexicographic among the host triple). See **`docs/HOST_IDENTITY_PLAN.md`** and **`docs/TERMINAL_PROFILE_ADAPTER_PLAN.md`**.
+**PH1-M34 (executable profile templates)** — present on every harness `run.json` that writes artifacts:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `resolved_terminal_argv` | array of strings | argv passed to the bounded launcher (direct exec path) or materialized from resolution; JSON array of non-empty segments after splitting rules. |
+| `terminal_exec_template_id` | string or `null` | Stable id when a built-in **executable template** applied (e.g. `kitty_exec_v1`); **`null`** for CLI split-only or fallback-only launches without a named template. |
+| `terminal_exec_template_version` | string | Template table revision; phase-1 value **`1`** when **`terminal_exec_template_id`** is non-null. |
+
+**Serialization order**: after `execution_mode`, before `host_identity_machine`: `terminal_profile_id`, `terminal_cmd_source`, `resolved_terminal_cmd`, **`resolved_terminal_argv`**, **`terminal_exec_template_id`**, **`terminal_exec_template_version`**, then `host_identity_machine`, `host_identity_release`, `host_identity_sysname` (lexicographic among the host triple). See **`docs/HOST_IDENTITY_PLAN.md`**, **`docs/TERMINAL_PROFILE_ADAPTER_PLAN.md`**, and **`docs/TERMINAL_PROFILE_EXEC_TEMPLATE_PLAN.md`**.
 
 **PH1-M11+ (run fingerprint)** — present on every harness `run.json` that writes artifacts:
 

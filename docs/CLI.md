@@ -19,13 +19,14 @@ These flags identify **which terminal** is under test and how it would be invoke
 | Flag | Meaning |
 |------|---------|
 | `--terminal <name>` | Short **logical id** for the terminal under test (e.g. `wezterm`, `alacritty`). Used in `run.json` / `env.json` and compare reports. |
-| `--terminal-cmd <string>` | Optional **full shell command** (or argv prefix) that would launch that terminal for automation later. May contain spaces; pass as a single flag argument. |
+| `--terminal-cmd <string>` | Optional launch string for automation. **PH1-M34** turns this into argv via **simple ASCII whitespace splitting** (see **`docs/TERMINAL_PROFILE_EXEC_TEMPLATE_PLAN.md`**); if splitting cannot fit harness caps, the harness may fall back to a **single argv token** or a **shell** execution path. May contain spaces; pass as a single flag argument. |
 | `--platform <name>` | OS tag for the run (e.g. `linux`). Defaults to a sensible native tag when omitted. |
 
 **Rules**
 
 - `--terminal` is the primary key for comparison: two runs with different `--terminal` values are expected to differ in metadata even if specs match.
 - **PH1-M33 profile resolution**: when **`--terminal-cmd`** is omitted, the harness resolves a **default launch command** from **`--terminal`** using built-in profile adapters (see **`docs/TERMINAL_PROFILE_ADAPTER_PLAN.md`**). When **`--terminal-cmd`** is set, it **wins** for the effective launch string; `run.json` records source **`cli_override`** vs **`profile`** vs **`fallback`**.
+- **PH1-M34 executable templates**: built-in profiles yield a **deterministic argv** and optional **`terminal_exec_template_id`** / **`terminal_exec_template_version`** in **`run.json`** (see **`docs/TERMINAL_PROFILE_EXEC_TEMPLATE_PLAN.md`**). **`resolved_terminal_cmd`** remains a **space-joined** summary of that argv.
 - Unknown or missing `--terminal` is recorded as `unknown` in artifacts unless a default is documented per command.
 
 ## Execution control flags (`run`, `run-suite`, PH1-M4+)
@@ -178,7 +179,7 @@ On **non-Linux** hosts, `pty_guarded` (non-dry-run) fails with exit **2** before
 
 **PH1-M31 real terminal launch (`transport` in `run.json`)**
 
-- **When**: `pty_guarded`, not **`--dry-run`**, Linux host, **`guarded_state == experiment_linux_pty`**, and the **resolved** launch command is non-empty (after **PH1-M33** profile resolution; **`--terminal-cmd`** overrides profile/fallback). The harness runs **`/bin/sh -c <resolved_terminal_cmd>`** with wall-clock budget **`transport.timeout_ms`** (poll **`waitpid`**, **`SIGKILL`** on timeout); see **`docs/REAL_TERMINAL_LAUNCH_PLAN.md`** and **`docs/TERMINAL_PROFILE_ADAPTER_PLAN.md`**.
+- **When**: `pty_guarded`, not **`--dry-run`**, Linux host, **`guarded_state == experiment_linux_pty`**, and the **resolved** launch argv is non-empty (after **PH1-M33**/**PH1-M34** resolution; **`--terminal-cmd`** overrides profile/fallback). The harness runs the **resolved argv** directly when formed (**PH1-M34**); otherwise **`/bin/sh -c <resolved_terminal_cmd>`** (legacy string path), with wall-clock budget **`transport.timeout_ms`** (poll **`waitpid`**, **`SIGKILL`** on timeout); see **`docs/REAL_TERMINAL_LAUNCH_PLAN.md`**, **`docs/TERMINAL_PROFILE_ADAPTER_PLAN.md`**, and **`docs/TERMINAL_PROFILE_EXEC_TEMPLATE_PLAN.md`**.
 - **Fail-closed**: a guarded **full** run on Linux **requires** a non-empty **resolved** command (from **`--terminal-cmd`**, a built-in profile, or **`--terminal`** fallback); otherwise the run exits before writing artifacts with a clear stderr message.
 - **Telemetry**: **`terminal_launch_*`** fields under **`transport`** (attempt, elapsed ns, exit code, ok flag, short error tag, **PH1-M32** outcome class). Full contract: **`docs/REPORT_FORMAT.md`**.
 - **PH1-M32 outcome class**: **`terminal_launch_outcome`** is one of **`ok`**, **`nonzero_exit`**, **`signaled`**, **`timeout`**, **`spawn_failed`** when a launch was attempted; it must agree with **`terminal_launch_ok`**, **`terminal_launch_error`**, and **`terminal_launch_exit_code`** per **`docs/TERMINAL_LAUNCH_SEMANTICS_PLAN.md`**.
