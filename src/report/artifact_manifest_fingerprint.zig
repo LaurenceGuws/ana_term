@@ -32,3 +32,47 @@ pub fn populate(ctx: *RunContext, allocator: std.mem.Allocator) !void {
     writeHexLower(&ctx.artifact_manifest_fingerprint_digest_hex, &digest);
     ctx.artifact_manifest_fingerprint_digest_len = 64;
 }
+
+fn fillDigest(dst: *[64]u8, len: *u8, hex_lower_64: *const [64]u8) void {
+    @memcpy(dst, hex_lower_64);
+    len.* = 64;
+}
+
+fn testCtxWithEnvironmentEnvelope(ee: *const [64]u8) RunContext {
+    var ctx = RunContext.initDefault();
+    fillDigest(&ctx.environment_envelope_fingerprint_digest_hex, &ctx.environment_envelope_fingerprint_digest_len, ee);
+    return ctx;
+}
+
+test "artifact manifest fingerprint is deterministic for fixed environment-envelope digest" {
+    var a = testCtxWithEnvironmentEnvelope(&"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".*);
+    var b = testCtxWithEnvironmentEnvelope(&"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".*);
+    try populate(&a, std.testing.allocator);
+    try populate(&b, std.testing.allocator);
+    try std.testing.expectEqual(a.artifact_manifest_fingerprint_digest_len, b.artifact_manifest_fingerprint_digest_len);
+    try std.testing.expectEqualSlices(
+        u8,
+        a.artifact_manifest_fingerprint_digest_hex[0..a.artifact_manifest_fingerprint_digest_len],
+        b.artifact_manifest_fingerprint_digest_hex[0..b.artifact_manifest_fingerprint_digest_len],
+    );
+}
+
+test "artifact manifest fingerprint changes when environment-envelope digest changes" {
+    var a = testCtxWithEnvironmentEnvelope(&"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".*);
+    var b = testCtxWithEnvironmentEnvelope(&"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb".*);
+    try populate(&a, std.testing.allocator);
+    try populate(&b, std.testing.allocator);
+    try std.testing.expect(!std.mem.eql(
+        u8,
+        a.artifact_manifest_fingerprint_digest_hex[0..a.artifact_manifest_fingerprint_digest_len],
+        b.artifact_manifest_fingerprint_digest_hex[0..b.artifact_manifest_fingerprint_digest_len],
+    ));
+}
+
+test "artifact manifest fingerprint matches golden for M23 environment-envelope digest chain" {
+    const golden_artifact_manifest = "090073497e9199080a37d57412b9fac50abc2622b366f3bcfff3ffd66858b3b2";
+    var ctx = testCtxWithEnvironmentEnvelope(&"dd59e6d080adfc5aac4cbc34c6aff533718ac40fd453ccb8f1ef4f85288e3acc".*);
+    try populate(&ctx, std.testing.allocator);
+    try std.testing.expectEqual(@as(u8, 64), ctx.artifact_manifest_fingerprint_digest_len);
+    try std.testing.expectEqualStrings(golden_artifact_manifest, ctx.artifact_manifest_fingerprint_digest_hex[0..ctx.artifact_manifest_fingerprint_digest_len]);
+}
