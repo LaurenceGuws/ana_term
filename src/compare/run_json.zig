@@ -81,6 +81,9 @@ pub const RunMeta = struct {
     terminal_launch_diagnostics_reason: ?[]const u8 = null,
     terminal_launch_diagnostics_elapsed_ms: ?[]const u8 = null,
     terminal_launch_diagnostics_signal: ?[]const u8 = null,
+    /// PH1-M38: launch diagnostics fingerprint digest and version.
+    terminal_launch_diagnostics_fingerprint_digest: ?[]const u8 = null,
+    terminal_launch_diagnostics_fingerprint_version: ?[]const u8 = null,
     transport_handshake: ?[]const u8 = null,
     transport_handshake_latency_ns: ?[]const u8 = null,
     transport_mode: ?[]const u8 = null,
@@ -126,6 +129,9 @@ pub fn parseRunMeta(allocator: std.mem.Allocator, root: std.json.Value) !RunMeta
     m.terminal_launch_diagnostics_reason = readOptStringOrNull(obj, "terminal_launch_diagnostics_reason");
     m.terminal_launch_diagnostics_elapsed_ms = try readOptNumberStringOrNull(allocator, obj, "terminal_launch_diagnostics_elapsed_ms");
     m.terminal_launch_diagnostics_signal = try readOptNumberStringOrNull(allocator, obj, "terminal_launch_diagnostics_signal");
+    // PH1-M38: populate launch diagnostics fingerprint metadata.
+    m.terminal_launch_diagnostics_fingerprint_digest = readOptStringOrNull(obj, "terminal_launch_diagnostics_fingerprint_digest");
+    m.terminal_launch_diagnostics_fingerprint_version = readOptStringOrNull(obj, "terminal_launch_diagnostics_fingerprint_version");
     m.host_identity_machine = readOptString(obj, "host_identity_machine");
     m.host_identity_release = readOptString(obj, "host_identity_release");
     m.host_identity_sysname = readOptString(obj, "host_identity_sysname");
@@ -291,7 +297,7 @@ fn metaDelta(l: ?[]const u8, r: ?[]const u8) []const u8 {
 }
 
 /// Fixed field order for deterministic compare output.
-pub fn diffRunMeta(left: RunMeta, right: RunMeta) [82]MetaDiffRow {
+pub fn diffRunMeta(left: RunMeta, right: RunMeta) [84]MetaDiffRow {
     return .{
         .{ .field = "comparison_id", .left = left.comparison_id, .right = right.comparison_id, .delta = metaDelta(left.comparison_id, right.comparison_id) },
         .{ .field = "execution_mode", .left = left.execution_mode, .right = right.execution_mode, .delta = metaDelta(left.execution_mode, right.execution_mode) },
@@ -376,6 +382,9 @@ pub fn diffRunMeta(left: RunMeta, right: RunMeta) [82]MetaDiffRow {
         .{ .field = "terminal_launch_diagnostics_reason", .left = left.terminal_launch_diagnostics_reason, .right = right.terminal_launch_diagnostics_reason, .delta = metaDelta(left.terminal_launch_diagnostics_reason, right.terminal_launch_diagnostics_reason) },
         .{ .field = "terminal_launch_diagnostics_elapsed_ms", .left = left.terminal_launch_diagnostics_elapsed_ms, .right = right.terminal_launch_diagnostics_elapsed_ms, .delta = metaDelta(left.terminal_launch_diagnostics_elapsed_ms, right.terminal_launch_diagnostics_elapsed_ms) },
         .{ .field = "terminal_launch_diagnostics_signal", .left = left.terminal_launch_diagnostics_signal, .right = right.terminal_launch_diagnostics_signal, .delta = metaDelta(left.terminal_launch_diagnostics_signal, right.terminal_launch_diagnostics_signal) },
+        // PH1-M38: include launch diagnostics fingerprint in metadata rows (at end to preserve original indices).
+        .{ .field = "terminal_launch_diagnostics_fingerprint_digest", .left = left.terminal_launch_diagnostics_fingerprint_digest, .right = right.terminal_launch_diagnostics_fingerprint_digest, .delta = metaDelta(left.terminal_launch_diagnostics_fingerprint_digest, right.terminal_launch_diagnostics_fingerprint_digest) },
+        .{ .field = "terminal_launch_diagnostics_fingerprint_version", .left = left.terminal_launch_diagnostics_fingerprint_version, .right = right.terminal_launch_diagnostics_fingerprint_version, .delta = metaDelta(left.terminal_launch_diagnostics_fingerprint_version, right.terminal_launch_diagnostics_fingerprint_version) },
     };
 }
 
