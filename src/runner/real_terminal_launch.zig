@@ -41,6 +41,11 @@ fn clampJsonNs(raw: u64) u64 {
     return @min(raw, @as(u64, @intCast(std.math.maxInt(i64))));
 }
 
+fn elapsedNsToMs(elapsed_ns: u64) u32 {
+    const ms = (elapsed_ns + std.time.ns_per_ms - 1) / std.time.ns_per_ms;
+    return @intCast(@min(ms, @as(u64, @intCast(std.math.maxInt(u32)))));
+}
+
 /// Runs `argv[0]` with remaining args with stdio discarded; polls `waitpid(WNOHANG)` until exit or `timeout_ms` elapses (then `SIGKILL`).
 /// Non-Linux: returns all-null fields. Empty `argv`: returns all-null fields.
 pub fn runBoundedArgvCommand(allocator: std.mem.Allocator, argv: []const []const u8, timeout_ms: u32) LaunchTelemetry {
@@ -61,6 +66,9 @@ pub fn runBoundedArgvCommand(allocator: std.mem.Allocator, argv: []const []const
             .ok = false,
             .err = err_spawn_failed,
             .outcome = outcome_spawn_failed,
+            .diagnostics_reason = diagnostics_spawn_failed,
+            .diagnostics_elapsed_ms = 0,
+            .diagnostics_signal = null,
         };
     };
 
@@ -72,6 +80,9 @@ pub fn runBoundedArgvCommand(allocator: std.mem.Allocator, argv: []const []const
             .ok = false,
             .err = err_spawn_failed,
             .outcome = outcome_spawn_failed,
+            .diagnostics_reason = diagnostics_spawn_failed,
+            .diagnostics_elapsed_ms = 0,
+            .diagnostics_signal = null,
         };
     };
 
@@ -87,6 +98,9 @@ pub fn runBoundedArgvCommand(allocator: std.mem.Allocator, argv: []const []const
             .ok = false,
             .err = err_spawn_failed,
             .outcome = outcome_spawn_failed,
+            .diagnostics_reason = diagnostics_spawn_failed,
+            .diagnostics_elapsed_ms = 0,
+            .diagnostics_signal = null,
         };
     };
 
@@ -107,6 +121,9 @@ pub fn runBoundedArgvCommand(allocator: std.mem.Allocator, argv: []const []const
                     .ok = false,
                     .err = err_spawn_failed,
                     .outcome = outcome_spawn_failed,
+                    .diagnostics_reason = diagnostics_spawn_failed,
+                    .diagnostics_elapsed_ms = 0,
+                    .diagnostics_signal = null,
                 };
             };
             const elapsed_raw = now.since(t_start);
@@ -122,6 +139,9 @@ pub fn runBoundedArgvCommand(allocator: std.mem.Allocator, argv: []const []const
                     .ok = false,
                     .err = err_timeout,
                     .outcome = outcome_timeout,
+                    .diagnostics_reason = diagnostics_timeout,
+                    .diagnostics_elapsed_ms = elapsedNsToMs(el),
+                    .diagnostics_signal = null,
                 };
             }
             std.Thread.sleep(1 * std.time.ns_per_ms);
@@ -139,15 +159,22 @@ pub fn runBoundedArgvCommand(allocator: std.mem.Allocator, argv: []const []const
                             .ok = false,
                             .err = err_spawn_failed,
                             .outcome = outcome_spawn_failed,
+                            .diagnostics_reason = diagnostics_spawn_failed,
+                            .diagnostics_elapsed_ms = 0,
+                            .diagnostics_signal = null,
                         };
                     };
+                    const el_e = clampJsonNs(now_e.since(t_start));
                     return .{
                         .attempt = 1,
-                        .elapsed_ns = clampJsonNs(now_e.since(t_start)),
+                        .elapsed_ns = el_e,
                         .exit_code = null,
                         .ok = false,
                         .err = err_spawn_failed,
                         .outcome = outcome_spawn_failed,
+                        .diagnostics_reason = diagnostics_spawn_failed,
+                        .diagnostics_elapsed_ms = elapsedNsToMs(el_e),
+                        .diagnostics_signal = null,
                     };
                 },
             }
@@ -161,20 +188,28 @@ pub fn runBoundedArgvCommand(allocator: std.mem.Allocator, argv: []const []const
                     .ok = false,
                     .err = err_spawn_failed,
                     .outcome = outcome_spawn_failed,
+                    .diagnostics_reason = diagnostics_spawn_failed,
+                    .diagnostics_elapsed_ms = 0,
+                    .diagnostics_signal = null,
                 };
             };
+            const el_u = clampJsonNs(now_u.since(t_start));
             return .{
                 .attempt = 1,
-                .elapsed_ns = clampJsonNs(now_u.since(t_start)),
+                .elapsed_ns = el_u,
                 .exit_code = null,
                 .ok = false,
                 .err = err_spawn_failed,
                 .outcome = outcome_spawn_failed,
+                .diagnostics_reason = diagnostics_spawn_failed,
+                .diagnostics_elapsed_ms = elapsedNsToMs(el_u),
+                .diagnostics_signal = null,
             };
         }
 
         const now_done = std.time.Instant.now() catch unreachable;
         const elapsed_final = clampJsonNs(now_done.since(t_start));
+        const elapsed_final_ms = elapsedNsToMs(elapsed_final);
         const ustatus: u32 = @bitCast(status);
         if (posix.W.IFEXITED(ustatus)) {
             const ec = posix.W.EXITSTATUS(ustatus);
@@ -186,6 +221,9 @@ pub fn runBoundedArgvCommand(allocator: std.mem.Allocator, argv: []const []const
                     .ok = true,
                     .err = null,
                     .outcome = outcome_ok,
+                    .diagnostics_reason = diagnostics_ok,
+                    .diagnostics_elapsed_ms = elapsed_final_ms,
+                    .diagnostics_signal = null,
                 };
             }
             return .{
@@ -195,9 +233,13 @@ pub fn runBoundedArgvCommand(allocator: std.mem.Allocator, argv: []const []const
                 .ok = false,
                 .err = null,
                 .outcome = outcome_nonzero_exit,
+                .diagnostics_reason = diagnostics_nonzero_exit,
+                .diagnostics_elapsed_ms = elapsed_final_ms,
+                .diagnostics_signal = null,
             };
         }
         if (posix.W.IFSIGNALED(ustatus)) {
+            const sig = posix.W.TERMSIG(ustatus);
             return .{
                 .attempt = 1,
                 .elapsed_ns = elapsed_final,
@@ -205,6 +247,9 @@ pub fn runBoundedArgvCommand(allocator: std.mem.Allocator, argv: []const []const
                 .ok = false,
                 .err = null,
                 .outcome = outcome_signaled,
+                .diagnostics_reason = diagnostics_signaled,
+                .diagnostics_elapsed_ms = elapsed_final_ms,
+                .diagnostics_signal = sig,
             };
         }
         return .{
@@ -214,6 +259,9 @@ pub fn runBoundedArgvCommand(allocator: std.mem.Allocator, argv: []const []const
             .ok = false,
             .err = err_spawn_failed,
             .outcome = outcome_spawn_failed,
+            .diagnostics_reason = diagnostics_spawn_failed,
+            .diagnostics_elapsed_ms = elapsed_final_ms,
+            .diagnostics_signal = null,
         };
     }
 }
@@ -285,6 +333,9 @@ pub fn runBoundedShellCommand(allocator: std.mem.Allocator, cmd: []const u8, tim
                     .ok = false,
                     .err = err_spawn_failed,
                     .outcome = outcome_spawn_failed,
+                    .diagnostics_reason = diagnostics_spawn_failed,
+                    .diagnostics_elapsed_ms = 0,
+                    .diagnostics_signal = null,
                 };
             };
             const elapsed_raw = now.since(t_start);
@@ -300,6 +351,9 @@ pub fn runBoundedShellCommand(allocator: std.mem.Allocator, cmd: []const u8, tim
                     .ok = false,
                     .err = err_timeout,
                     .outcome = outcome_timeout,
+                    .diagnostics_reason = diagnostics_timeout,
+                    .diagnostics_elapsed_ms = elapsedNsToMs(el),
+                    .diagnostics_signal = null,
                 };
             }
             std.Thread.sleep(1 * std.time.ns_per_ms);
@@ -317,15 +371,22 @@ pub fn runBoundedShellCommand(allocator: std.mem.Allocator, cmd: []const u8, tim
                             .ok = false,
                             .err = err_spawn_failed,
                             .outcome = outcome_spawn_failed,
+                            .diagnostics_reason = diagnostics_spawn_failed,
+                            .diagnostics_elapsed_ms = 0,
+                            .diagnostics_signal = null,
                         };
                     };
+                    const el_e = clampJsonNs(now_e.since(t_start));
                     return .{
                         .attempt = 1,
-                        .elapsed_ns = clampJsonNs(now_e.since(t_start)),
+                        .elapsed_ns = el_e,
                         .exit_code = null,
                         .ok = false,
                         .err = err_spawn_failed,
                         .outcome = outcome_spawn_failed,
+                        .diagnostics_reason = diagnostics_spawn_failed,
+                        .diagnostics_elapsed_ms = elapsedNsToMs(el_e),
+                        .diagnostics_signal = null,
                     };
                 },
             }
@@ -339,20 +400,28 @@ pub fn runBoundedShellCommand(allocator: std.mem.Allocator, cmd: []const u8, tim
                     .ok = false,
                     .err = err_spawn_failed,
                     .outcome = outcome_spawn_failed,
+                    .diagnostics_reason = diagnostics_spawn_failed,
+                    .diagnostics_elapsed_ms = 0,
+                    .diagnostics_signal = null,
                 };
             };
+            const el_u = clampJsonNs(now_u.since(t_start));
             return .{
                 .attempt = 1,
-                .elapsed_ns = clampJsonNs(now_u.since(t_start)),
+                .elapsed_ns = el_u,
                 .exit_code = null,
                 .ok = false,
                 .err = err_spawn_failed,
                 .outcome = outcome_spawn_failed,
+                .diagnostics_reason = diagnostics_spawn_failed,
+                .diagnostics_elapsed_ms = elapsedNsToMs(el_u),
+                .diagnostics_signal = null,
             };
         }
 
         const now_done = std.time.Instant.now() catch unreachable;
         const elapsed_final = clampJsonNs(now_done.since(t_start));
+        const elapsed_final_ms = elapsedNsToMs(elapsed_final);
         const ustatus: u32 = @bitCast(status);
         if (posix.W.IFEXITED(ustatus)) {
             const ec = posix.W.EXITSTATUS(ustatus);
@@ -364,6 +433,9 @@ pub fn runBoundedShellCommand(allocator: std.mem.Allocator, cmd: []const u8, tim
                     .ok = true,
                     .err = null,
                     .outcome = outcome_ok,
+                    .diagnostics_reason = diagnostics_ok,
+                    .diagnostics_elapsed_ms = elapsed_final_ms,
+                    .diagnostics_signal = null,
                 };
             }
             return .{
@@ -373,9 +445,13 @@ pub fn runBoundedShellCommand(allocator: std.mem.Allocator, cmd: []const u8, tim
                 .ok = false,
                 .err = null,
                 .outcome = outcome_nonzero_exit,
+                .diagnostics_reason = diagnostics_nonzero_exit,
+                .diagnostics_elapsed_ms = elapsed_final_ms,
+                .diagnostics_signal = null,
             };
         }
         if (posix.W.IFSIGNALED(ustatus)) {
+            const sig = posix.W.TERMSIG(ustatus);
             return .{
                 .attempt = 1,
                 .elapsed_ns = elapsed_final,
@@ -383,6 +459,9 @@ pub fn runBoundedShellCommand(allocator: std.mem.Allocator, cmd: []const u8, tim
                 .ok = false,
                 .err = null,
                 .outcome = outcome_signaled,
+                .diagnostics_reason = diagnostics_signaled,
+                .diagnostics_elapsed_ms = elapsed_final_ms,
+                .diagnostics_signal = sig,
             };
         }
         return .{
@@ -392,6 +471,9 @@ pub fn runBoundedShellCommand(allocator: std.mem.Allocator, cmd: []const u8, tim
             .ok = false,
             .err = err_spawn_failed,
             .outcome = outcome_spawn_failed,
+            .diagnostics_reason = diagnostics_spawn_failed,
+            .diagnostics_elapsed_ms = elapsed_final_ms,
+            .diagnostics_signal = null,
         };
     }
 }
