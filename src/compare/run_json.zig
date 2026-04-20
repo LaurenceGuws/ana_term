@@ -324,10 +324,6 @@ pub fn diffRunMeta(left: RunMeta, right: RunMeta) [82]MetaDiffRow {
         .{ .field = "terminal_launch_exit_code", .left = left.terminal_launch_exit_code, .right = right.terminal_launch_exit_code, .delta = metaDelta(left.terminal_launch_exit_code, right.terminal_launch_exit_code) },
         .{ .field = "terminal_launch_ok", .left = left.terminal_launch_ok, .right = right.terminal_launch_ok, .delta = metaDelta(left.terminal_launch_ok, right.terminal_launch_ok) },
         .{ .field = "terminal_launch_outcome", .left = left.terminal_launch_outcome, .right = right.terminal_launch_outcome, .delta = metaDelta(left.terminal_launch_outcome, right.terminal_launch_outcome) },
-        // PH1-M37: include diagnostics envelope in metadata rows.
-        .{ .field = "terminal_launch_diagnostics_reason", .left = left.terminal_launch_diagnostics_reason, .right = right.terminal_launch_diagnostics_reason, .delta = metaDelta(left.terminal_launch_diagnostics_reason, right.terminal_launch_diagnostics_reason) },
-        .{ .field = "terminal_launch_diagnostics_elapsed_ms", .left = left.terminal_launch_diagnostics_elapsed_ms, .right = right.terminal_launch_diagnostics_elapsed_ms, .delta = metaDelta(left.terminal_launch_diagnostics_elapsed_ms, right.terminal_launch_diagnostics_elapsed_ms) },
-        .{ .field = "terminal_launch_diagnostics_signal", .left = left.terminal_launch_diagnostics_signal, .right = right.terminal_launch_diagnostics_signal, .delta = metaDelta(left.terminal_launch_diagnostics_signal, right.terminal_launch_diagnostics_signal) },
         .{ .field = "run_fingerprint_digest", .left = left.run_fingerprint_digest, .right = right.run_fingerprint_digest, .delta = metaDelta(left.run_fingerprint_digest, right.run_fingerprint_digest) },
         .{ .field = "run_fingerprint_version", .left = left.run_fingerprint_version, .right = right.run_fingerprint_version, .delta = metaDelta(left.run_fingerprint_version, right.run_fingerprint_version) },
         .{ .field = "specset_fingerprint_digest", .left = left.specset_fingerprint_digest, .right = right.specset_fingerprint_digest, .delta = metaDelta(left.specset_fingerprint_digest, right.specset_fingerprint_digest) },
@@ -376,6 +372,10 @@ pub fn diffRunMeta(left: RunMeta, right: RunMeta) [82]MetaDiffRow {
         .{ .field = "transport_handshake_latency_ns", .left = left.transport_handshake_latency_ns, .right = right.transport_handshake_latency_ns, .delta = metaDelta(left.transport_handshake_latency_ns, right.transport_handshake_latency_ns) },
         .{ .field = "transport_mode", .left = left.transport_mode, .right = right.transport_mode, .delta = metaDelta(left.transport_mode, right.transport_mode) },
         .{ .field = "transport_timeout_ms", .left = left.transport_timeout_ms, .right = right.transport_timeout_ms, .delta = metaDelta(left.transport_timeout_ms, right.transport_timeout_ms) },
+        // PH1-M37: include diagnostics envelope in metadata rows (at end to preserve original indices).
+        .{ .field = "terminal_launch_diagnostics_reason", .left = left.terminal_launch_diagnostics_reason, .right = right.terminal_launch_diagnostics_reason, .delta = metaDelta(left.terminal_launch_diagnostics_reason, right.terminal_launch_diagnostics_reason) },
+        .{ .field = "terminal_launch_diagnostics_elapsed_ms", .left = left.terminal_launch_diagnostics_elapsed_ms, .right = right.terminal_launch_diagnostics_elapsed_ms, .delta = metaDelta(left.terminal_launch_diagnostics_elapsed_ms, right.terminal_launch_diagnostics_elapsed_ms) },
+        .{ .field = "terminal_launch_diagnostics_signal", .left = left.terminal_launch_diagnostics_signal, .right = right.terminal_launch_diagnostics_signal, .delta = metaDelta(left.terminal_launch_diagnostics_signal, right.terminal_launch_diagnostics_signal) },
     };
 }
 

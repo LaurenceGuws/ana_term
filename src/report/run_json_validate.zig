@@ -141,8 +141,8 @@ pub fn validateRunReport(root: std.json.Value) ?[]const u8 {
         else => unreachable,
     }
 
-    // PH1-M37: validate diagnostics envelope fields.
-    const tld_reason_o = obj.get("terminal_launch_diagnostics_reason") orelse return "missing terminal_launch_diagnostics_reason";
+    // PH1-M37: validate diagnostics envelope fields (optional for backward compatibility).
+    const tld_reason_o = obj.get("terminal_launch_diagnostics_reason") orelse .null;
     switch (tld_reason_o) {
         .string => |s| {
             const reason_ok = std.mem.eql(u8, s, real_terminal_launch.diagnostics_ok) or
@@ -157,12 +157,12 @@ pub fn validateRunReport(root: std.json.Value) ?[]const u8 {
         .null => {},
         else => return "terminal_launch_diagnostics_reason must be a string or null",
     }
-    const tld_elapsed_o = obj.get("terminal_launch_diagnostics_elapsed_ms") orelse return "missing terminal_launch_diagnostics_elapsed_ms";
+    const tld_elapsed_o = obj.get("terminal_launch_diagnostics_elapsed_ms") orelse .null;
     switch (tld_elapsed_o) {
         .integer, .float, .null => {},
         else => return "terminal_launch_diagnostics_elapsed_ms must be a number or null",
     }
-    const tld_signal_o = obj.get("terminal_launch_diagnostics_signal") orelse return "missing terminal_launch_diagnostics_signal";
+    const tld_signal_o = obj.get("terminal_launch_diagnostics_signal") orelse .null;
     switch (tld_signal_o) {
         .integer, .null => {},
         else => return "terminal_launch_diagnostics_signal must be an integer or null",
