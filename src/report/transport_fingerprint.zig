@@ -17,7 +17,7 @@ pub fn populate(ctx: *RunContext, allocator: std.mem.Allocator, run_id: []const 
     var canon: std.ArrayList(u8) = .empty;
     defer canon.deinit(allocator);
 
-    try canon.appendSlice(allocator, "PH1-M14/transport/fp/v3\n");
+    try canon.appendSlice(allocator, "PH1-M14/transport/fp/v4\n");
 
     const guarded_opt_in = ctx.transport_mode == .pty_guarded;
     const guarded_state: []const u8 = blk: {
@@ -112,6 +112,13 @@ pub fn populate(ctx: *RunContext, allocator: std.mem.Allocator, run_id: []const 
         }
         if (ctx.terminal_launch_preflight_reason) |r| {
             try canon.print(allocator, "{s}\n", .{r});
+        } else {
+            try canon.appendSlice(allocator, "null\n");
+        }
+        // PH1-M37: include diagnostics reason in canonical transport payload (v4).
+        if (ctx.terminal_launch_diagnostics_reason_len > 0) {
+            const reason = ctx.terminal_launch_diagnostics_reason_buf[0..ctx.terminal_launch_diagnostics_reason_len];
+            try canon.print(allocator, "{s}\n", .{reason});
         } else {
             try canon.appendSlice(allocator, "null\n");
         }

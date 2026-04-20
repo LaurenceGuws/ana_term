@@ -162,6 +162,27 @@ pub fn writeRun(
         try buf.appendSlice(allocator, "null");
     }
 
+    // PH1-M37: emit diagnostics envelope fields.
+    try buf.appendSlice(allocator, ",\n  \"terminal_launch_diagnostics_reason\": ");
+    if (ctx.terminal_launch_diagnostics_reason_len > 0) {
+        const reason = ctx.terminal_launch_diagnostics_reason_buf[0..ctx.terminal_launch_diagnostics_reason_len];
+        try appendJsonEncodedString(allocator, &buf, reason);
+    } else {
+        try buf.appendSlice(allocator, "null");
+    }
+    try buf.appendSlice(allocator, ",\n  \"terminal_launch_diagnostics_elapsed_ms\": ");
+    if (ctx.terminal_launch_diagnostics_elapsed_ms) |ms| {
+        try buf.writer(allocator).print("{d}", .{ms});
+    } else {
+        try buf.appendSlice(allocator, "null");
+    }
+    try buf.appendSlice(allocator, ",\n  \"terminal_launch_diagnostics_signal\": ");
+    if (ctx.terminal_launch_diagnostics_signal) |sig| {
+        try buf.writer(allocator).print("{d}", .{sig});
+    } else {
+        try buf.appendSlice(allocator, "null");
+    }
+
     try buf.appendSlice(allocator, ",\n  \"host_identity_machine\": ");
     try appendJsonEncodedString(allocator, &buf, ctx.host_identity_machine[0..ctx.host_identity_machine_len]);
     try buf.appendSlice(allocator, ",\n  \"host_identity_release\": ");
