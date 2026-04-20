@@ -12,6 +12,7 @@ const run_fingerprint = @import("../report/run_fingerprint.zig");
 const specset_fingerprint = @import("../report/specset_fingerprint.zig");
 const resultset_fingerprint = @import("../report/resultset_fingerprint.zig");
 const transport_fingerprint = @import("../report/transport_fingerprint.zig");
+const launch_diagnostics_fingerprint = @import("../report/launch_diagnostics_fingerprint.zig");
 const exec_summary_fingerprint = @import("../report/exec_summary_fingerprint.zig");
 const context_summary_fingerprint = @import("../report/context_summary_fingerprint.zig");
 const metadata_envelope_fingerprint = @import("../report/metadata_envelope_fingerprint.zig");
@@ -165,6 +166,7 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
     specset_fingerprint.populate(&ctx, allocator, records.items) catch return errors.Category.runtime_failure.exitCode();
     resultset_fingerprint.populate(&ctx, allocator, records.items) catch return errors.Category.runtime_failure.exitCode();
     transport_fingerprint.populate(&ctx, allocator, run_id) catch return errors.Category.runtime_failure.exitCode();
+    launch_diagnostics_fingerprint.populate(&ctx, allocator) catch return errors.Category.runtime_failure.exitCode();
     exec_summary_fingerprint.populate(&ctx, allocator) catch return errors.Category.runtime_failure.exitCode();
     const term = std.posix.getenv("TERM") orelse "";
     context_summary_fingerprint.populate(&ctx, allocator, term) catch return errors.Category.runtime_failure.exitCode();
