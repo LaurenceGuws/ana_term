@@ -325,6 +325,14 @@ fn canonicalization_signal_status(signal: ?u32) ?[]const u8 {
 
 /// Fixed field order for deterministic compare output.
 pub fn diffRunMeta(left: RunMeta, right: RunMeta) [87]MetaDiffRow {
+    // ANA-3907: Compute canonicalization status before constructing array to avoid compiler confusion
+    const can_reason_left = canonicalization_reason_status(left.terminal_launch_diagnostics_reason);
+    const can_reason_right = canonicalization_reason_status(right.terminal_launch_diagnostics_reason);
+    const can_elapsed_left = canonicalization_elapsed_status(left.terminal_launch_diagnostics_elapsed_ms);
+    const can_elapsed_right = canonicalization_elapsed_status(right.terminal_launch_diagnostics_elapsed_ms);
+    const can_signal_left = canonicalization_signal_status(left.terminal_launch_diagnostics_signal);
+    const can_signal_right = canonicalization_signal_status(right.terminal_launch_diagnostics_signal);
+
     return .{
         .{ .field = "comparison_id", .left = left.comparison_id, .right = right.comparison_id, .delta = metaDelta(left.comparison_id, right.comparison_id) },
         .{ .field = "execution_mode", .left = left.execution_mode, .right = right.execution_mode, .delta = metaDelta(left.execution_mode, right.execution_mode) },
@@ -413,9 +421,9 @@ pub fn diffRunMeta(left: RunMeta, right: RunMeta) [87]MetaDiffRow {
         .{ .field = "terminal_launch_diagnostics_fingerprint_digest", .left = left.terminal_launch_diagnostics_fingerprint_digest, .right = right.terminal_launch_diagnostics_fingerprint_digest, .delta = metaDelta(left.terminal_launch_diagnostics_fingerprint_digest, right.terminal_launch_diagnostics_fingerprint_digest) },
         .{ .field = "terminal_launch_diagnostics_fingerprint_version", .left = left.terminal_launch_diagnostics_fingerprint_version, .right = right.terminal_launch_diagnostics_fingerprint_version, .delta = metaDelta(left.terminal_launch_diagnostics_fingerprint_version, right.terminal_launch_diagnostics_fingerprint_version) },
         // PH1-M39 (ANA-3907): edge-case metadata rows for detecting canonicalization drift.
-        .{ .field = "canonicalization_reason_status", .left = canonicalization_reason_status(left.terminal_launch_diagnostics_reason), .right = canonicalization_reason_status(right.terminal_launch_diagnostics_reason), .delta = metaDelta(canonicalization_reason_status(left.terminal_launch_diagnostics_reason), canonicalization_reason_status(right.terminal_launch_diagnostics_reason)) },
-        .{ .field = "canonicalization_elapsed_status", .left = canonicalization_elapsed_status(left.terminal_launch_diagnostics_elapsed_ms), .right = canonicalization_elapsed_status(right.terminal_launch_diagnostics_elapsed_ms), .delta = metaDelta(canonicalization_elapsed_status(left.terminal_launch_diagnostics_elapsed_ms), canonicalization_elapsed_status(right.terminal_launch_diagnostics_elapsed_ms)) },
-        .{ .field = "canonicalization_signal_status", .left = canonicalization_signal_status(left.terminal_launch_diagnostics_signal), .right = canonicalization_signal_status(right.terminal_launch_diagnostics_signal), .delta = metaDelta(canonicalization_signal_status(left.terminal_launch_diagnostics_signal), canonicalization_signal_status(right.terminal_launch_diagnostics_signal)) },
+        .{ .field = "canonicalization_reason_status", .left = can_reason_left, .right = can_reason_right, .delta = metaDelta(can_reason_left, can_reason_right) },
+        .{ .field = "canonicalization_elapsed_status", .left = can_elapsed_left, .right = can_elapsed_right, .delta = metaDelta(can_elapsed_left, can_elapsed_right) },
+        .{ .field = "canonicalization_signal_status", .left = can_signal_left, .right = can_signal_right, .delta = metaDelta(can_signal_left, can_signal_right) },
     };
 }
 
