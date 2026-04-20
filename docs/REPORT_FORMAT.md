@@ -81,6 +81,15 @@ Top-level JSON object with at least:
 
 **Serialization order**: after `terminal_launch_preflight_reason`, before `host_identity_machine`: **`terminal_launch_diagnostics_reason`**, **`terminal_launch_diagnostics_elapsed_ms`**, **`terminal_launch_diagnostics_signal`** (lexicographic within terminal launch keys).
 
+**PH1-M38 (launch diagnostics fingerprint)** — present on every harness `run.json` that writes artifacts and contains launch diagnostics envelope data:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `terminal_launch_diagnostics_fingerprint_digest` | string or `null` | **64**-character lowercase hex SHA-256 of the canonical launch diagnostics fingerprint payload (see **`docs/LAUNCH_DIAGNOSTICS_FINGERPRINT_PLAN.md`**). Composed from **`terminal_launch_diagnostics_reason`**, **`elapsed_ms`**, and **`signal`** values. **`null`** when diagnostics envelope is not applicable (non-Linux, non-`pty_guarded`, or dry-run). |
+| `terminal_launch_diagnostics_fingerprint_version` | string or `null` | Fingerprint schema revision; PH1-M38 value **`1`**. **`null`** when diagnostics fingerprint is absent. |
+
+**Serialization order**: after `terminal_launch_diagnostics_signal`, before `run_fingerprint_digest`: **`terminal_launch_diagnostics_fingerprint_digest`**, **`terminal_launch_diagnostics_fingerprint_version`** (lexicographic).
+
 **PH1-M11+ (run fingerprint)** — present on every harness `run.json` that writes artifacts:
 
 | Field | Type | Description |
