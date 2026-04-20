@@ -94,6 +94,13 @@ Verify fields are output as-is (no normalization needed post-validation).
 #### Fingerprint Population (src/report/launch_diagnostics_fingerprint.zig)
 **ADD**: Document that inputs are pre-validated; assume canonical form.
 
+**ANA-3905 Pipeline Threading**: Canonicalized inputs from validation flow through fingerprint populate() unchanged:
+- validate() in run_json_validate.zig enforces canonical forms (reason tags, elapsed range, signal range)
+- populate() in launch_diagnostics_fingerprint.zig receives canonicalized values
+- Canonical payload serialization guarantees determinism: same validated inputs → identical fingerprints
+- Fingerprint digest flows to JSON writer and compare parsing without re-normalization
+- Invariant: fingerprint determinism is preserved if and only if validation enforces canonical forms
+
 #### Compare Parsing (src/compare/run_json.zig)
 **ADD**: Edge-case metadata rows for:
 - Reason mismatch with same fingerprint (indicates canonicalization bug)
