@@ -136,3 +136,39 @@ All acceptance criteria met:
 - Transport fingerprint v4 includes canonical diagnostics line
 - Documentation complete
 - Build succeeds, tests pass
+
+## Corrective Batch (Architectural Review Regressions)
+
+During architectural review, 27 test failures were identified in two categories:
+
+### ANA-3912 & ANA-3913 (FIXED)
+**Issue**: 
+- Schema validation incorrectly required diagnostics envelope fields in all run.json fixtures (backward compatibility violation)
+- Metadata row indices shifted by 3 due to diagnostics fields inserted in wrong position
+
+**Fix**:
+```
+[ANA-3912] make diagnostics envelope fields optional in validation for backward compatibility
+- Changed run_json_validate.zig lines 145, 160, 165 from `orelse return "missing ..."` to `orelse .null`
+- Diagnostics fields now optional (missing or null allowed) while still validating when present
+
+[ANA-3913] move diagnostics metadata rows to end of diffRunMeta to restore original indices
+- Removed diagnostics rows from positions 31-33 (between terminal_launch_outcome and run_fingerprint_digest)
+- Appended diagnostics rows at end of diffRunMeta (after transport_timeout_ms)
+- Restored original indices: run_fingerprint_digest@31, fingerprint_version@32, etc.
+```
+
+**Test Results**: All 228 tests pass (27 failures → 0 failures)
+
+### ANA-3911, ANA-3914, ANA-3915 (VERIFICATION)
+- **ANA-3911**: Test suite restoration ✅ (implicitly fixed by ANA-3912/3913)
+- **ANA-3914**: Launch_preflight non-executable behavior ✅ (verified, no changes needed)
+- **ANA-3915**: Working tree cleanup ✅ (clean state, documented)
+
+## Final Status
+
+✅ **Corrective batch complete**
+- All regressions fixed
+- Test suite 100% passing
+- Git history clean: 10 sprint commits + 2 corrective commits
+- Ready for Architect acceptance of PH1-M37-S1
