@@ -296,8 +296,35 @@ fn metaDelta(l: ?[]const u8, r: ?[]const u8) []const u8 {
     return "changed";
 }
 
+// ANA-3907: Canonicalization edge-case detection helpers.
+fn canonicalization_reason_status(reason: ?[]const u8) ?[]const u8 {
+    if (reason == null) return "canonical_null";
+    const r = reason.?;
+    // Canonical tags: ok, missing_executable, not_executable, spawn_failed, timeout, nonzero_exit, signaled
+    if (std.mem.eql(u8, r, "ok") or std.mem.eql(u8, r, "missing_executable") or
+        std.mem.eql(u8, r, "not_executable") or std.mem.eql(u8, r, "spawn_failed") or
+        std.mem.eql(u8, r, "timeout") or std.mem.eql(u8, r, "nonzero_exit") or
+        std.mem.eql(u8, r, "signaled")) {
+        return "canonical_tag";
+    }
+    return "non_canonical_tag";
+}
+
+fn canonicalization_elapsed_status(_: ?u32) ?[]const u8 {
+    // u32 values are always in [0, maxInt(u32)], all are canonical
+    return "canonical_u32";
+}
+
+fn canonicalization_signal_status(signal: ?u32) ?[]const u8 {
+    if (signal == null) return "canonical_null";
+    const s = signal.?;
+    // Canonical range: [1, 128]
+    if (s >= 1 and s <= 128) return "canonical_signal";
+    return "non_canonical_signal";
+}
+
 /// Fixed field order for deterministic compare output.
-pub fn diffRunMeta(left: RunMeta, right: RunMeta) [84]MetaDiffRow {
+pub fn diffRunMeta(left: RunMeta, right: RunMeta) [87]MetaDiffRow {
     return .{
         .{ .field = "comparison_id", .left = left.comparison_id, .right = right.comparison_id, .delta = metaDelta(left.comparison_id, right.comparison_id) },
         .{ .field = "execution_mode", .left = left.execution_mode, .right = right.execution_mode, .delta = metaDelta(left.execution_mode, right.execution_mode) },
@@ -385,6 +412,10 @@ pub fn diffRunMeta(left: RunMeta, right: RunMeta) [84]MetaDiffRow {
         // PH1-M38: include launch diagnostics fingerprint in metadata rows (at end to preserve original indices).
         .{ .field = "terminal_launch_diagnostics_fingerprint_digest", .left = left.terminal_launch_diagnostics_fingerprint_digest, .right = right.terminal_launch_diagnostics_fingerprint_digest, .delta = metaDelta(left.terminal_launch_diagnostics_fingerprint_digest, right.terminal_launch_diagnostics_fingerprint_digest) },
         .{ .field = "terminal_launch_diagnostics_fingerprint_version", .left = left.terminal_launch_diagnostics_fingerprint_version, .right = right.terminal_launch_diagnostics_fingerprint_version, .delta = metaDelta(left.terminal_launch_diagnostics_fingerprint_version, right.terminal_launch_diagnostics_fingerprint_version) },
+        // PH1-M39 (ANA-3907): edge-case metadata rows for detecting canonicalization drift.
+        .{ .field = "canonicalization_reason_status", .left = canonicalization_reason_status(left.terminal_launch_diagnostics_reason), .right = canonicalization_reason_status(right.terminal_launch_diagnostics_reason), .delta = metaDelta(canonicalization_reason_status(left.terminal_launch_diagnostics_reason), canonicalization_reason_status(right.terminal_launch_diagnostics_reason)) },
+        .{ .field = "canonicalization_elapsed_status", .left = canonicalization_elapsed_status(left.terminal_launch_diagnostics_elapsed_ms), .right = canonicalization_elapsed_status(right.terminal_launch_diagnostics_elapsed_ms), .delta = metaDelta(canonicalization_elapsed_status(left.terminal_launch_diagnostics_elapsed_ms), canonicalization_elapsed_status(right.terminal_launch_diagnostics_elapsed_ms)) },
+        .{ .field = "canonicalization_signal_status", .left = canonicalization_signal_status(left.terminal_launch_diagnostics_signal), .right = canonicalization_signal_status(right.terminal_launch_diagnostics_signal), .delta = metaDelta(canonicalization_signal_status(left.terminal_launch_diagnostics_signal), canonicalization_signal_status(right.terminal_launch_diagnostics_signal)) },
     };
 }
 
