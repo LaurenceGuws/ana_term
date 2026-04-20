@@ -174,6 +174,9 @@ pub const RunContext = struct {
     terminal_launch_diagnostics_elapsed_ms: ?u32,
     /// PH1-M37: signal number when signaled (e.g. 9 for SIGKILL); `null` otherwise.
     terminal_launch_diagnostics_signal: ?u32,
+    /// PH1-M38: 64-char lowercase SHA-256 hex; length 0 until fingerprint populated.
+    launch_diagnostics_fingerprint_digest_hex: [64]u8,
+    launch_diagnostics_fingerprint_digest_len: u8,
 
     pub fn initDefault() RunContext {
         return .{
@@ -273,6 +276,8 @@ pub const RunContext = struct {
             .terminal_launch_diagnostics_reason_len = 0,
             .terminal_launch_diagnostics_elapsed_ms = null,
             .terminal_launch_diagnostics_signal = null,
+            .launch_diagnostics_fingerprint_digest_hex = std.mem.zeroes([64]u8),
+            .launch_diagnostics_fingerprint_digest_len = 0,
         };
     }
 

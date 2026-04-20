@@ -17,6 +17,8 @@ pub const LaunchTelemetry = struct {
     diagnostics_elapsed_ms: ?u32 = null,
     /// PH1-M37 signal number when signaled; null otherwise.
     diagnostics_signal: ?u32 = null,
+    /// PH1-M38 64-char lowercase SHA-256 hex of launch diagnostics fingerprint.
+    launch_diagnostics_fingerprint_digest: ?[]const u8 = null,
 };
 
 pub const err_spawn_failed: []const u8 = "spawn_failed";
