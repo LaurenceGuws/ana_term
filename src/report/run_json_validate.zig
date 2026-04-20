@@ -168,6 +168,33 @@ pub fn validateRunReport(root: std.json.Value) ?[]const u8 {
         else => return "terminal_launch_diagnostics_signal must be an integer or null",
     }
 
+    // PH1-M38: validate launch diagnostics fingerprint fields (optional for backward compatibility).
+    const ldf_digest_o = obj.get("terminal_launch_diagnostics_fingerprint_digest") orelse .null;
+    switch (ldf_digest_o) {
+        .string => |s| {
+            if (s.len != 64) return "terminal_launch_diagnostics_fingerprint_digest must be exactly 64 characters";
+            for (s) |c| {
+                if (!((c >= '0' and c <= '9') or (c >= 'a' and c <= 'f'))) {
+                    return "terminal_launch_diagnostics_fingerprint_digest must be lowercase hex";
+                }
+            }
+        },
+        .null => {},
+        else => return "terminal_launch_diagnostics_fingerprint_digest must be a string or null",
+    }
+    const ldf_version_o = obj.get("terminal_launch_diagnostics_fingerprint_version") orelse .null;
+    switch (ldf_version_o) {
+        .string => |s| {
+            if (!std.mem.eql(u8, s, "1")) return "terminal_launch_diagnostics_fingerprint_version must be \"1\" or null";
+        },
+        .null => {},
+        else => return "terminal_launch_diagnostics_fingerprint_version must be a string or null",
+    }
+    // Invariant: both should be present or both absent
+    const has_digest = ldf_digest_o != .null;
+    const has_version = ldf_version_o != .null;
+    if (has_digest != has_version) return "terminal_launch_diagnostics_fingerprint_digest and _version must both be present or both absent";
+
     const term_o = obj.get("terminal") orelse return "missing terminal object";
     const term_obj = switch (term_o) {
         .object => |t| t,
