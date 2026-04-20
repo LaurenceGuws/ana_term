@@ -11,6 +11,12 @@ pub const LaunchTelemetry = struct {
     err: ?[]const u8 = null,
     /// PH1-M32 explicit outcome class (`transport.terminal_launch_outcome`).
     outcome: ?[]const u8 = null,
+    /// PH1-M37 normalized failure reason for diagnostics envelope.
+    diagnostics_reason: ?[]const u8 = null,
+    /// PH1-M37 wall-time milliseconds from spawn to outcome.
+    diagnostics_elapsed_ms: ?u32 = null,
+    /// PH1-M37 signal number when signaled; null otherwise.
+    diagnostics_signal: ?u32 = null,
 };
 
 pub const err_spawn_failed: []const u8 = "spawn_failed";
@@ -21,6 +27,15 @@ pub const outcome_nonzero_exit: []const u8 = "nonzero_exit";
 pub const outcome_signaled: []const u8 = "signaled";
 pub const outcome_timeout: []const u8 = "timeout";
 pub const outcome_spawn_failed: []const u8 = "spawn_failed";
+
+/// PH1-M37 diagnostics failure reasons (normalized across preflight, spawn, termination).
+pub const diagnostics_ok: []const u8 = "ok";
+pub const diagnostics_missing_executable: []const u8 = "missing_executable";
+pub const diagnostics_not_executable: []const u8 = "not_executable";
+pub const diagnostics_spawn_failed: []const u8 = "spawn_failed";
+pub const diagnostics_timeout: []const u8 = "timeout";
+pub const diagnostics_nonzero_exit: []const u8 = "nonzero_exit";
+pub const diagnostics_signaled: []const u8 = "signaled";
 
 fn clampJsonNs(raw: u64) u64 {
     return @min(raw, @as(u64, @intCast(std.math.maxInt(i64))));

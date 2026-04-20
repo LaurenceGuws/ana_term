@@ -27,6 +27,8 @@ pub const terminal_exec_arg_max: usize = 256;
 pub const terminal_exec_template_id_cap: usize = 64;
 /// PH1-M35: max bytes for `terminal_exec_resolved_path` in artifacts.
 pub const terminal_exec_resolved_path_cap: usize = 512;
+/// PH1-M37: max bytes for `terminal_launch_diagnostics_reason` in artifacts.
+pub const terminal_launch_diagnostics_reason_cap: usize = 32;
 
 pub const RunContext = struct {
     capture_mode: []const u8,
@@ -165,6 +167,13 @@ pub const RunContext = struct {
     /// PH1-M35: resolved path buffer for `argv[0]` probe.
     terminal_exec_resolved_path_buf: [terminal_exec_resolved_path_cap]u8,
     terminal_exec_resolved_path_len: u16,
+    /// PH1-M37: normalized failure reason (ok, missing_executable, not_executable, spawn_failed, timeout, nonzero_exit, signaled).
+    terminal_launch_diagnostics_reason_buf: [terminal_launch_diagnostics_reason_cap]u8,
+    terminal_launch_diagnostics_reason_len: u8,
+    /// PH1-M37: wall-time milliseconds from launch start to outcome; `null` when not applicable.
+    terminal_launch_diagnostics_elapsed_ms: ?u32,
+    /// PH1-M37: signal number when signaled (e.g. 9 for SIGKILL); `null` otherwise.
+    terminal_launch_diagnostics_signal: ?u32,
 
     pub fn initDefault() RunContext {
         return .{
@@ -260,6 +269,10 @@ pub const RunContext = struct {
             .terminal_exec_resolved_path_normalization = null,
             .terminal_exec_resolved_path_buf = std.mem.zeroes([terminal_exec_resolved_path_cap]u8),
             .terminal_exec_resolved_path_len = 0,
+            .terminal_launch_diagnostics_reason_buf = std.mem.zeroes([terminal_launch_diagnostics_reason_cap]u8),
+            .terminal_launch_diagnostics_reason_len = 0,
+            .terminal_launch_diagnostics_elapsed_ms = null,
+            .terminal_launch_diagnostics_signal = null,
         };
     }
 
