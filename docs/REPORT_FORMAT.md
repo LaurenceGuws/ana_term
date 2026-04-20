@@ -69,7 +69,17 @@ Top-level JSON object with at least:
 |-------|------|-------------|
 | `terminal_exec_resolved_path_normalization` | string or `null` | **`canonical`** (**`realpath`** succeeded), **`literal`** (probe path retained), or **`null`** when **`terminal_exec_resolved_path`** is **`null`**. See **`docs/LAUNCH_PREFLIGHT_STRICTNESS_PLAN.md`**. |
 
-**Serialization order**: after `execution_mode`, before `host_identity_machine`: `terminal_profile_id`, `terminal_cmd_source`, `resolved_terminal_cmd`, **`resolved_terminal_argv`**, **`terminal_exec_template_id`**, **`terminal_exec_template_version`**, **`terminal_exec_resolved_path`**, **`terminal_exec_resolved_path_normalization`**, **`terminal_launch_preflight_ok`**, **`terminal_launch_preflight_reason`**, then `host_identity_machine`, `host_identity_release`, `host_identity_sysname` (lexicographic among the host triple). See **`docs/HOST_IDENTITY_PLAN.md`**, **`docs/TERMINAL_PROFILE_ADAPTER_PLAN.md`**, **`docs/TERMINAL_PROFILE_EXEC_TEMPLATE_PLAN.md`**, **`docs/LAUNCH_PREFLIGHT_PLAN.md`**, and **`docs/LAUNCH_PREFLIGHT_STRICTNESS_PLAN.md`**.
+**Serialization order**: after `execution_mode`, before `host_identity_machine`: `terminal_profile_id`, `terminal_cmd_source`, `resolved_terminal_cmd`, **`resolved_terminal_argv`**, **`terminal_exec_template_id`**, **`terminal_exec_template_version`**, **`terminal_exec_resolved_path`**, **`terminal_exec_resolved_path_normalization`**, **`terminal_launch_preflight_ok`**, **`terminal_launch_preflight_reason`**, then **`terminal_launch_diagnostics_*`** (PH1-M37), then `host_identity_machine`, `host_identity_release`, `host_identity_sysname` (lexicographic among the host triple). See **`docs/HOST_IDENTITY_PLAN.md`**, **`docs/TERMINAL_PROFILE_ADAPTER_PLAN.md`**, **`docs/TERMINAL_PROFILE_EXEC_TEMPLATE_PLAN.md`**, **`docs/LAUNCH_PREFLIGHT_PLAN.md`**, **`docs/LAUNCH_PREFLIGHT_STRICTNESS_PLAN.md`**, and **`docs/LAUNCH_FAILURE_ENVELOPE_PLAN.md`**.
+
+**PH1-M37 (launch failure diagnostics envelope)** — present on every harness `run.json` that writes artifacts:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `terminal_launch_diagnostics_reason` | string or `null` | Normalized failure reason: **`ok`**, **`missing_executable`**, **`not_executable`**, **`spawn_failed`**, **`timeout`**, **`nonzero_exit`**, **`signaled`**, or **`null`** when not applicable (non-Linux, non-`pty_guarded`, or dry-run). See **`docs/LAUNCH_FAILURE_ENVELOPE_PLAN.md`**. |
+| `terminal_launch_diagnostics_elapsed_ms` | number or `null` | Wall-time milliseconds from launch attempt start to final outcome (success or termination); clamped to **`maxInt(i64)`** for JSON. **`null`** when not applicable. |
+| `terminal_launch_diagnostics_signal` | number or `null` | Signal number when outcome is **`signaled`** (e.g. **`9`** for SIGKILL); **`null`** otherwise. |
+
+**Serialization order**: after `terminal_launch_preflight_reason`, before `host_identity_machine`: **`terminal_launch_diagnostics_reason`**, **`terminal_launch_diagnostics_elapsed_ms`**, **`terminal_launch_diagnostics_signal`** (lexicographic within terminal launch keys).
 
 **PH1-M11+ (run fingerprint)** — present on every harness `run.json` that writes artifacts:
 
