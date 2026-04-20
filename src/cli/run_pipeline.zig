@@ -116,6 +116,14 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
             const block_launch = !probe.ok;
             if (block_launch) {
                 launch_preflight_failed = true;
+                // PH1-M37: populate diagnostics envelope for preflight failure.
+                if (probe.reason.len > 0) {
+                    const n = @min(probe.reason.len, run_context_mod.terminal_launch_diagnostics_reason_cap);
+                    @memcpy(ctx.terminal_launch_diagnostics_reason_buf[0..n], probe.reason[0..n]);
+                    ctx.terminal_launch_diagnostics_reason_len = @intCast(n);
+                }
+                ctx.terminal_launch_diagnostics_elapsed_ms = 0;
+                ctx.terminal_launch_diagnostics_signal = null;
             } else if (probe.ok) {
                 const telem = real_terminal_launch.runBoundedArgvCommand(allocator, launch_argv[0..na], ctx.timeout_ms);
                 ctx.terminal_launch_attempt = telem.attempt;
@@ -124,6 +132,14 @@ pub fn executeSpecPaths(allocator: std.mem.Allocator, spec_paths: []const []cons
                 ctx.terminal_launch_ok = telem.ok;
                 ctx.terminal_launch_error = telem.err;
                 ctx.terminal_launch_outcome = telem.outcome;
+                // PH1-M37: copy diagnostics envelope from telemetry.
+                if (telem.diagnostics_reason) |dr| {
+                    const n = @min(dr.len, run_context_mod.terminal_launch_diagnostics_reason_cap);
+                    @memcpy(ctx.terminal_launch_diagnostics_reason_buf[0..n], dr[0..n]);
+                    ctx.terminal_launch_diagnostics_reason_len = @intCast(n);
+                }
+                ctx.terminal_launch_diagnostics_elapsed_ms = telem.diagnostics_elapsed_ms;
+                ctx.terminal_launch_diagnostics_signal = telem.diagnostics_signal;
             }
         }
     }
