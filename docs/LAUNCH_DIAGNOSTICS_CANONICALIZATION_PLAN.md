@@ -134,3 +134,17 @@ Verify fields are output as-is (no normalization needed post-validation).
 - Same logical diagnostics → identical fingerprints
 - Different diagnostics → different fingerprints
 - Edge cases (zero elapsed, high signal numbers) handled consistently
+
+## Implementation Status (PH1-M39 Execution)
+
+### ANA-3905: Pipeline Threading
+- Status: ✓ Implemented in ANA-3904 validation
+- Canonicalized inputs flow through fingerprint population unchanged
+- Fingerprint logic assumes pre-validated canonical form
+
+### ANA-3906: Schema Validation Enforcement  
+- Status: ✓ Implemented in ANA-3904
+- Schema validation enforces all canonicalization invariants
+- Reason must match exact tags (case-sensitive lowercase)
+- Elapsed must be non-negative integer ≤ maxInt(u32)
+- Signal must be integer in range [1, 128]
