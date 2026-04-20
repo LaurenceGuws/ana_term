@@ -1516,7 +1516,7 @@ Queue lines (exact):
 - [x] Stop only at `ANA-GATE-400` (post `ANA-3810`) unless truly blocked.
 - [x] Submit checkpoint packet in `docs/todo/PH1_M38_CHECKPOINT.md`.
 
-### `PH1-M39` (`accepted`)
+### `PH1-M39` (`completed`)
 
 Purpose:
 
@@ -1561,3 +1561,49 @@ Queue lines (exact):
 - [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
 - [x] Reached `ANA-GATE-410` (post `ANA-3914`) with all tickets in review_gate.
 - [x] Submit checkpoint packet in `docs/todo/PH1_M39_CHECKPOINT.md` with corrective evidence.
+
+Outcome:
+
+- Accepted at `ANA-GATE-410` after corrective scope recovery (`ANA-3911`..`ANA-3914`) and compiler fixes.
+
+### `PH1-M40` (`in_progress`)
+
+Purpose:
+
+- Establish a launch diagnostics compatibility envelope that tracks canonicalization compatibility status across report validation, fingerprinting, and compare output.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M40_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- define PH1-M40 compatibility-envelope plan and boundaries
+- add compatibility envelope fields and populate seam for launch diagnostics metadata
+- emit compatibility envelope fields in `run.json` root metadata
+- enforce compatibility envelope invariants in report schema validation
+- extend compare metadata rows for compatibility envelope deltas
+- add tests and smoke updates for compatibility-envelope edge cases
+- PH1-M40 checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-4001` through `ANA-4010` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-420` reached and reported.
+
+Non-goals:
+
+- full VT stream replay and assertion engine
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [ ] Execute `ANA-4001` through `ANA-4010` in order from `docs/todo/PH1_M40_TICKETS.md`.
+- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [ ] Stop only at `ANA-GATE-420` (post `ANA-4010`) unless truly blocked.
+- [ ] Submit checkpoint packet in `docs/todo/PH1_M40_CHECKPOINT.md`.

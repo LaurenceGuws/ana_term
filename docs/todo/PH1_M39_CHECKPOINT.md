@@ -1,6 +1,6 @@
 # PH1-M39 Checkpoint (ANA-3901..ANA-3914 including correctives ANA-3911..ANA-3913)
 
-Status: **Complete and ready for Architect review** at `ANA-GATE-410`.
+Status: **Accepted by Architect** at `ANA-GATE-410` (with corrective closeout `ANA-3911`..`ANA-3914` and compiler fixes).
 
 ## Objective ✓
 
