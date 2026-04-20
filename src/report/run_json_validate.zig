@@ -2,6 +2,7 @@ const std = @import("std");
 const terminal_profile = @import("../runner/terminal_profile.zig");
 const launch_preflight = @import("../runner/launch_preflight.zig");
 const real_terminal_launch = @import("../runner/real_terminal_launch.zig");
+const launch_diagnostics_canonical = @import("../runner/launch_diagnostics_canonical.zig");
 
 /// Returns `null` if `root` satisfies the phase-1 `run.json` contract (`docs/REPORT_FORMAT.md` + harness output); otherwise a static error description.
 pub fn validateRunReport(root: std.json.Value) ?[]const u8 {
@@ -142,29 +143,36 @@ pub fn validateRunReport(root: std.json.Value) ?[]const u8 {
     }
 
     // PH1-M37: validate diagnostics envelope fields (optional for backward compatibility).
+    // PH1-M39: enforce canonical forms for reason, elapsed, signal.
     const tld_reason_o = obj.get("terminal_launch_diagnostics_reason") orelse .null;
     switch (tld_reason_o) {
         .string => |s| {
-            const reason_ok = std.mem.eql(u8, s, real_terminal_launch.diagnostics_ok) or
-                std.mem.eql(u8, s, real_terminal_launch.diagnostics_missing_executable) or
-                std.mem.eql(u8, s, real_terminal_launch.diagnostics_not_executable) or
-                std.mem.eql(u8, s, real_terminal_launch.diagnostics_spawn_failed) or
-                std.mem.eql(u8, s, real_terminal_launch.diagnostics_timeout) or
-                std.mem.eql(u8, s, real_terminal_launch.diagnostics_nonzero_exit) or
-                std.mem.eql(u8, s, real_terminal_launch.diagnostics_signaled);
-            if (!reason_ok) return "terminal_launch_diagnostics_reason must be a valid reason tag";
+            // PH1-M39: use canonicalization helper to validate reason.
+            if (!launch_diagnostics_canonical.isValidCanonicalReason(s)) {
+                return "terminal_launch_diagnostics_reason must be one of: ok, missing_executable, not_executable, spawn_failed, timeout, nonzero_exit, signaled";
+            }
         },
         .null => {},
         else => return "terminal_launch_diagnostics_reason must be a string or null",
     }
     const tld_elapsed_o = obj.get("terminal_launch_diagnostics_elapsed_ms") orelse .null;
     switch (tld_elapsed_o) {
-        .integer, .float, .null => {},
+        .integer => |i| {
+            // PH1-M39: enforce non-negative, within u32 range.
+            if (i < 0) return "terminal_launch_diagnostics_elapsed_ms must be non-negative";
+            if (i > @as(i64, @intCast(std.math.maxInt(u32)))) return "terminal_launch_diagnostics_elapsed_ms exceeds maximum";
+        },
+        .float => return "terminal_launch_diagnostics_elapsed_ms must be integer, not float",
+        .null => {},
         else => return "terminal_launch_diagnostics_elapsed_ms must be a number or null",
     }
     const tld_signal_o = obj.get("terminal_launch_diagnostics_signal") orelse .null;
     switch (tld_signal_o) {
-        .integer, .null => {},
+        .integer => |i| {
+            // PH1-M39: enforce canonical signal range [1, 128].
+            if (i < 1 or i > 128) return "terminal_launch_diagnostics_signal must be in range [1, 128]";
+        },
+        .null => {},
         else => return "terminal_launch_diagnostics_signal must be an integer or null",
     }
 
