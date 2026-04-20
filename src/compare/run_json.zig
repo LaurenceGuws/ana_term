@@ -319,7 +319,6 @@ fn canonicalization_elapsed_status(elapsed: ?[]const u8) ?[]const u8 {
 
 fn canonicalization_signal_status(signal: ?[]const u8) ?[]const u8 {
     if (signal == null) return "canonical_null";
-    const s = signal.?;
     // In metadata, signal values are stored as strings
     // Canonical range is [1, 128], but stored as decimal strings
     // For edge case detection, non-null means it was parsed (canonical) or it's invalid
