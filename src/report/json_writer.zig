@@ -183,6 +183,19 @@ pub fn writeRun(
         try buf.appendSlice(allocator, "null");
     }
 
+    try buf.appendSlice(allocator, ",\n  \"terminal_launch_diagnostics_fingerprint_digest\": ");
+    if (ctx.launch_diagnostics_fingerprint_digest_len > 0) {
+        try appendJsonEncodedString(allocator, &buf, ctx.launch_diagnostics_fingerprint_digest_hex[0..ctx.launch_diagnostics_fingerprint_digest_len]);
+    } else {
+        try buf.appendSlice(allocator, "null");
+    }
+    try buf.appendSlice(allocator, ",\n  \"terminal_launch_diagnostics_fingerprint_version\": ");
+    if (ctx.launch_diagnostics_fingerprint_digest_len > 0) {
+        try buf.appendSlice(allocator, "\"1\"");
+    } else {
+        try buf.appendSlice(allocator, "null");
+    }
+
     try buf.appendSlice(allocator, ",\n  \"host_identity_machine\": ");
     try appendJsonEncodedString(allocator, &buf, ctx.host_identity_machine[0..ctx.host_identity_machine_len]);
     try buf.appendSlice(allocator, ",\n  \"host_identity_release\": ");
