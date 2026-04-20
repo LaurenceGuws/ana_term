@@ -20,13 +20,14 @@ This file is the canonical ticket board for active execution.
 
 ## Current Sprint
 
-- Sprint ID: `PH1-M37-S1`
+- Sprint ID: `PH1-M37-S1` (completed), corrective batch: `ANA-3911`..`ANA-3915`
 - Objective: launch failure diagnostics envelope (`ANA-3701`..`ANA-3710`)
-- Commit budget before checkpoint: `10`
-- Super-gate: `ANA-GATE-390`
+- Commit budget before checkpoint: `10` (completed) + `2` (corrective)
+- Super-gate: `ANA-GATE-390` (architectural review, regressions identified and fixed)
 
-## Ticket Order (`PH1-M37-S1`)
+## Ticket Order (`PH1-M37-S1` and Corrective Batch)
 
+### Sprint Tickets (completed)
 1. `ANA-3701`
 2. `ANA-3702`
 3. `ANA-3703`
@@ -38,10 +39,17 @@ This file is the canonical ticket board for active execution.
 9. `ANA-3709`
 10. `ANA-3710`
 
+### Corrective Batch (regressions from gate review)
+11. `ANA-3911` (test suite restoration)
+12. `ANA-3912` (report schema compatibility - FIXED)
+13. `ANA-3913` (compare metadata ordering - FIXED)
+14. `ANA-3914` (launch_preflight behavior)
+15. `ANA-3915` (working tree cleanup)
+
 ## Current State
 
 - `in_progress`: none
-- `todo`: none
+- `todo`: `ANA-3911`, `ANA-3914`, `ANA-3915` (remaining corrective tickets)
 - `blocked`: none
 - `review_gate`: `ANA-3701`..`ANA-3710` (awaiting Architect review)
-- `done`: `ANA-101`..`ANA-123`, `ANA-201`..`ANA-223`, `ANA-301`..`ANA-310`, `ANA-401`..`ANA-410`, `ANA-501`..`ANA-510`, `ANA-601`..`ANA-610`, `ANA-701`..`ANA-710`, `ANA-801`..`ANA-810`, `ANA-901`..`ANA-913`, `ANA-1001`..`ANA-1010`, `ANA-1101`..`ANA-1110`, `ANA-1201`..`ANA-1210`, `ANA-1301`..`ANA-1310`, `ANA-1401`..`ANA-1410`, `ANA-1501`..`ANA-1510`, `ANA-1601`..`ANA-1610`, `ANA-1701`..`ANA-1710`, `ANA-1801`..`ANA-1810`, `ANA-1901`..`ANA-1910`, `ANA-2001`..`ANA-2010`, `ANA-2101`..`ANA-2110`, `ANA-2201`..`ANA-2210`, `ANA-2301`..`ANA-2310`, `ANA-2401`..`ANA-2410`, `ANA-2501`..`ANA-2510`, `ANA-2601`..`ANA-2610`, `ANA-2701`..`ANA-2710`, `ANA-2801`..`ANA-2810`, `ANA-2901`..`ANA-2910`, `ANA-3001`..`ANA-3010`, `ANA-3101`..`ANA-3110`, `ANA-3201`..`ANA-3210`, `ANA-3301`..`ANA-3310`, `ANA-3401`..`ANA-3410` (accepted), `ANA-3501`..`ANA-3510`, `ANA-3601`..`ANA-3610`
+- `done`: `ANA-101`..`ANA-123`, `ANA-201`..`ANA-223`, `ANA-301`..`ANA-310`, `ANA-401`..`ANA-410`, `ANA-501`..`ANA-510`, `ANA-601`..`ANA-610`, `ANA-701`..`ANA-710`, `ANA-801`..`ANA-810`, `ANA-901`..`ANA-913`, `ANA-1001`..`ANA-1010`, `ANA-1101`..`ANA-1110`, `ANA-1201`..`ANA-1210`, `ANA-1301`..`ANA-1310`, `ANA-1401`..`ANA-1410`, `ANA-1501`..`ANA-1510`, `ANA-1601`..`ANA-1610`, `ANA-1701`..`ANA-1710`, `ANA-1801`..`ANA-1810`, `ANA-1901`..`ANA-1910`, `ANA-2001`..`ANA-2010`, `ANA-2101`..`ANA-2110`, `ANA-2201`..`ANA-2210`, `ANA-2301`..`ANA-2310`, `ANA-2401`..`ANA-2410`, `ANA-2501`..`ANA-2510`, `ANA-2601`..`ANA-2610`, `ANA-2701`..`ANA-2710`, `ANA-2801`..`ANA-2810`, `ANA-2901`..`ANA-2910`, `ANA-3001`..`ANA-3010`, `ANA-3101`..`ANA-3110`, `ANA-3201`..`ANA-3210`, `ANA-3301`..`ANA-3310`, `ANA-3401`..`ANA-3410` (accepted), `ANA-3501`..`ANA-3510`, `ANA-3601`..`ANA-3610`, `ANA-3912`, `ANA-3913` (corrective batch, regressions fixed)
