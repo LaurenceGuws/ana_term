@@ -1,6 +1,7 @@
 const std = @import("std");
 const terminal_profile = @import("../runner/terminal_profile.zig");
 const launch_preflight = @import("../runner/launch_preflight.zig");
+const real_terminal_launch = @import("../runner/real_terminal_launch.zig");
 
 /// Returns `null` if `root` satisfies the phase-1 `run.json` contract (`docs/REPORT_FORMAT.md` + harness output); otherwise a static error description.
 pub fn validateRunReport(root: std.json.Value) ?[]const u8 {
@@ -138,6 +139,33 @@ pub fn validateRunReport(root: std.json.Value) ?[]const u8 {
             if (ternorm_o == .null) return "terminal_exec_resolved_path_normalization must be set when terminal_exec_resolved_path is set";
         },
         else => unreachable,
+    }
+
+    // PH1-M37: validate diagnostics envelope fields.
+    const tld_reason_o = obj.get("terminal_launch_diagnostics_reason") orelse return "missing terminal_launch_diagnostics_reason";
+    switch (tld_reason_o) {
+        .string => |s| {
+            const reason_ok = std.mem.eql(u8, s, real_terminal_launch.diagnostics_ok) or
+                std.mem.eql(u8, s, real_terminal_launch.diagnostics_missing_executable) or
+                std.mem.eql(u8, s, real_terminal_launch.diagnostics_not_executable) or
+                std.mem.eql(u8, s, real_terminal_launch.diagnostics_spawn_failed) or
+                std.mem.eql(u8, s, real_terminal_launch.diagnostics_timeout) or
+                std.mem.eql(u8, s, real_terminal_launch.diagnostics_nonzero_exit) or
+                std.mem.eql(u8, s, real_terminal_launch.diagnostics_signaled);
+            if (!reason_ok) return "terminal_launch_diagnostics_reason must be a valid reason tag";
+        },
+        .null => {},
+        else => return "terminal_launch_diagnostics_reason must be a string or null",
+    }
+    const tld_elapsed_o = obj.get("terminal_launch_diagnostics_elapsed_ms") orelse return "missing terminal_launch_diagnostics_elapsed_ms";
+    switch (tld_elapsed_o) {
+        .integer, .float, .null => {},
+        else => return "terminal_launch_diagnostics_elapsed_ms must be a number or null",
+    }
+    const tld_signal_o = obj.get("terminal_launch_diagnostics_signal") orelse return "missing terminal_launch_diagnostics_signal";
+    switch (tld_signal_o) {
+        .integer, .null => {},
+        else => return "terminal_launch_diagnostics_signal must be an integer or null",
     }
 
     const term_o = obj.get("terminal") orelse return "missing terminal object";
