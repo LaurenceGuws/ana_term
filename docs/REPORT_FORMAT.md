@@ -90,6 +90,12 @@ Top-level JSON object with at least:
 
 **Serialization order**: after `terminal_launch_diagnostics_signal`, before `run_fingerprint_digest`: **`terminal_launch_diagnostics_fingerprint_digest`**, **`terminal_launch_diagnostics_fingerprint_version`** (lexicographic).
 
+**PH1-M39 (launch diagnostics canonicalization)** — hardening milestone that enforces canonical normalization for diagnostics fingerprint inputs:
+- **`terminal_launch_diagnostics_reason`**: must be one of **`ok`**, **`missing_executable`**, **`not_executable`**, **`spawn_failed`**, **`timeout`**, **`nonzero_exit`**, **`signaled`** (lowercase, exact match) or **`null`**. Empty strings and misspelled tags are rejected by schema validation.
+- **`terminal_launch_diagnostics_elapsed_ms`**: must be non-negative integer in range **`[0, maxInt(u32)]`** or **`null`**. Negative numbers and floating-point values are rejected by validation.
+- **`terminal_launch_diagnostics_signal`**: must be integer in range **`[1, 128]`** (POSIX signal numbers) or **`null`**. Zero, negative numbers, and out-of-range values are rejected by validation.
+- Fingerprint digest stability guarantee: identical diagnostics values (after validation) always produce identical fingerprints; different validated values always produce different fingerprints (see **`docs/LAUNCH_DIAGNOSTICS_CANONICALIZATION_PLAN.md`**).
+
 **PH1-M11+ (run fingerprint)** — present on every harness `run.json` that writes artifacts:
 
 | Field | Type | Description |
