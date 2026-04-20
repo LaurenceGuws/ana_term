@@ -77,6 +77,10 @@ pub const RunMeta = struct {
     terminal_launch_exit_code: ?[]const u8 = null,
     terminal_launch_ok: ?[]const u8 = null,
     terminal_launch_outcome: ?[]const u8 = null,
+    /// PH1-M37: normalized failure reason from diagnostics envelope.
+    terminal_launch_diagnostics_reason: ?[]const u8 = null,
+    terminal_launch_diagnostics_elapsed_ms: ?[]const u8 = null,
+    terminal_launch_diagnostics_signal: ?[]const u8 = null,
     transport_handshake: ?[]const u8 = null,
     transport_handshake_latency_ns: ?[]const u8 = null,
     transport_mode: ?[]const u8 = null,
@@ -118,6 +122,10 @@ pub fn parseRunMeta(allocator: std.mem.Allocator, root: std.json.Value) !RunMeta
     m.terminal_exec_resolved_path_normalization = readOptStringOrNull(obj, "terminal_exec_resolved_path_normalization");
     m.terminal_launch_preflight_ok = try readOptBoolString(allocator, obj, "terminal_launch_preflight_ok");
     m.terminal_launch_preflight_reason = readOptStringOrNull(obj, "terminal_launch_preflight_reason");
+    // PH1-M37: populate diagnostics envelope metadata.
+    m.terminal_launch_diagnostics_reason = readOptStringOrNull(obj, "terminal_launch_diagnostics_reason");
+    m.terminal_launch_diagnostics_elapsed_ms = try readOptNumberStringOrNull(allocator, obj, "terminal_launch_diagnostics_elapsed_ms");
+    m.terminal_launch_diagnostics_signal = try readOptNumberStringOrNull(allocator, obj, "terminal_launch_diagnostics_signal");
     m.host_identity_machine = readOptString(obj, "host_identity_machine");
     m.host_identity_release = readOptString(obj, "host_identity_release");
     m.host_identity_sysname = readOptString(obj, "host_identity_sysname");
@@ -283,7 +291,7 @@ fn metaDelta(l: ?[]const u8, r: ?[]const u8) []const u8 {
 }
 
 /// Fixed field order for deterministic compare output.
-pub fn diffRunMeta(left: RunMeta, right: RunMeta) [79]MetaDiffRow {
+pub fn diffRunMeta(left: RunMeta, right: RunMeta) [82]MetaDiffRow {
     return .{
         .{ .field = "comparison_id", .left = left.comparison_id, .right = right.comparison_id, .delta = metaDelta(left.comparison_id, right.comparison_id) },
         .{ .field = "execution_mode", .left = left.execution_mode, .right = right.execution_mode, .delta = metaDelta(left.execution_mode, right.execution_mode) },
@@ -316,6 +324,10 @@ pub fn diffRunMeta(left: RunMeta, right: RunMeta) [79]MetaDiffRow {
         .{ .field = "terminal_launch_exit_code", .left = left.terminal_launch_exit_code, .right = right.terminal_launch_exit_code, .delta = metaDelta(left.terminal_launch_exit_code, right.terminal_launch_exit_code) },
         .{ .field = "terminal_launch_ok", .left = left.terminal_launch_ok, .right = right.terminal_launch_ok, .delta = metaDelta(left.terminal_launch_ok, right.terminal_launch_ok) },
         .{ .field = "terminal_launch_outcome", .left = left.terminal_launch_outcome, .right = right.terminal_launch_outcome, .delta = metaDelta(left.terminal_launch_outcome, right.terminal_launch_outcome) },
+        // PH1-M37: include diagnostics envelope in metadata rows.
+        .{ .field = "terminal_launch_diagnostics_reason", .left = left.terminal_launch_diagnostics_reason, .right = right.terminal_launch_diagnostics_reason, .delta = metaDelta(left.terminal_launch_diagnostics_reason, right.terminal_launch_diagnostics_reason) },
+        .{ .field = "terminal_launch_diagnostics_elapsed_ms", .left = left.terminal_launch_diagnostics_elapsed_ms, .right = right.terminal_launch_diagnostics_elapsed_ms, .delta = metaDelta(left.terminal_launch_diagnostics_elapsed_ms, right.terminal_launch_diagnostics_elapsed_ms) },
+        .{ .field = "terminal_launch_diagnostics_signal", .left = left.terminal_launch_diagnostics_signal, .right = right.terminal_launch_diagnostics_signal, .delta = metaDelta(left.terminal_launch_diagnostics_signal, right.terminal_launch_diagnostics_signal) },
         .{ .field = "run_fingerprint_digest", .left = left.run_fingerprint_digest, .right = right.run_fingerprint_digest, .delta = metaDelta(left.run_fingerprint_digest, right.run_fingerprint_digest) },
         .{ .field = "run_fingerprint_version", .left = left.run_fingerprint_version, .right = right.run_fingerprint_version, .delta = metaDelta(left.run_fingerprint_version, right.run_fingerprint_version) },
         .{ .field = "specset_fingerprint_digest", .left = left.specset_fingerprint_digest, .right = right.specset_fingerprint_digest, .delta = metaDelta(left.specset_fingerprint_digest, right.specset_fingerprint_digest) },
