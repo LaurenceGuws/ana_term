@@ -1,5 +1,7 @@
 # PH1-M37 Checkpoint (ANA-3701..ANA-3710)
 
+Status: **Accepted by Architect** at `ANA-GATE-390` after corrective fixes (`ANA-3912`, `ANA-3913`).
+
 ## Objective ✓
 
 Add deterministic launch failure diagnostics envelope data so guarded runs provide actionable, comparable failure evidence across artifacts, report validation, and compare outputs.

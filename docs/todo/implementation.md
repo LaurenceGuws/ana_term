@@ -1426,7 +1426,7 @@ Queue lines (exact):
 - [x] Stop only at `ANA-GATE-380` (post `ANA-3610`) unless truly blocked.
 - [x] Submit checkpoint packet in `docs/todo/PH1_M36_CHECKPOINT.md`.
 
-### `PH1-M37` (`in_progress`)
+### `PH1-M37` (`completed`)
 
 Purpose:
 
@@ -1460,9 +1460,54 @@ Non-goals:
 - screenshot/OCR systems
 - rich TUI frontend
 
+Outcome:
+
+- Accepted at `ANA-GATE-390` after corrective closeout (`ANA-3912`, `ANA-3913`).
+
 Queue lines (exact):
 
-- [ ] Execute `ANA-3701` through `ANA-3710` in order from `docs/todo/PH1_M37_TICKETS.md`.
+- [x] Execute `ANA-3701` through `ANA-3710` in order from `docs/todo/PH1_M37_TICKETS.md`.
+- [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [x] Stop only at `ANA-GATE-390` (post `ANA-3710`) unless truly blocked.
+- [x] Submit checkpoint packet in `docs/todo/PH1_M37_CHECKPOINT.md`.
+
+### `PH1-M38` (`in_progress`)
+
+Purpose:
+
+- Add a dedicated launch diagnostics fingerprint chain so launch diagnostics envelope changes are detectable and attributable across artifacts and compare output.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M38_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- define PH1-M38 launch diagnostics fingerprint plan and boundaries
+- add launch diagnostics fingerprint fields to `RunContext` and populate seam
+- emit launch diagnostics fingerprint root fields in `run.json`
+- enforce report and compare invariants for launch diagnostics fingerprint fields
+- add regression coverage and smoke steps for diagnostics fingerprint deltas
+- PH1-M38 checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-3801` through `ANA-3810` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-400` reached and reported.
+
+Non-goals:
+
+- full VT stream replay and assertion engine
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [ ] Execute `ANA-3801` through `ANA-3810` in order from `docs/todo/PH1_M38_TICKETS.md`.
 - [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
-- [ ] Stop only at `ANA-GATE-390` (post `ANA-3710`) unless truly blocked.
-- [ ] Submit checkpoint packet in `docs/todo/PH1_M37_CHECKPOINT.md`.
+- [ ] Stop only at `ANA-GATE-400` (post `ANA-3810`) unless truly blocked.
+- [ ] Submit checkpoint packet in `docs/todo/PH1_M38_CHECKPOINT.md`.
