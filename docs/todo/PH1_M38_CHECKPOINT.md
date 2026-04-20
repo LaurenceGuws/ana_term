@@ -1,6 +1,6 @@
 # PH1-M38 Checkpoint (ANA-3801..ANA-3810)
 
-Status: **Ready for Architect review** at `ANA-GATE-400`.
+Status: **Accepted by Architect** at `ANA-GATE-400`.
 
 ## Objective ✓
 

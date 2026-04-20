@@ -1471,7 +1471,7 @@ Queue lines (exact):
 - [x] Stop only at `ANA-GATE-390` (post `ANA-3710`) unless truly blocked.
 - [x] Submit checkpoint packet in `docs/todo/PH1_M37_CHECKPOINT.md`.
 
-### `PH1-M38` (`in_progress`)
+### `PH1-M38` (`completed`)
 
 Purpose:
 
@@ -1505,9 +1505,54 @@ Non-goals:
 - screenshot/OCR systems
 - rich TUI frontend
 
+Outcome:
+
+- Accepted at `ANA-GATE-400`.
+
 Queue lines (exact):
 
-- [ ] Execute `ANA-3801` through `ANA-3810` in order from `docs/todo/PH1_M38_TICKETS.md`.
+- [x] Execute `ANA-3801` through `ANA-3810` in order from `docs/todo/PH1_M38_TICKETS.md`.
+- [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [x] Stop only at `ANA-GATE-400` (post `ANA-3810`) unless truly blocked.
+- [x] Submit checkpoint packet in `docs/todo/PH1_M38_CHECKPOINT.md`.
+
+### `PH1-M39` (`in_progress`)
+
+Purpose:
+
+- Harden launch diagnostics fingerprint stability by canonicalizing normalization rules and adding strict cross-file invariants.
+
+Owner docs:
+
+- `docs/Vision.md`
+- `docs/todo/JIRA_BOARD.md`
+- `docs/todo/PH1_M39_TICKETS.md`
+- `docs/todo/ENGINEER_ENTRYPOINT.md`
+
+Scope:
+
+- define PH1-M39 canonicalization-hardening plan and boundaries
+- enforce canonical null/zero/value handling for diagnostics fingerprint payload inputs
+- align writer/validator/compare behavior for launch diagnostics fingerprint edge cases
+- add regression coverage for normalization drift detection
+- update smoke docs for PH1-M39 validation path
+- PH1-M39 checkpoint evidence
+
+Acceptance criteria:
+
+- tickets `ANA-3901` through `ANA-3910` complete in order.
+- one commit per ticket with `[ANA-###]` subject prefix.
+- `ANA-GATE-410` reached and reported.
+
+Non-goals:
+
+- full VT stream replay and assertion engine
+- screenshot/OCR systems
+- rich TUI frontend
+
+Queue lines (exact):
+
+- [ ] Execute `ANA-3901` through `ANA-3910` in order from `docs/todo/PH1_M39_TICKETS.md`.
 - [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
-- [ ] Stop only at `ANA-GATE-400` (post `ANA-3810`) unless truly blocked.
-- [ ] Submit checkpoint packet in `docs/todo/PH1_M38_CHECKPOINT.md`.
+- [ ] Stop only at `ANA-GATE-410` (post `ANA-3910`) unless truly blocked.
+- [ ] Submit checkpoint packet in `docs/todo/PH1_M39_CHECKPOINT.md`.
