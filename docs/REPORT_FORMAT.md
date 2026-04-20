@@ -96,6 +96,23 @@ Top-level JSON object with at least:
 - **`terminal_launch_diagnostics_signal`**: must be integer in range **`[1, 128]`** (POSIX signal numbers) or **`null`**. Zero, negative numbers, and out-of-range values are rejected by validation.
 - Fingerprint digest stability guarantee: identical diagnostics values (after validation) always produce identical fingerprints; different validated values always produce different fingerprints (see **`docs/LAUNCH_DIAGNOSTICS_CANONICALIZATION_PLAN.md`**).
 
+**PH1-M40 (launch diagnostics compatibility envelope)** — compatibility tracking for diagnostics canonical conformance:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `terminal_launch_diagnostics_compatible` | string | Overall compatibility status: **`compatible`** (all non-null fields are canonical), **`warning`** (at least one field is null/missing), **`incompatible`** (at least one field violates canonical rules). |
+| `terminal_launch_diagnostics_reason_compatible` | boolean | **`true`** if reason is null or canonical tag (one of 7 valid tags); **`false`** if reason is non-canonical (empty string, uppercase, misspelled, etc.). |
+| `terminal_launch_diagnostics_elapsed_compatible` | boolean | **`true`** if elapsed_ms is null or canonical integer **`[0, maxInt(u32)]`**; **`false`** if negative, float, or out-of-range. |
+| `terminal_launch_diagnostics_signal_compatible` | boolean | **`true`** if signal is null or canonical integer **`[1, 128]`**; **`false`** if zero, negative, >128, or float. |
+
+**Serialization order**: after `terminal_launch_diagnostics_fingerprint_version`, before next milestone fields: `terminal_launch_diagnostics_compatible`, then per-field flags (lexicographic).
+
+**Cross-field invariants**:
+- If `compatible="compatible"`, all three per-field flags must be **`true`**.
+- If `compatible="warning"`, at least one field is null (per-field flag may be **`false`** for missing data).
+- If `compatible="incompatible"`, at least one field violates canonical rules (per-field flag is **`false`**).
+- Null fields are always compatible (null reason/elapsed/signal are canonical forms).
+
 **PH1-M11+ (run fingerprint)** — present on every harness `run.json` that writes artifacts:
 
 | Field | Type | Description |
