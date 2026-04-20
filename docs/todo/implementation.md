@@ -1516,7 +1516,7 @@ Queue lines (exact):
 - [x] Stop only at `ANA-GATE-400` (post `ANA-3810`) unless truly blocked.
 - [x] Submit checkpoint packet in `docs/todo/PH1_M38_CHECKPOINT.md`.
 
-### `PH1-M39` (`in_progress`)
+### `PH1-M39` (`accepted`)
 
 Purpose:
 
@@ -1537,12 +1537,16 @@ Scope:
 - add regression coverage for normalization drift detection
 - update smoke docs for PH1-M39 validation path
 - PH1-M39 checkpoint evidence
+- **corrective**: recover missing ANA-3905 (pipeline threading), ANA-3907 (compare metadata), ANA-3908 (determinism tests)
+- **corrective**: normalize governance records for `ANA-GATE-410` review
 
 Acceptance criteria:
 
-- tickets `ANA-3901` through `ANA-3910` complete in order.
+- tickets `ANA-3901` through `ANA-3914` (11 total: 7 primary + 4 correctives) complete in order.
 - one commit per ticket with `[ANA-###]` subject prefix.
 - `ANA-GATE-410` reached and reported.
+- all missing scopes recovered (ANA-3905, ANA-3907, ANA-3908 via ANA-3911, ANA-3912, ANA-3913).
+- governance records normalized (checkpoint, JIRA board, implementation.md).
 
 Non-goals:
 
@@ -1552,7 +1556,8 @@ Non-goals:
 
 Queue lines (exact):
 
-- [ ] Execute `ANA-3901` through `ANA-3910` in order from `docs/todo/PH1_M39_TICKETS.md`.
-- [ ] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
-- [ ] Stop only at `ANA-GATE-410` (post `ANA-3910`) unless truly blocked.
-- [ ] Submit checkpoint packet in `docs/todo/PH1_M39_CHECKPOINT.md`.
+- [x] Execute `ANA-3901` through `ANA-3910` in order from `docs/todo/PH1_M39_TICKETS.md`.
+- [x] Execute correctives `ANA-3911` through `ANA-3914` to recover missing scopes and normalize governance.
+- [x] Keep Jira board status current in `docs/todo/JIRA_BOARD.md`.
+- [x] Reached `ANA-GATE-410` (post `ANA-3914`) with all tickets in review_gate.
+- [x] Submit checkpoint packet in `docs/todo/PH1_M39_CHECKPOINT.md` with corrective evidence.
